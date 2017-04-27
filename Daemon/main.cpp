@@ -41,7 +41,9 @@ int main(int , char **)
     } else if (!pid) {
         umask(0);
         setsid();
-        chdir("/");
+        if(chdir("/") != 0) {
+            cerr << "Error: Can't change directory to / " << strerror(errno) << endl;
+        }
         close(STDIN_FILENO);
         close(STDOUT_FILENO);
         close(STDERR_FILENO);
@@ -197,9 +199,6 @@ void SignalError(int sig, siginfo_t *si, void *ptr)
     }
 
     syslog(LOG_INFO, "[VerAIDaemon] Stopped\n");
-
-    server->Stop();
-    server.release();
 
     exit(NeedToWork);
 }

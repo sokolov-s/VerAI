@@ -13,9 +13,9 @@ ExternalProject_Add(libtorrent
     SOURCE_DIR ${LIBTORRENT_SRC_DIR}
     CONFIGURE_COMMAND cd ${LIBTORRENT_SRC_DIR} &&
         ./autotool.sh &&
-        ./configure --prefix=${LIBTORRENT_BIN_DIR} --enable-python-binding --enable-examples=no --enable-encryption --enable-tests=yes --with-boost-python=mt
+        ./configure --prefix=${LIBTORRENT_BIN_DIR} --enable-logging --enable-debug --enable-dht --enable-python-binding --enable-examples=no --enable-encryption --enable-tests=yes --with-libiconv
 
-    BUILD_COMMAND cd ${LIBTORRENT_SRC_DIR} && make V=1 -j4 dist
+    BUILD_COMMAND cd ${LIBTORRENT_SRC_DIR} && make
     INSTALL_COMMAND  cd ${LIBTORRENT_SRC_DIR} && make install
     )
 
