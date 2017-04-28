@@ -1,23 +1,20 @@
 #ifndef DAEMON_H
 #define DAEMON_H
 
-#include <string>
-#include <unordered_map>
-#include <vector>
-#include <mutex>
-
+#include <memory>
+#include "torrent.h"
 namespace daemonspace {
 
 class Daemon
 {
-    Daemon();
-    Daemon(const Daemon &) = delete;
-    Daemon& operator=(const Daemon &) = delete;
 public:
-    static Daemon &GetInstance();
+    Daemon();
 
+    void Start();
+    void Stop();
 private:
 private:
+    std::unique_ptr<torrent::Torrent> torrent;
 };
 
 } //namespace daemon

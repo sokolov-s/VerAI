@@ -1,5 +1,4 @@
 #include "daemon.h"
-#include <stdexcept>
 
 using namespace daemonspace;
 using namespace std;
@@ -8,8 +7,13 @@ Daemon::Daemon()
 {
 }
 
-Daemon &Daemon::GetInstance()
+void Daemon::Start()
 {
-    static Daemon daemon;
-    return daemon;
+    torrent.reset(new torrent::Torrent());
+    torrent->Start();
+}
+
+void Daemon::Stop()
+{
+    torrent.release();
 }
