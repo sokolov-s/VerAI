@@ -13,10 +13,13 @@ ExternalProject_Add(libtorrent
     SOURCE_DIR ${LIBTORRENT_SRC_DIR}
     CONFIGURE_COMMAND cd ${LIBTORRENT_SRC_DIR} &&
         ./autotool.sh &&
-        ./configure --prefix=${LIBTORRENT_BIN_DIR} --enable-logging --enable-debug --enable-dht --enable-python-binding --enable-examples=no --enable-encryption --enable-tests=yes --with-libiconv
+        ./configure --prefix=${LIBTORRENT_BIN_DIR} --enable-logging --enable-debug --enable-examples=no
+        --enable-encryption --enable-tests=yes --with-libiconv
 
     BUILD_COMMAND cd ${LIBTORRENT_SRC_DIR} && make
     INSTALL_COMMAND  cd ${LIBTORRENT_SRC_DIR} && make install
     )
+
+add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 
 add_subdirectory(Daemon)

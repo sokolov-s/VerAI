@@ -15,6 +15,7 @@ Torrent::Torrent()
 
 void Torrent::Start()
 {
-    lt::settings_pack stp;
-    stp.set_str(lt::settings_pack::listen_interfaces, cfg.GetInterface() + ":" + cfg.GetPort());
+//    lt::settings_pack stp;
+//    stp.set_str(lt::settings_pack::listen_interfaces, cfg.GetInterface() + ":" + cfg.GetPort());
+
 }
