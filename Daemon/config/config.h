@@ -11,15 +11,22 @@ namespace config {
 
 namespace additions {
 
+void CreateFolder(const std::string &dir);
+
 template<typename T>
-struct Key {
-    std::map<T, std::string> keys;
-    Key(const std::map<T, std::string> && initKeys) noexcept
+class Key {
+public:
+    Key(const std::map<T, std::string> & initKeys) noexcept
+        : keys(initKeys)
+    {
+    }
+
+    Key(std::map<T, std::string> && initKeys) noexcept
         : keys(std::move(initKeys))
     {
     }
 
-    std::string operator()(const T key) const
+    std::string operator()(const T & key) const
     {
         auto resKey = keys.find(key);
         if(keys.end() == resKey) {
@@ -29,8 +36,18 @@ struct Key {
         }
         return resKey->second;
     }
+private:
+    std::map<T, std::string> keys;
 };
 
+class Section {
+public:
+    Section(const std::string & sectionName) noexcept : name(sectionName){}
+    Section(std::string && sectionName) noexcept : name(std::move(sectionName)){}
+    std::string operator()(const std::string & key) const noexcept {return name + "." + key;}
+private:
+    std::string name;
+};
 } //namespace additions
 
 class Config : private noncopyable::NonCopyable
@@ -53,7 +70,6 @@ private:
     const std::string defFolder = "/opt/VerAI";
     const std::string defConfigPath = defFolder + "/daemon.cfg";
     boost::property_tree::ptree root;
-    bool isInit = false;
     std::mutex mtx;
 };
 

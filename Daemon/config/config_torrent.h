@@ -26,15 +26,17 @@ public:
 
     std::string GetDownloadDirectory() const;
     void SetDownloadDirectory(const std::string &dir);
-private:
 
 private:
-    const std::string sectionName = "torrent";
+    void Init();
+
+private:
+    Config &cnfg;
+    const additions::Section section;
+    additions::Key<eKeys> keys;
     const std::string defPort = "6881";
     const std::string defInterface = "0.0.0.0";
-    const std::string defDownloadDir = "./";
-    Config &cnfg;
-    additions::Key<eKeys> keys;
+    const std::string defDownloadDir = "downloads";
 };
 
 } //namespace config

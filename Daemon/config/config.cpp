@@ -7,7 +7,7 @@
 using namespace config;
 namespace pt = boost::property_tree;
 
-void CreateFolder(const std::string &dir)
+void additions::CreateFolder(const std::string &dir)
 {
     std::string next_part(dir);
     std::string created_dir;
@@ -40,12 +40,12 @@ void CreateFolder(const std::string &dir)
 
 Config::Config()
 {
+    Init();
 }
 
 Config &Config::GetInstance()
 {
     static Config cfg;
-    cfg.Init();
     return cfg;
 }
 
@@ -86,9 +86,6 @@ std::string Config::GetFolder() const
 
 void Config::Init()
 {
-    std::lock_guard<std::mutex> locker(mtx);
-    if(isInit)
-        return;
     struct stat buffer;
     if(stat(GetConfigPath().c_str(), &buffer) == 0) {
         try {
@@ -97,9 +94,8 @@ void Config::Init()
             throw std::runtime_error("Can't parse config file : " + GetConfigPath());
         }
     } else {
-        CreateFolder(GetFolder());
+        additions::CreateFolder(GetFolder());
     }
-    isInit = true;
 }
 
 std::string Config::GetConfigPath() const

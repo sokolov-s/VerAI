@@ -4,12 +4,14 @@ using namespace config;
 
 ConfigTorrent::ConfigTorrent()
     : cnfg(Config::GetInstance())
+    , section("torrent")
     , keys({
-               {eKeys::kPort, sectionName + ".port"},
-               {eKeys::kInterface, sectionName + ".interface"},
-               {eKeys::kDownloadFolder, sectionName + ".downloadFolder"},
+               {eKeys::kPort, section("port")},
+               {eKeys::kInterface, section("interface")},
+               {eKeys::kDownloadFolder, section("downloadFolder")},
            })
 {
+    Init();
 }
 
 ConfigTorrent &ConfigTorrent::GetInstance()
@@ -40,10 +42,15 @@ void ConfigTorrent::SetInterface(const std::string &interface)
 
 std::string ConfigTorrent::GetDownloadDirectory() const
 {
-    return cnfg.GetString(keys(eKeys::kDownloadFolder), defDownloadDir);
+    return cnfg.GetString(keys(eKeys::kDownloadFolder), cnfg.GetFolder() + "/" + defDownloadDir);
 }
 
 void ConfigTorrent::SetDownloadDirectory(const std::string &dir)
 {
     cnfg.WriteString(keys(eKeys::kDownloadFolder), dir);
+}
+
+void ConfigTorrent::Init()
+{
+    additions::CreateFolder(GetDownloadDirectory());
 }

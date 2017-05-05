@@ -3,7 +3,6 @@
 
 #include <Daemon/noncopyable.h>
 #include "config.h"
-#include <mutex>
 
 namespace config {
 
@@ -26,11 +25,9 @@ private:
     void Init();
     void GenerateUUID();
 private:
-    const std::string sectionName = "daemon";
     Config &cnfg;
+    const additions::Section section;
     additions::Key <eKeys> keys;
-    bool isInit = false;
-    std::recursive_mutex mtx;
 };
 
 } //namespace config
