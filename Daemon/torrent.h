@@ -1,7 +1,7 @@
 #ifndef TORRENT_H
 #define TORRENT_H
 
-#include "config.h"
+#include "config/config_torrent.h"
 
 namespace torrent {
 
@@ -11,7 +11,7 @@ public:
     Torrent();
     void Start();
 private:
-    const config::Torrent &cfg;
+    const config::ConfigTorrent &cfg;
 };
 
 } //namespace torrent

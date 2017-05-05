@@ -39,12 +39,7 @@ void CreateFolder(const std::string &dir)
 }
 
 Config::Config()
-    : isInit(false)
-    , keys({
-    {eKeys::kVersion, "version"},
-           })
 {
-    CreateFolder(GetFolder());
 }
 
 Config &Config::GetInstance()
@@ -52,11 +47,6 @@ Config &Config::GetInstance()
     static Config cfg;
     cfg.Init();
     return cfg;
-}
-
-std::string Config::GetVersion() const
-{
-    return compileVersion;
 }
 
 int Config::GetInt(const std::string &key, const int &defValue)
@@ -100,74 +90,19 @@ void Config::Init()
     if(isInit)
         return;
     struct stat buffer;
-    if(stat(GetConfigPath().c_str(), &buffer) != 0) {
-        try {
-            root.put("Version", GetVersion());
-            pt::write_json(GetConfigPath(), root);
-        } catch(...) {
-            throw std::runtime_error("Can't create config file : " + GetConfigPath());
-        }
-    } else {
+    if(stat(GetConfigPath().c_str(), &buffer) == 0) {
         try {
             pt::read_json(GetConfigPath(), root);
-            if (GetString(keys(eKeys::kVersion), compileVersion) != compileVersion) {
-                //TODO: write correct updater here if it necessary
-                WriteString("Version", GetVersion());
-            }
         } catch(...) {
             throw std::runtime_error("Can't parse config file : " + GetConfigPath());
         }
+    } else {
+        CreateFolder(GetFolder());
     }
+    isInit = true;
 }
 
 std::string Config::GetConfigPath() const
 {
     return defConfigPath;
-}
-
-
-Torrent::Torrent()
-    : cnfg(Config::GetInstance())
-    , keys({
-{eKeys::kPort, "torrent.port"},
-{eKeys::kInterface, "torrent.interface"},
-{eKeys::kDownloadFolder, "torrent.downloadFolder"},
-          })
-{
-}
-
-Torrent &Torrent::GetInstance()
-{
-    static Torrent torrent;
-    return torrent;
-}
-
-std::string Torrent::GetPort() const
-{
-    return cnfg.GetString(keys(eKeys::kPort), defPort);
-}
-
-void Torrent::SetPort(const std::string &port)
-{
-    cnfg.WriteString(keys(eKeys::kPort), port);
-}
-
-std::string Torrent::GetInterface() const
-{
-    return cnfg.GetString(keys(eKeys::kInterface), defInterface);
-}
-
-void Torrent::SetInterface(const std::string &interface)
-{
-    cnfg.WriteString(keys(eKeys::kInterface), interface);
-}
-
-std::string Torrent::GetDownloadDirectory() const
-{
-    return cnfg.GetString(keys(eKeys::kDownloadFolder), defDownloadDir);
-}
-
-void Torrent::SetDownloadDirectory(const std::string &dir)
-{
-    cnfg.WriteString(keys(eKeys::kDownloadFolder), dir);
 }

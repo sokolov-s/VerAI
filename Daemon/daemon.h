@@ -3,6 +3,8 @@
 
 #include <memory>
 #include "torrent.h"
+#include "config/config_daemon.h"
+
 namespace daemonspace {
 
 class Daemon
@@ -15,6 +17,7 @@ public:
 private:
 private:
     std::unique_ptr<torrent::Torrent> torrent;
+    const config::ConfigDaemon &daemonCfg;
 };
 
 } //namespace daemon

@@ -9,7 +9,7 @@ using namespace torrent;
 namespace lt = libtorrent;
 
 Torrent::Torrent()
-    : cfg(config::Torrent::GetInstance())
+    : cfg(config::ConfigTorrent::GetInstance())
 {
 }
 

@@ -4,6 +4,7 @@ using namespace daemonspace;
 using namespace std;
 
 Daemon::Daemon()
+    : daemonCfg(config::ConfigDaemon::GetInstance())
 {
 }
 
