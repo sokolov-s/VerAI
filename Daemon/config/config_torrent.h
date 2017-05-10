@@ -2,7 +2,7 @@
 #define VERAI_CONFIG_TORRENT_H
 
 #include "config.h"
-#include <Daemon/noncopyable.h>
+#include "../noncopyable.h"
 
 namespace config {
 

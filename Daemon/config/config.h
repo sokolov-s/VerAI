@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "Daemon/noncopyable.h"
+#include "../noncopyable.h"
 #include <string>
 #include <map>
 #include <mutex>

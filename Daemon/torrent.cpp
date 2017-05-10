@@ -1,11 +1,15 @@
 #include "torrent.h"
 
-#include <libtorrent/session.hpp>
-#include <libtorrent/add_torrent_params.hpp>
-#include <libtorrent/torrent_handle.hpp>
-#include <libtorrent/settings_pack.hpp>
+#include "libtorrent/entry.hpp"
+#include "libtorrent/bencode.hpp"
+#include "libtorrent/session.hpp"
+#include "libtorrent/torrent_info.hpp"
+#include "libtorrent/settings_pack.hpp"
+
+#include <boost/make_shared.hpp>
 
 using namespace torrent;
+using namespace libtorrent;
 namespace lt = libtorrent;
 
 Torrent::Torrent()
@@ -15,7 +19,21 @@ Torrent::Torrent()
 
 void Torrent::Start()
 {
-//    lt::settings_pack stp;
-//    stp.set_str(lt::settings_pack::listen_interfaces, cfg.GetInterface() + ":" + cfg.GetPort());
 
+    std::string tfile = "/home/serhii/Downloads/rutracker.org.t4976066.torrent";
+
+    settings_pack sett;
+    sett.set_str((int)settings_pack::listen_interfaces, std::string("0.0.0.0:6881"));
+    lt::session s(sett);
+    add_torrent_params p;
+    p.save_path = "./";
+    error_code ec;
+    p.ti = boost::make_shared<torrent_info>(tfile, boost::ref(ec), 0);
+    if (ec) {
+        throw std::runtime_error("Can't init torrent file : " + ec.message());
+    }
+    s.add_torrent(p, ec);
+    if (ec) {
+        throw std::runtime_error("Can't download torrent file : " + ec.message());
+    }
 }

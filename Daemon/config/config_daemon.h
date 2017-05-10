@@ -1,7 +1,7 @@
 #ifndef VERAI_CONFIG_DAEMON_H
 #define VERAI_CONFIG_DAEMON_H
 
-#include <Daemon/noncopyable.h>
+#include "../noncopyable.h"
 #include "config.h"
 
 namespace config {
