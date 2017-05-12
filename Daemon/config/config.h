@@ -1,17 +1,16 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "../noncopyable.h"
+#include "common/noncopyable.h"
 #include <string>
 #include <map>
 #include <mutex>
 #include <boost/property_tree/ptree.hpp>
+#include <plog/Log.h>
 
 namespace config {
 
 namespace additions {
-
-void CreateFolder(const std::string &dir);
 
 template<typename T>
 class Key {
@@ -32,6 +31,7 @@ public:
         if(keys.end() == resKey) {
             std::ostringstream msg;
             msg << "Key " << static_cast<int>(key) << " does not found in config keys";
+            PLOG_WARNING << msg.str();
             throw std::invalid_argument(msg.str());
         }
         return resKey->second;
@@ -50,7 +50,7 @@ private:
 };
 } //namespace additions
 
-class Config : private noncopyable::NonCopyable
+class Config : private common::noncopyable::NonCopyable
 {
     Config();
 public:

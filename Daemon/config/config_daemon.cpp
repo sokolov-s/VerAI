@@ -6,6 +6,7 @@
 
 using namespace config;
 using namespace additions;
+using namespace std;
 
 ConfigDaemon::ConfigDaemon()
     : cnfg(Config::GetInstance())
@@ -25,25 +26,26 @@ ConfigDaemon &ConfigDaemon::GetInstance()
     return daemonCfg;
 }
 
-std::string ConfigDaemon::GetVersion() const
+string ConfigDaemon::GetVersion() const
 {
     return cnfg.GetString(keys(eKeys::kVersion));
 }
 
-std::string ConfigDaemon::GetUUID() const
+string ConfigDaemon::GetUUID() const
 {
     return cnfg.GetString(keys(eKeys::kUUID));
 }
 
-std::string ConfigDaemon::GetKey() const
+string ConfigDaemon::GetKey() const
 {
     return cnfg.GetString(keys(eKeys::kKey));
 }
 
 void ConfigDaemon::Init()
 {
-    std::string curVersion = GetVersion();
+    string curVersion = GetVersion();
     if(curVersion.empty() || curVersion != VERSION) {
+        PLOG_INFO << "A new version of daemon will running";
         cnfg.WriteString(keys(eKeys::kVersion), VERSION);
         //TODO: Add update code if it necessary
     }
@@ -55,8 +57,14 @@ void ConfigDaemon::Init()
 void ConfigDaemon::GenerateUUID()
 {
     boost::uuids::uuid uuid = boost::uuids::random_generator()();
-    std::ostringstream str;
+    ostringstream str;
     str << uuid;
     cnfg.WriteString(keys(eKeys::kUUID), str.str());
+    PLOG_DEBUG << "Generated new daemon uuid : " + str.str();
 }
 
+
+string config::ConfigDaemon::GetLogFolder() const
+{
+    return cnfg.GetFolder();
+}

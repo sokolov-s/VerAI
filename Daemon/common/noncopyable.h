@@ -1,6 +1,7 @@
 #ifndef NONCOPYABLE_H
 #define NONCOPYABLE_H
 
+namespace common {
 namespace noncopyable {
 
 struct NonCopyable
@@ -12,5 +13,6 @@ struct NonCopyable
     NonCopyable &operator=(const NonCopyable &&) = delete;
 };
 
-} //namespace
+} //namespace noncopyable
+} //namespace common
 #endif // NONCOPYABLE_H

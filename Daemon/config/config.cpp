@@ -1,4 +1,5 @@
 #include "config.h"
+#include "common/filesystem.h"
 #include <exception>
 #include <sstream>
 #include <boost/lexical_cast.hpp>
@@ -6,41 +7,16 @@
 
 using namespace config;
 namespace pt = boost::property_tree;
-
-void additions::CreateFolder(const std::string &dir)
-{
-    std::string next_part(dir);
-    std::string created_dir;
-    struct stat buffer;
-    if(dir.empty() || stat(dir.c_str(), &buffer) == 0) {
-        return;
-    }
-    if(next_part[0] == '/') {
-        created_dir += "/";
-        next_part.erase(0, 1);
-    }
-    while (!next_part.empty()) {
-        size_t pos = next_part.find("/");
-        if (pos != std::string::npos) {
-            created_dir += next_part.substr(0, pos);
-            next_part.erase(0, pos + 1);
-        } else {
-            created_dir += next_part;
-            next_part.clear();
-        }
-        if(!created_dir.empty() && stat(created_dir.c_str(), &buffer) != 0) {
-            if (mkdir(created_dir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0) {
-                return;
-            }
-            chmod (created_dir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
-        }
-        created_dir += "/";
-    }
-}
+using namespace std;
 
 Config::Config()
 {
-    Init();
+    try {
+        Init();
+    } catch(runtime_error &err) {
+        PLOG_FATAL << err.what();
+        throw;
+    }
 }
 
 Config &Config::GetInstance()
@@ -49,22 +25,22 @@ Config &Config::GetInstance()
     return cfg;
 }
 
-int Config::GetInt(const std::string &key, const int &defValue)
+int Config::GetInt(const string &key, const int &defValue)
 {
-    return boost::lexical_cast<int>(GetString(key, boost::lexical_cast<std::string>(defValue)));
+    return boost::lexical_cast<int>(GetString(key, boost::lexical_cast<string>(defValue)));
 }
 
-void Config::WriteInt(const std::string &key, const int value)
+void Config::WriteInt(const string &key, const int value)
 {
-    WriteString(key, boost::lexical_cast<std::string>(value));
+    WriteString(key, boost::lexical_cast<string>(value));
 }
 
-std::string Config::GetString(const std::string &key, const std::string &defValue)
+string Config::GetString(const string &key, const string &defValue)
 {
-    std::lock_guard<std::mutex> locker(mtx);
-    std::string res = defValue;
+    lock_guard<mutex> locker(mtx);
+    string res = defValue;
     try {
-        res = root.get<std::string>(key, defValue);
+        res = root.get<string>(key, defValue);
     } catch(const pt::ptree_bad_path &) {
         WriteString(key, defValue);
     }
@@ -72,14 +48,14 @@ std::string Config::GetString(const std::string &key, const std::string &defValu
     return res;
 }
 
-void Config::WriteString(const std::string &key, const std::string &value)
+void Config::WriteString(const string &key, const string &value)
 {
-    std::lock_guard<std::mutex> locker(mtx);
+    lock_guard<mutex> locker(mtx);
     root.put(key, value);
     pt::write_json(GetConfigPath(), root);
 }
 
-std::string Config::GetFolder() const
+string Config::GetFolder() const
 {
     return defFolder;
 }
@@ -91,14 +67,14 @@ void Config::Init()
         try {
             pt::read_json(GetConfigPath(), root);
         } catch(...) {
-            throw std::runtime_error("Can't parse config file : " + GetConfigPath());
+            throw runtime_error("Can't parse config file : " + GetConfigPath());
         }
     } else {
-        additions::CreateFolder(GetFolder());
+        common::filesystem::FileSystem::CreateFolder(GetFolder());
     }
 }
 
-std::string Config::GetConfigPath() const
+string Config::GetConfigPath() const
 {
     return defConfigPath;
 }

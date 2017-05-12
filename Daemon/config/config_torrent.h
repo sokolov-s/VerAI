@@ -2,11 +2,11 @@
 #define VERAI_CONFIG_TORRENT_H
 
 #include "config.h"
-#include "../noncopyable.h"
+#include "common/noncopyable.h"
 
 namespace config {
 
-class ConfigTorrent : private noncopyable::NonCopyable
+class ConfigTorrent : private common::noncopyable::NonCopyable
 {
     enum class eKeys {
         kPort,

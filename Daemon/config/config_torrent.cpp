@@ -1,6 +1,8 @@
 #include "config_torrent.h"
+#include "common/filesystem.h"
 
 using namespace config;
+using namespace std;
 
 ConfigTorrent::ConfigTorrent()
     : cnfg(Config::GetInstance())
@@ -20,37 +22,40 @@ ConfigTorrent &ConfigTorrent::GetInstance()
     return torrent;
 }
 
-std::string ConfigTorrent::GetPort() const
+string ConfigTorrent::GetPort() const
 {
     return cnfg.GetString(keys(eKeys::kPort), defPort);
 }
 
-void ConfigTorrent::SetPort(const std::string &port)
+void ConfigTorrent::SetPort(const string &port)
 {
     cnfg.WriteString(keys(eKeys::kPort), port);
 }
 
-std::string ConfigTorrent::GetInterface() const
+string ConfigTorrent::GetInterface() const
 {
     return cnfg.GetString(keys(eKeys::kInterface), defInterface);
 }
 
-void ConfigTorrent::SetInterface(const std::string &interface)
+void ConfigTorrent::SetInterface(const string &interface)
 {
     cnfg.WriteString(keys(eKeys::kInterface), interface);
 }
 
-std::string ConfigTorrent::GetDownloadDirectory() const
+string ConfigTorrent::GetDownloadDirectory() const
 {
     return cnfg.GetString(keys(eKeys::kDownloadFolder), cnfg.GetFolder() + "/" + defDownloadDir);
 }
 
-void ConfigTorrent::SetDownloadDirectory(const std::string &dir)
+void ConfigTorrent::SetDownloadDirectory(const string &dir)
 {
     cnfg.WriteString(keys(eKeys::kDownloadFolder), dir);
 }
 
 void ConfigTorrent::Init()
 {
-    additions::CreateFolder(GetDownloadDirectory());
+    SetDownloadDirectory(GetDownloadDirectory());
+    SetInterface(GetInterface());
+    SetPort(GetPort());
+    common::filesystem::FileSystem::CreateFolder(GetDownloadDirectory());
 }
