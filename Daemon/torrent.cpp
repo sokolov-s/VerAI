@@ -3,6 +3,7 @@
 #include <plog/Log.h>
 #include <chrono>
 #include <thread>
+#include <fstream>
 
 #include <libtorrent/entry.hpp>
 #include <libtorrent/bencode.hpp>
@@ -11,7 +12,6 @@
 #include <libtorrent/torrent_handle.hpp>
 #include <libtorrent/settings_pack.hpp>
 #include <libtorrent/add_torrent_params.hpp>
-#include <libtorrent/alert_types.hpp>
 #include <libtorrent/magnet_uri.hpp>
 #include <libtorrent/error_code.hpp>
 
@@ -33,6 +33,10 @@ Torrent::~Torrent()
 
 void Torrent::Start()
 {
+    std::lock_guard<std::mutex> locker(handlersMtx);
+    if(isWork) {
+        return;
+    }
     lt::settings_pack settings;
     settings.set_str(lt::settings_pack::listen_interfaces, cfg.GetInterface() + ":" + cfg.GetPort());
     settings.set_int(lt::settings_pack::alert_mask
@@ -56,6 +60,7 @@ void Torrent::Start()
         params.push_back(std::move(param));
     }
     handlersThread = std::thread(std::bind(&Torrent::Handler, this));
+    isWork = true;
     PLOG_INFO << "Torrent started";
 }
 
@@ -64,7 +69,7 @@ void Torrent::Stop()
     if(handlersThread.joinable()) {
         {
             std::lock_guard<std::mutex> locker(handlersMtx);
-            needWork = false;
+            isWork = false;
         }
         handlersThread.join();
     }
@@ -75,12 +80,11 @@ void Torrent::Stop()
 
 void Torrent::Handler()
 {
-    lt::torrent_handle handler;
     clk::time_point lastSaveResume = clk::now();
     for (;;) {
         {
             std::lock_guard<std::mutex> locker(handlersMtx);
-            if(!needWork)
+            if(!isWork)
                 break;
         }
         std::vector<lt::alert*> alerts;
@@ -88,28 +92,29 @@ void Torrent::Handler()
 
         for (lt::alert const* a : alerts) {
             if (auto at = lt::alert_cast<lt::add_torrent_alert>(a)) {
-                handler = at->handle;
+                tHandlers[std::string(at->torrent_name())] = at;
             }
 
-            if (lt::alert_cast<lt::torrent_finished_alert>(a)) {
-                handler.save_resume_data();
-                PLOG_DEBUG << a->message();
+            if (auto t = lt::alert_cast<lt::torrent_finished_alert>(a)) {
+                t->handle.save_resume_data();
+                tHandlers.erase(t->torrent_name());
+                PLOG_DEBUG << "Downloading of " << t->torrent_name() << " has been finished : " << a->message();
             }
 
-            if (lt::alert_cast<lt::torrent_error_alert>(a)) {
-                PLOG_ERROR << a->message();
+            if (auto t = lt::alert_cast<lt::torrent_error_alert>(a)) {
+                PLOG_ERROR << "Some error with torrent " << t->torrent_name() << " : " << a->message();
             }
 
             // when resume data is ready, save it
-//            if (auto rd = lt::alert_cast<lt::save_resume_data_alert>(a)) {
-//                ofstream of(".resume_file", ios_base::binary);
-//                of.unsetf(ios_base::skipws);
-//                lt::bencode(ostream_iterator<char>(of)
-//                            , *rd->resume_data);
-//            }
+            if (auto rd = lt::alert_cast<lt::save_resume_data_alert>(a)) {
+                std::ofstream of(cfg.GetDownloadDirectory() + "/." + rd->torrent_name() + ".resume_file", std::ios_base::binary);
+                of.unsetf(std::ios_base::skipws);
+                lt::bencode(std::ostream_iterator<char>(of)
+                            , *rd->resume_data);
+            }
 
-            if (auto st = lt::alert_cast<lt::state_update_alert>(a)) {
-                if (st->status.empty()) continue;
+//            if (auto st = lt::alert_cast<lt::state_update_alert>(a)) {
+//                if (st->status.empty()) continue;
 
                 // we only have a single torrent, so we know which one
                 // the status is for
@@ -119,7 +124,7 @@ void Torrent::Handler()
 //                          << (s.total_done / 1000) << " kB ("
 //                          << (s.progress_ppm / 10000) << "%) downloaded\x1b[K";
 //                cout.flush();
-            }
+//            }
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
@@ -129,7 +134,13 @@ void Torrent::Handler()
 
         // save resume data once every 30 seconds
         if (clk::now() - lastSaveResume > std::chrono::seconds(30)) {
-            handler.save_resume_data();
+            for(const auto &it : tHandlers) {
+                if(it.second) {
+                    it.second->handle.save_resume_data();
+                } else {
+                    tHandlers.erase(it.first);
+                }
+            }
             lastSaveResume = clk::now();
         }
     }

@@ -5,9 +5,11 @@
 #include <memory>
 #include <vector>
 #include <thread>
+#include <map>
 #include <libtorrent/session.hpp>
 #include <libtorrent/torrent_handle.hpp>
 #include <libtorrent/torrent_status.hpp>
+#include <libtorrent/alert_types.hpp>
 
 namespace torrent {
 
@@ -27,7 +29,8 @@ private:
     std::vector<libtorrent::add_torrent_params> params;
     std::thread handlersThread;
     std::mutex handlersMtx;
-    bool needWork = false;
+    bool isWork = false;
+    std::map<std::string, libtorrent::torrent_alert const *> tHandlers;
 };
 
 } //namespace torrent
