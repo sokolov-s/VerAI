@@ -14,7 +14,7 @@ add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 ExternalProject_Add(libtorrent
     SOURCE_DIR ${LIBTORRENT_SRC_DIR}
     CONFIGURE_COMMAND cd ${LIBTORRENT_SRC_DIR} &&
-        git checkout 1.1.3 &&
+        git checkout libtorrent-1_1_3 &&
         ./autotool.sh &&
         ./configure --prefix=${LIBTORRENT_BIN_DIR} --enable-logging --enable-debug --disable-examples
         --enable-encryption --enable-tests=yes --with-libiconv
