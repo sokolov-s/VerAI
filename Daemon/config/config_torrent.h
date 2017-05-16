@@ -11,7 +11,8 @@ class ConfigTorrent : private common::noncopyable::NonCopyable
     enum class eKeys {
         kPort,
         kInterface,
-        kDownloadFolder
+        kDownloadFolder,
+        kTFilesFolder
     };
 
     ConfigTorrent();
@@ -27,6 +28,8 @@ public:
     std::string GetDownloadDirectory() const;
     void SetDownloadDirectory(const std::string &dir);
 
+    std::string GetTorrentFilesDirectory() const;
+    void SetTorrentFilesDirectory(const std::string &dir);
 private:
     void Init();
 
@@ -37,6 +40,7 @@ private:
     const std::string defPort = "6881";
     const std::string defInterface = "0.0.0.0";
     const std::string defDownloadDir = "downloads";
+    const std::string defTFilesDir = "torrents";
 };
 
 } //namespace config

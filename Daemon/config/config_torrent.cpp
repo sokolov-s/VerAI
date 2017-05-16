@@ -11,6 +11,7 @@ ConfigTorrent::ConfigTorrent()
                {eKeys::kPort, section("port")},
                {eKeys::kInterface, section("interface")},
                {eKeys::kDownloadFolder, section("downloadFolder")},
+               {eKeys::kTFilesFolder, section("torrentFilesFolder")},
            })
 {
     Init();
@@ -52,10 +53,20 @@ void ConfigTorrent::SetDownloadDirectory(const string &dir)
     cnfg.WriteString(keys(eKeys::kDownloadFolder), dir);
 }
 
+string ConfigTorrent::GetTorrentFilesDirectory() const
+{
+    return cnfg.GetString(keys(eKeys::kTFilesFolder), cnfg.GetFolder() + "/" + defTFilesDir);
+}
+
+void ConfigTorrent::SetTorrentFilesDirectory(const string &dir)
+{
+    cnfg.WriteString(keys(eKeys::kTFilesFolder), dir);
+}
+
 void ConfigTorrent::Init()
 {
     SetDownloadDirectory(GetDownloadDirectory());
     SetInterface(GetInterface());
     SetPort(GetPort());
-    common::filesystem::FileSystem::CreateFolder(GetDownloadDirectory());
+    common::filesystem::CreateFolder(GetDownloadDirectory());
 }

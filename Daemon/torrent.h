@@ -3,7 +3,7 @@
 
 #include "config/config_torrent.h"
 #include <memory>
-#include <vector>
+#include <list>
 #include <thread>
 #include <map>
 #include <libtorrent/session.hpp>
@@ -20,17 +20,32 @@ public:
     ~Torrent();
     void Start();
     void Stop();
+    std::string PrepareMagnetAsync(const std::string &path);
+    std::string GetMagnet(const std::string &uuid) const;
+    void DownloadAsync(const std::string &link);
+
 private:
     void Handler();
     std::string State(libtorrent::torrent_status::state_t s);
+    std::string GetResumeFilePath(const libtorrent::add_torrent_params &param) const;
+    std::string GetResumeFilePath(const std::string &name) const;
+    void PrepareMagnet(const std::string &path, const std::string &uuid = "");
+    void FindTFilesAndAdd();
+    void AddTorrent(const std::string &fullPath, const std::string &uuid = "");
+    void AddTorrent(libtorrent::add_torrent_params && param, const std::string &uuid = "");
+    bool IsWork() const;
 private:
     const config::ConfigTorrent &cfg;
     std::unique_ptr<libtorrent::session> session;
-    std::vector<libtorrent::add_torrent_params> params;
+    typedef std::list<libtorrent::add_torrent_params> params_type;
+    params_type params;
     std::thread handlersThread;
-    std::mutex handlersMtx;
+    std::thread addThread;
+    mutable std::recursive_mutex workMtx;
+    mutable std::mutex paramsMtx;
     bool isWork = false;
     std::map<std::string, libtorrent::torrent_alert const *> tHandlers;
+    std::map<std::string, params_type::iterator> torrents;
 };
 
 } //namespace torrent

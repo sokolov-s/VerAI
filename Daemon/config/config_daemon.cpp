@@ -1,8 +1,5 @@
 #include "config_daemon.h"
-#include <sstream>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
+#include "common/uuid.h"
 
 using namespace config;
 using namespace additions;
@@ -50,17 +47,15 @@ void ConfigDaemon::Init()
         //TODO: Add update code if it necessary
     }
     if(GetUUID().empty()) {
-        GenerateUUID();
+        CreateUUID();
     }
 }
 
-void ConfigDaemon::GenerateUUID()
+void ConfigDaemon::CreateUUID()
 {
-    boost::uuids::uuid uuid = boost::uuids::random_generator()();
-    ostringstream str;
-    str << uuid;
-    cnfg.WriteString(keys(eKeys::kUUID), str.str());
-    PLOG_DEBUG << "Generated new daemon uuid : " + str.str();
+    auto uid = common::GenerateUUID();
+    cnfg.WriteString(keys(eKeys::kUUID), uid);
+    PLOG_DEBUG << "Generated new daemon uuid : " + uid;
 }
 
 

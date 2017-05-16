@@ -6,6 +6,7 @@ set(DAEMON_SRC_LIST
     ./main.cpp
     ./torrent.cpp
     ./common/filesystem.cpp
+    ./common/uuid.cpp
     ./config/config.cpp
     ./config/config_daemon.cpp
     ./config/config_torrent.cpp
@@ -16,6 +17,7 @@ set(DAEMON_HEADER_LIST
     ./torrent.h
     ./common/noncopyable.h
     ./common/filesystem.h
+    ./common/uuid.h
     ./config/config.h
     ./config/config_daemon.h
     ./config/config_torrent.h

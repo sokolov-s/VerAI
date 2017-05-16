@@ -70,7 +70,7 @@ void Config::Init()
             throw runtime_error("Can't parse config file : " + GetConfigPath());
         }
     } else {
-        common::filesystem::FileSystem::CreateFolder(GetFolder());
+        common::filesystem::CreateFolder(GetFolder());
     }
 }
 

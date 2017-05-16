@@ -22,7 +22,8 @@ public:
     std::string GetLogFolder() const;
 private:
     void Init();
-    void GenerateUUID();
+    void CreateUUID();
+
 private:
     Config &cnfg;
     const additions::Section section;
