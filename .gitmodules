@@ -3,4 +3,4 @@
 	url = https://github.com/arvidn/libtorrent.git
 [submodule "grpc"]
 	path = grpc
-	url = https://github.com/grpc/grpc.git
+	url = https://github.com/grpc/grpc

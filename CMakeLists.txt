@@ -18,14 +18,14 @@ add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 ExternalProject_Add(grpc
     SOURCE_DIR ${GRPC_SRC_DIR}
     CONFIGURE_COMMAND cd ${GRPC_SRC_DIR} &&
-        git checkout release-0_15 &&
+        git checkout -b $(curl -L http://grpc.io/release) &&
         git submodule update --init &&
-        cd ${GRPC_SRC_DIR}/grpc/third_party/protobuf &&
+        cd ${GRPC_SRC_DIR}/third_party/protobuf &&
         ./autogen.sh &&
         ./configure
 
-    BUILD_COMMAND cd ${GRPC_SRC_DIR}/grpc/third_party/protobuf && make
-    INSTALL_COMMAND  cd ${GRPC_SRC_DIR}/grpc/third_party/protobuf && make install
+    BUILD_COMMAND cd ${GRPC_SRC_DIR}/third_party/protobuf && make && cd ${GRPC_SRC_DIR} && make
+    INSTALL_COMMAND  cd ${GRPC_SRC_DIR}/third_party/protobuf && make install && cd ${GRPC_SRC_DIR} && make install
     )
 
 ExternalProject_Add(libtorrent
