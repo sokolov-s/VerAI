@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package DaemonRPC;
+
+service  DaemonService {
+    rpc Download(DownloadRequest) returns (DownloadResponse) {}
+    rpc DownloadStatus(DownloadStatusRequest) returns (DownloadStatusResponse) {}
+    rpc GenerateTorrent(GenerateMagnetRequest) returns (GenerateMagnetResponse) {}
+}
+
+message DownloadRequest {
+    string magent = 1;
+}
+
+message DownloadResponse {
+    string downloadUUID = 1;
+    string error_code = 2;
+}
+
+message DownloadStatusRequest {
+    string downloadUUID = 1;
+}
+
+message DownloadStatusResponse {
+    enum Status {
+        DOWNLOADED = 0;
+        DOWNLOADING = 1;
+        ERROR = 2;
+    }
+    Status status = 1;
+    string percent = 2;
+    string error_code = 3;
+}
+
+message GenerateMagnetRequest {
+    string tPath = 1;
+}
+
+message GenerateMagnetResponse {
+    string uuid = 2;
+    string error_code = 3;
+}
+
+
