@@ -4,10 +4,9 @@
 #include <string>
 #include <memory>
 #include <grpc++/grpc++.h>
-
 #include "daemon.grpc.pb.h"
 
-namespace grpcservice {
+namespace grpcserver {
 
 class GRPCClient
 {
@@ -15,7 +14,7 @@ public:
     explicit GRPCClient(std::shared_ptr<grpc::Channel> channel);
 
 private:
-    std::unique_ptr<DaemonRPC::DaemonService::Stub> stub;
+//    std::unique_ptr<DaemonRPC::DaemonService::Stub> stub;
 };
 
 } //namespace grpcservice

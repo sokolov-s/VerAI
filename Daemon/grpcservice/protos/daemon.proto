@@ -2,43 +2,51 @@ syntax = "proto3";
 
 package DaemonRPC;
 
-service  DaemonService {
-    rpc Download(DownloadRequest) returns (DownloadResponse) {}
-    rpc DownloadStatus(DownloadStatusRequest) returns (DownloadStatusResponse) {}
-    rpc GenerateTorrent(GenerateMagnetRequest) returns (GenerateMagnetResponse) {}
+service  ServerService {
+    rpc HandShake(HandShakeRequest) returns (DaemonInfo) {}
+    rpc UpdateTorrentStatus(UpdateTorrentStatusRequest) returns (BaseResponse) {}
 }
 
-message DownloadRequest {
-    string magent = 1;
+service ClientService {
+    rpc GenerateTorrent(GenerateTorrentRequest) returns (TorrentInfo) {}
+    rpc UpdateTorrentStatus(TorrentInfo) returns (BaseResponse) {}
+    rpc DownloadTorrent(TorrentInfo) returns (BaseResponse) {}
 }
 
-message DownloadResponse {
-    string downloadUUID = 1;
-    string error_code = 2;
+message HandShakeRequest {
+    string uuid = 1;
 }
 
-message DownloadStatusRequest {
-    string downloadUUID = 1;
+message DaemonInfo {
+    string uuid = 1;
+    string authTocken = 2;
 }
 
-message DownloadStatusResponse {
+message TorrentInfo {
+    string id = 1;
+    string link = 2;
+    string path = 3;
     enum Status {
-        DOWNLOADED = 0;
-        DOWNLOADING = 1;
-        ERROR = 2;
+        NONE = 0;
+        DOWNLOADED = 1;
+        DOWNLOADING = 2;
+        GENERATED = 3;
+        GENERATING = 4;
+        PAUSED = 5;
+        ERROR = 6;
     }
-    Status status = 1;
-    string percent = 2;
-    string error_code = 3;
+    Status status = 4;
 }
 
-message GenerateMagnetRequest {
-    string tPath = 1;
+message GenerateTorrentRequest {
+    string dir = 1;
 }
 
-message GenerateMagnetResponse {
-    string uuid = 2;
-    string error_code = 3;
+message UpdateTorrentStatusRequest {
+    DaemonInfo agentInfo = 1;
+    TorrentInfo torrentInfo = 2;
 }
 
-
+message BaseResponse {
+    string error_code = 1;
+}
