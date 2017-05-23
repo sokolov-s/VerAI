@@ -54,9 +54,10 @@ void Torrent::Start()
                      | lt::alert::progress_notification);
 
     session.reset(new lt::session(settings));
-    handlersThread = std::thread(std::bind(&Torrent::Handler, this));
-    addThread = std::thread(std::bind(&Torrent::FindTFilesAndAdd, this));
     isWork = true;
+    handlersThread = std::thread(&Torrent::Handler, this);
+    //TODO: this thread is crashed. Fix it or find another way to add torrent files
+//    addThread = std::thread(&Torrent::FindTFilesAndAdd, this);
     PLOG_INFO << "Torrent started";
 }
 
@@ -78,11 +79,9 @@ void Torrent::Stop()
     PLOG_INFO << "Torrent stoped";
 }
 
-std::string Torrent::PrepareMagnetAsync(const std::string &path)
+void Torrent::PrepareMagnetAsync(const std::string &path, const std::string &uuid)
 {
-    auto uuid = common::GenerateUUID();
     std::thread(std::bind(&Torrent::PrepareMagnet, this, path, uuid)).detach();
-    return uuid;
 }
 
 void Torrent::PrepareMagnet(const std::string &path, const std::string &uuid)
@@ -133,9 +132,9 @@ void Torrent::DownloadAsync(const std::string &link)
     lt::parse_magnet_uri(link, param, ec);
 
     param.save_path = cfg.GetDownloadDirectory();
+    // TODO: use own File class
     std::ifstream ifs(GetResumeFilePath(param), std::ios_base::binary);
     ifs.unsetf(std::ios_base::skipws);
-    // TODO: use own File class
     param.resume_data.assign(std::istream_iterator<char>(ifs)
                            , std::istream_iterator<char>());
     if (ec) {
@@ -151,6 +150,7 @@ void Torrent::Handler()
     clk::time_point lastSaveResume = clk::now();
     while(IsWork()) {
         std::vector<lt::alert*> alerts;
+        std::lock_guard<std::mutex> locker(paramsMtx);
         session->pop_alerts(&alerts);
 
         for (lt::alert const* a : alerts) {

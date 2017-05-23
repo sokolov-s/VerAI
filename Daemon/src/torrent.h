@@ -20,7 +20,7 @@ public:
     ~Torrent();
     void Start();
     void Stop();
-    std::string PrepareMagnetAsync(const std::string &path);
+    void PrepareMagnetAsync(const std::string &path, const std::string &uuid);
     std::string GetMagnet(const std::string &uuid) const;
     void DownloadAsync(const std::string &link);
 

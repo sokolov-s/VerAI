@@ -13,8 +13,8 @@ namespace grpcserver {
 class ClientHandlerInterface;
 class ServerHandlerInterface;
 
-template<typename T>
-class ServerHelper
+template<typename C, typename T>
+class ServerHelper : public C
 {
 public:
     ServerHelper(T *handlerObject) : handler(handlerObject) {}
@@ -30,10 +30,16 @@ public:
         server = builder.BuildAndStart();
     }
 
+    void Wait() {
+        if(server) {
+            server->Wait();
+        }
+    }
+
     void Stop() {
         if(server) {
             server->Shutdown();
-            server->Wait();
+            Wait();
             server.release();
         }
     }
@@ -47,7 +53,7 @@ private:
     T *handler = nullptr;
 };
 
-class ClientImpl : public DaemonRPC::ClientService::Service, public ServerHelper<ClientHandlerInterface>
+class ClientImpl : public ServerHelper<DaemonRPC::ClientService::Service, ClientHandlerInterface>
 {
 public:
     ClientImpl(ClientHandlerInterface *handlerObject);
@@ -61,6 +67,7 @@ public:
 
 class ClientHandlerInterface {
 public:
+    virtual ~ClientHandlerInterface(){}
     virtual DaemonRPC::TorrentInfo GenerateTorrent(const std::string &dir) = 0;
     virtual void DownloadTorrent(const DaemonRPC::TorrentInfo &info) = 0;
     virtual void UpdateTorrentStatus(const DaemonRPC::TorrentInfo &info) = 0;
@@ -72,22 +79,32 @@ public:
   * You can use this class only for some local tests.
   * No one guarantees any actual status or correct work or identical behavior with GO server.
   */
-class ServerImpl : public DaemonRPC::ServerService::Service , public ServerHelper<ServerHandlerInterface>
+class ServerImpl : public ServerHelper<DaemonRPC::ServerService::Service, ServerHandlerInterface>
 {
 public:
     ServerImpl(ServerHandlerInterface *handlerObject);
 
-    grpc::Status HandShake(grpc::ServerContext *context,
-                           const DaemonRPC::HandShakeRequest *request,
+    grpc::Status Handshake(grpc::ServerContext *context,
+                           const DaemonRPC::HandshakeRequest *request,
                            DaemonRPC::DaemonInfo *response) override;
     grpc::Status UpdateTorrentStatus(grpc::ServerContext *context, const DaemonRPC::UpdateTorrentStatusRequest *request,
                                      DaemonRPC::BaseResponse *response) override;
+    grpc::Status GetTaskList(grpc::ServerContext *context, const DaemonRPC::DaemonInfo *request,
+                             ::grpc::ServerWriter<::DaemonRPC::Task> *writer) override;
+    grpc::Status GetInfoForGenerateTorrents(grpc::ServerContext *context, const DaemonRPC::DaemonInfo *request,
+                                            ::grpc::ServerWriter<DaemonRPC::TorrentInfo> *writer) override;
+    grpc::Status GetTorrentsForDownload(grpc::ServerContext *context, const DaemonRPC::DaemonInfo *request,
+                                        ::grpc::ServerWriter<DaemonRPC::TorrentInfo> *writer) override;
 };
 
 class ServerHandlerInterface {
 public:
-    virtual DaemonRPC::DaemonInfo HandShake(const std::string daemonUUID) = 0;
+    virtual ~ServerHandlerInterface(){}
+    virtual DaemonRPC::DaemonInfo Handshake(const std::string &daemonUUID) = 0;
     virtual void UpdateTorrentStatus(const DaemonRPC::DaemonInfo &dInfo, const DaemonRPC::TorrentInfo &tInfo) = 0;
+    virtual std::vector<DaemonRPC::Task> GetTaskList(const DaemonRPC::DaemonInfo &dInfo) = 0;
+    virtual std::vector<DaemonRPC::TorrentInfo> GetInfoForGenerateTorrents(const DaemonRPC::DaemonInfo &dInfo) = 0;
+    virtual std::vector<DaemonRPC::TorrentInfo> GetTorrentsForDownload(const DaemonRPC::DaemonInfo &dInfo) = 0;
 };
 
 } //namespace grpcdaemon

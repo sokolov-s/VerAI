@@ -3,7 +3,10 @@ syntax = "proto3";
 package DaemonRPC;
 
 service  ServerService {
-    rpc HandShake(HandShakeRequest) returns (DaemonInfo) {}
+    rpc Handshake(HandshakeRequest) returns (DaemonInfo) {}
+    rpc GetTaskList(DaemonInfo) returns (stream Task) {}
+    rpc GetInfoForGenerateTorrents(DaemonInfo) returns (stream TorrentInfo) {}
+    rpc GetTorrentsForDownload(DaemonInfo) returns (stream TorrentInfo) {}
     rpc UpdateTorrentStatus(UpdateTorrentStatusRequest) returns (BaseResponse) {}
 }
 
@@ -13,7 +16,7 @@ service ClientService {
     rpc DownloadTorrent(TorrentInfo) returns (BaseResponse) {}
 }
 
-message HandShakeRequest {
+message HandshakeRequest {
     string uuid = 1;
 }
 
@@ -49,4 +52,13 @@ message UpdateTorrentStatusRequest {
 
 message BaseResponse {
     string error_code = 1;
+}
+
+message Task {
+    enum TaskType {
+        GENERATE_MAGENT = 0;
+        DOWNLOAD_TORRENT = 1;
+        UPDATE_TORRENT_STATUS = 2;
+    }
+    TaskType task = 1;
 }

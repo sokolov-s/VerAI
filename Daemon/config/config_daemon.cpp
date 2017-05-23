@@ -7,11 +7,14 @@ using namespace std;
 
 ConfigDaemon::ConfigDaemon()
     : cnfg(Config::GetInstance())
-    , section("daemon")
+    , sectionDaemon("daemon")
+    , sectionRPC(sectionDaemon("server"))
     , keys({
-        {eKeys::kVersion, section("version")},
-        {eKeys::kUUID, section("uuid")},
-        {eKeys::kKey, section("key")},
+        {eKeys::kVersion, sectionDaemon("version")},
+        {eKeys::kUUID, sectionDaemon("uuid")},
+        {eKeys::kKey, sectionDaemon("key")},
+        {eKeys::kServerName, sectionRPC("domainName")},
+        {eKeys::kServerPort, sectionRPC("port")},
     })
 {
     Init();
@@ -62,4 +65,14 @@ void ConfigDaemon::CreateUUID()
 string config::ConfigDaemon::GetLogFolder() const
 {
     return cnfg.GetFolder();
+}
+
+string ConfigDaemon::GetServerDomainName() const
+{
+    return cnfg.GetString(keys(eKeys::kServerName), "192.168.150.130");
+}
+
+string ConfigDaemon::GetServerPort() const
+{
+    return cnfg.GetString(keys(eKeys::kServerPort), "50051");
 }

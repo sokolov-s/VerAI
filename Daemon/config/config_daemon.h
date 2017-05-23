@@ -10,7 +10,9 @@ class ConfigDaemon : private common::noncopyable::NonCopyable {
     enum class eKeys {
         kVersion,
         kUUID,
-        kKey
+        kKey,
+        kServerName,
+        kServerPort
     };
 
     ConfigDaemon();
@@ -20,13 +22,17 @@ public:
     std::string GetUUID() const;
     std::string GetKey() const;
     std::string GetLogFolder() const;
+    std::string GetServerDomainName() const;
+    std::string GetServerPort() const;
+
 private:
     void Init();
     void CreateUUID();
 
 private:
     Config &cnfg;
-    const additions::Section section;
+    const additions::Section sectionDaemon;
+    const additions::Section sectionRPC;
     additions::Key<eKeys> keys;
 };
 

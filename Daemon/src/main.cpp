@@ -13,7 +13,7 @@
 #include <execinfo.h>
 #include <syslog.h>
 #include <memory>
-#include "daemon.h"
+#include "controller.h"
 
 using namespace std;
 
@@ -23,7 +23,7 @@ enum eDaemonStatus {
     NeedToTerminate
 };
 const unsigned int kFdLimit = 2048;
-std::unique_ptr<daemonspace::Daemon> dmn;
+std::unique_ptr<daemonspace::Controller> dmn;
 
 int VerAIDaemonProc();
 void CreatePidFile(const char* fileName);
@@ -155,7 +155,7 @@ int WorkProc()
 
     syslog(LOG_INFO, "[VerAIDaemon] Started\n");
 
-    dmn.reset(new daemonspace::Daemon());
+    dmn.reset(new daemonspace::Controller());
     try {
         dmn->Start();
         for (;;) {

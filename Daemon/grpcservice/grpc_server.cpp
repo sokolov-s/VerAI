@@ -9,17 +9,11 @@ using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::ServerCompletionQueue;
 using grpc::Status;
-using DaemonRPC::HandShakeRequest;
-using DaemonRPC::DaemonInfo;
-using DaemonRPC::TorrentInfo;
-using DaemonRPC::GenerateTorrentRequest;
-using DaemonRPC::UpdateTorrentStatusRequest;
-using DaemonRPC::BaseResponse;
 using namespace DaemonRPC;
 using std::chrono::system_clock;
 
 ClientImpl::ClientImpl(ClientHandlerInterface *handlerObject)
-    : ServerHelper<ClientHandlerInterface>(handlerObject)
+    : ServerHelper<DaemonRPC::ClientService::Service, ClientHandlerInterface>(handlerObject)
 {
 }
 
@@ -46,15 +40,15 @@ grpc::Status ClientImpl::UpdateTorrentStatus(grpc::ServerContext */*context*/, c
 
 
 ServerImpl::ServerImpl(ServerHandlerInterface *handlerObject)
-    : ServerHelper<ServerHandlerInterface>(handlerObject)
+    : ServerHelper<DaemonRPC::ServerService::Service, ServerHandlerInterface>(handlerObject)
 {
 }
 
-grpc::Status ServerImpl::HandShake(grpc::ServerContext */*context*/,
-                                   const DaemonRPC::HandShakeRequest *request,
+grpc::Status ServerImpl::Handshake(grpc::ServerContext */*context*/,
+                                   const DaemonRPC::HandshakeRequest *request,
                                    DaemonRPC::DaemonInfo *response)
 {
-    *response = GetHandler()->HandShake(request->uuid());
+    *response = GetHandler()->Handshake(request->uuid());
     return grpc::Status::OK;
 }
 
@@ -63,4 +57,34 @@ grpc::Status ServerImpl::UpdateTorrentStatus(grpc::ServerContext */*context*/, c
 {
     GetHandler()->UpdateTorrentStatus(request->agentinfo(), request->torrentinfo());
     return grpc::Status::OK;
+}
+
+grpc::Status ServerImpl::GetTaskList(grpc::ServerContext */*context*/, const DaemonInfo *request,
+                                     ::grpc::ServerWriter<::DaemonRPC::Task> *writer)
+{
+    auto tasks = GetHandler()->GetTaskList(*request);
+    for (const Task& task : tasks) {
+        writer->Write(task);
+    }
+    return Status::OK;
+}
+
+grpc::Status ServerImpl::GetInfoForGenerateTorrents(grpc::ServerContext */*context*/, const DaemonInfo *request,
+                                                    ::grpc::ServerWriter<TorrentInfo> *writer)
+{
+    auto torrents = GetHandler()->GetInfoForGenerateTorrents(*request);
+    for (const TorrentInfo& tInfo : torrents) {
+        writer->Write(tInfo);
+    }
+    return Status::OK;
+}
+
+grpc::Status ServerImpl::GetTorrentsForDownload(grpc::ServerContext */*context*/, const DaemonInfo *request,
+                                                ::grpc::ServerWriter<TorrentInfo> *writer)
+{
+    auto torrents = GetHandler()->GetTorrentsForDownload(*request);
+    for (const TorrentInfo& tInfo : torrents) {
+        writer->Write(tInfo);
+    }
+    return Status::OK;
 }

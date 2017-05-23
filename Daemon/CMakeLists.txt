@@ -26,38 +26,28 @@ else()
     add_definitions(-DLOG_LEVEL=2)
 endif(CMAKE_BUILD_TYPE MATCHES Debug)
 
-set(DAEMON_SRC_LIST
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/daemon.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/torrent.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/common/filesystem.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/common/uuid.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/config/config.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/config/config_daemon.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/config/config_torrent.cpp
+file(GLOB DAEMON_SRC_LIST
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/config/*.cpp
     )
 
-set(DAEMON_HEADER_LIST
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/daemon.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/torrent.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/common/noncopyable.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/common/filesystem.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/common/uuid.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/config/config.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/config/config_daemon.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/config/config_torrent.h
+file(GLOB DAEMON_HEADER_LIST
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/config/*.h
     )
 
 add_executable(${PROJECT_NAME}
     ${DAEMON_SRC_LIST}
-    ${DAEMON_HEADER_LIST}
     )
 
 target_link_libraries(${PROJECT_NAME}
     torrent-rasterbar
     ${Boost_LIBRARIES}
     pthread
+    verai_common
+    GRPCDaemonService
     )
 
+add_subdirectory(common)
 add_subdirectory(grpcservice)
 add_subdirectory(tests)
