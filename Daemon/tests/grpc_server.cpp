@@ -29,6 +29,7 @@ public:
         DaemonRPC::DaemonInfo info;
         info.set_uuid(daemonUUID);
         info.set_authtocken("Some tocken");
+        info.set_authstatus(DaemonRPC::DaemonInfo::Status::DaemonInfo_Status_OK);
         lock_guard<recursive_mutex> locker(mtx);
         uuids.emplace(daemonUUID);
         static bool isFirst = true;

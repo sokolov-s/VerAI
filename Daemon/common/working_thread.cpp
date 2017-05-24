@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/syscall.h>    /* For SYS_xxx definitions */
 #include <sys/resource.h>
+#include <algorithm>
 
 using namespace common;
 using namespace std;
@@ -12,6 +13,7 @@ void WorkingThread::Run()
 {
     if (IsRunning()) return;
     thrWork = thread(&WorkingThread::Runner, this);
+    defferedTasksThr = std::thread(&WorkingThread::DefferedTasksHandler, this);
 }
 
 WorkingThread::WorkingThread()
@@ -23,11 +25,19 @@ WorkingThread::~WorkingThread()
 {
     Stop();
     thrWork.join();
+    defferedTasksThr.join();
 }
 
 void WorkingThread::EnqueueTask(shared_ptr<IRunnable> task)
 {
     taskQueue.Push(task);
+}
+
+void WorkingThread::EnqueueTaskAfterTimeOut(std::shared_ptr<IRunnable> task, unsigned int timeout)
+{
+    std::unique_lock<std::mutex> locker(defferedTasksMtx);
+    defferedTasksList.push_back(DefferedTask(task, timeout));
+    defferedTasksCnd.notify_one();
 }
 
 void WorkingThread::EnqueueTaskFront(shared_ptr<IRunnable> task)
@@ -73,6 +83,11 @@ void WorkingThread::Stop()
 {
     this->isRunning.store(false);
     taskQueue.Push(shared_ptr<IRunnable>());
+    if(defferedTasksThr.joinable()) {
+        std::unique_lock<std::mutex> locker(defferedTasksMtx);
+        defferedTasksList.clear();
+        defferedTasksCnd.notify_all();
+    }
 }
 
 bool WorkingThread::TasksQueueEmpty()
@@ -99,6 +114,37 @@ void WorkingThread::SetMeLowPriority(int priority)
         int err = setpriority(PRIO_PROCESS, tid, priority);
         if (err) {
             fprintf(stderr, "FAILED to setpriority\n");
+        }
+    }
+}
+
+void WorkingThread::DefferedTasksHandler()
+{
+    std::unique_lock<std::mutex> locker(defferedTasksMtx);
+    unsigned int nextWait = 500;
+    bool isFirstWait = true;
+    while(IsRunning()) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        defferedTasksCnd.wait_for(locker, std::chrono::milliseconds(nextWait));
+        if(defferedTasksList.empty())
+            continue;
+        std::sort(defferedTasksList.begin(), defferedTasksList.end());
+        if(isFirstWait) {
+            isFirstWait = false;
+        } else {
+            auto t2 = std::chrono::high_resolution_clock::now();
+            auto curWait = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
+            auto it = defferedTasksList.begin();
+            while(it != defferedTasksList.end()) {
+                if(((*it).ms - curWait.count()) <= 0) {
+                    EnqueueTask((*it).taskToRun);
+                    it = defferedTasksList.erase(it);
+                } else {
+                    (*it).ms -= curWait.count();
+                    ++it;
+                }
+            }
+            nextWait = defferedTasksList.at(0).ms;
         }
     }
 }

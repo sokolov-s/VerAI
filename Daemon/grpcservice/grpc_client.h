@@ -46,11 +46,13 @@ public:
     void UpdateTorrentStatus(const DaemonRPC::TorrentInfo &tInfo);
 
 private:
-    void GetTasks();
     DaemonRPC::DaemonInfo GetClientInfo() const;
     void AddTask(const DaemonRPC::Task &task);
     void AddTask(const DaemonRPC::Task::TaskType &taskType);
-    void HandShake();
+    void AddTaskAfterTimeOut(const DaemonRPC::Task::TaskType &taskType, const unsigned int ms);
+    std::shared_ptr<common::IRunnable> CreateTask(const DaemonRPC::Task::TaskType &taskType);
+    void UpdateTasksClb();
+    void HandshakeClb();
     void DownloadTorrentClb();
     void UpdateTorrentClb();
     void CreateTorrentClb();
@@ -79,7 +81,6 @@ private:
     bool isRun = false;
     DaemonRPC::DaemonInfo clientInfo;
     common::WorkingThread tasksWorker;
-    std::thread updateTaskThread;
 };
 
 } //namespace grpcservice

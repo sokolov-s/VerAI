@@ -23,6 +23,11 @@ message HandshakeRequest {
 message DaemonInfo {
     string uuid = 1;
     string authTocken = 2;
+    enum Status {
+        FAILED = 0;
+        OK = 1;
+    }
+    Status authStatus = 3;
 }
 
 message TorrentInfo {
@@ -59,6 +64,8 @@ message Task {
         GENERATE_MAGENT = 0;
         DOWNLOAD_TORRENT = 1;
         UPDATE_TORRENT_STATUS = 2;
+        UPDATE_TASK_LIST = 3;
+        MAKE_HANDSHAKE = 4;
     }
     TaskType task = 1;
 }

@@ -61,6 +61,8 @@ public:
      * @param task - runnable class to add into the queue.
      */
     void EnqueueTask(std::shared_ptr<IRunnable> task);
+
+    void EnqueueTaskAfterTimeOut(std::shared_ptr<IRunnable> task, unsigned int timeout);
     
     /**
      * @brief EnqueueTaskFront - add task into beginning of queue
@@ -101,11 +103,25 @@ public:
      */
     static void SetMeLowPriority(int priority);
 private:
+    void DefferedTasksHandler();
+private:
     static void* Runner(void* context);
     int Work(void);
     std::atomic<bool> isRunning;
     MessageQueue<std::shared_ptr<IRunnable>> taskQueue;
     std::thread thrWork;
+    std::thread defferedTasksThr;
+    std::condition_variable defferedTasksCnd;
+    std::mutex defferedTasksMtx;
+    struct DefferedTask {
+        DefferedTask(std::shared_ptr<IRunnable> task, const unsigned int millisec) : taskToRun(task), ms(millisec) {}
+        std::shared_ptr<IRunnable> taskToRun;
+        unsigned int ms = 0;
+        bool operator<(const DefferedTask &rhs) {
+            return std::tie(ms) < std::tie(rhs.ms);
+        }
+    };
+    std::vector<DefferedTask> defferedTasksList;
 };
 
 } // namespace common

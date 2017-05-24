@@ -21,12 +21,12 @@ void GRPCClient::Start()
     std::lock_guard<std::recursive_mutex> locker(mtxTask);
     if(IsRun())
         return;
+    //TODO: choose correct safety connection
     channel = grpc::CreateChannel(server, grpc::InsecureChannelCredentials());
     stub = DaemonRPC::ServerService::NewStub(channel);
-
     tasksWorker.Run();
-    updateTaskThread = std::thread(&GRPCClient::GetTasks, this);
     isRun = true;
+    AddTask(DaemonRPC::Task::TaskType::Task_TaskType_MAKE_HANDSHAKE);
 }
 
 void GRPCClient::Stop()
@@ -34,11 +34,11 @@ void GRPCClient::Stop()
     std::lock_guard<std::recursive_mutex> locker(mtxTask);
     if(!IsRun())
         return;
+    isRun = false;
+    tasksWorker.Stop();
     stub.reset();
     channel.reset();
-    tasksWorker.Stop();
     clientInfo.Clear();
-    isRun = false;
 }
 
 bool GRPCClient::IsRun() const
@@ -47,22 +47,9 @@ bool GRPCClient::IsRun() const
     return isRun;
 }
 
-void GRPCClient::GetTasks()
-{
-    while(IsRun()) {
-        ClientContext context;
-        std::unique_ptr<ClientReader<Task>> reader(
-                    stub->GetTaskList(&context, GetClientInfo()));
-        auto taskList = ReadStream<Task>(std::move(reader));
-        for(const auto &task : taskList) {
-            AddTask(task);
-        }
-        std::this_thread::sleep_for(std::chrono::seconds(updateTimeSec));
-    }
-}
-
 DaemonInfo GRPCClient::GetClientInfo() const
 {
+    std::lock_guard<std::recursive_mutex> locker(mtxTask);
     return clientInfo;
 }
 
@@ -73,21 +60,66 @@ void GRPCClient::AddTask(const Task &task)
 
 void GRPCClient::AddTask(const Task::TaskType &taskType)
 {
+    tasksWorker.EnqueueTask(CreateTask(taskType));
+}
+
+void GRPCClient::AddTaskAfterTimeOut(const Task::TaskType &taskType, const unsigned int ms)
+{
+    tasksWorker.EnqueueTaskAfterTimeOut(CreateTask(taskType), ms);
+}
+
+std::shared_ptr<common::IRunnable> GRPCClient::CreateTask(const Task::TaskType &taskType)
+{
     switch(taskType) {
     case DaemonRPC::Task::TaskType::Task_TaskType_DOWNLOAD_TORRENT:
-        tasksWorker.EnqueueTask(common::WrapTask(std::bind(&GRPCClient::DownloadTorrentClb, this)));
-        break;
+        return common::WrapTask(std::bind(&GRPCClient::DownloadTorrentClb, this));
 
     case DaemonRPC::Task::TaskType::Task_TaskType_GENERATE_MAGENT:
-        tasksWorker.EnqueueTask(common::WrapTask(std::bind(&GRPCClient::CreateTorrentClb, this)));
-        break;
+        return common::WrapTask(std::bind(&GRPCClient::CreateTorrentClb, this));
 
     case DaemonRPC::Task::TaskType::Task_TaskType_UPDATE_TORRENT_STATUS:
-        tasksWorker.EnqueueTask(common::WrapTask(std::bind(&GRPCClient::UpdateTorrentClb, this)));
+        return common::WrapTask(std::bind(&GRPCClient::UpdateTorrentClb, this));
+
+    case DaemonRPC::Task::TaskType::Task_TaskType_MAKE_HANDSHAKE:
+        return common::WrapTask(std::bind(&GRPCClient::HandshakeClb, this));
+
+    case DaemonRPC::Task::TaskType::Task_TaskType_UPDATE_TASK_LIST:
+        return common::WrapTask(std::bind(&GRPCClient::UpdateTasksClb, this));
         break;
 
     default:
-        break;
+        return std::shared_ptr<common::IRunnable>();
+    }
+}
+
+void GRPCClient::UpdateTasksClb()
+{
+    if(IsRun()) {
+        ClientContext context;
+        std::unique_ptr<ClientReader<Task>> reader(
+                    stub->GetTaskList(&context, GetClientInfo()));
+        auto taskList = ReadStream<Task>(std::move(reader));
+        for(const auto &task : taskList) {
+            AddTask(task);
+        }
+        AddTaskAfterTimeOut(DaemonRPC::Task::TaskType::Task_TaskType_UPDATE_TASK_LIST, updateTimeSec.count() * 1000);
+    }
+}
+
+void GRPCClient::HandshakeClb()
+{
+    ClientContext context;
+    HandshakeRequest request;
+    request.set_uuid(client->GetClientUUID());
+    DaemonInfo dInfo;
+    Status status = stub->Handshake(&context, request, &dInfo);
+    if (!status.ok() || dInfo.authstatus() != DaemonRPC::DaemonInfo::Status::DaemonInfo_Status_OK) {
+        PLOG_ERROR << "Handshake failed : " << status.error_message() << " , Authorization status " << dInfo.authstatus();
+        AddTaskAfterTimeOut(DaemonRPC::Task::TaskType::Task_TaskType_MAKE_HANDSHAKE, updateTimeSec.count() * 1000);
+    } else {
+        std::lock_guard<std::recursive_mutex> locker(mtxTask);
+        clientInfo = dInfo;
+        AddTask(DaemonRPC::Task::TaskType::Task_TaskType_UPDATE_TASK_LIST);
     }
 }
 
@@ -103,7 +135,7 @@ void GRPCClient::DownloadTorrentClb()
 
 void GRPCClient::UpdateTorrentClb()
 {
-
+    //TODO: add update torrent info code
 }
 
 void GRPCClient::CreateTorrentClb()
