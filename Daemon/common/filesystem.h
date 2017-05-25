@@ -52,16 +52,16 @@ public:
     File(const File &) = delete;
     File & operator=(const File &) = delete;
 
-    void Open();
+    void Open() throw();
     bool IsOpened() const;
 
-    void Write(const std::string &data, ssize_t length = -1);
-    void Trunc();
-    void Remove();
-    void Close();
-    void ForceClose();
-    void Move(std::string &newPath);
-    int GetFileSize() const;
+    void Write(const std::string &data, ssize_t length = -1) throw();
+    void Trunc() throw();
+    void Remove() throw();
+    void Close() throw();
+    void ForceClose() noexcept;
+    void Move(std::string &newPath) throw();
+    int GetFileSize() const throw();
 
     std::string GetFullPath() const;
 

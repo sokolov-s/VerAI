@@ -56,8 +56,7 @@ void Torrent::Start()
     session.reset(new lt::session(settings));
     isWork = true;
     handlersThread = std::thread(&Torrent::Handler, this);
-    //TODO: this thread is crashed. Fix it or find another way to add torrent files
-//    addThread = std::thread(&Torrent::FindTFilesAndAdd, this);
+    addThread = std::thread(&Torrent::FindTFilesAndAdd, this);
     PLOG_INFO << "Torrent started";
 }
 
@@ -79,37 +78,60 @@ void Torrent::Stop()
     PLOG_INFO << "Torrent stoped";
 }
 
-void Torrent::PrepareMagnetAsync(const std::string &path, const std::string &uuid)
+void Torrent::PrepareMagnetLinkAsync(const std::string &path, const std::string &uuid)
 {
-    std::thread(std::bind(&Torrent::PrepareMagnet, this, path, uuid)).detach();
+    std::lock_guard<std::mutex> locker(prepareMagnetStatusMtx);
+    if(prepareMagnetStatusList.find(uuid) == prepareMagnetStatusList.end()) {
+        std::thread(&Torrent::PrepareMagnet, this, path, uuid).detach();
+    }
 }
 
 void Torrent::PrepareMagnet(const std::string &path, const std::string &uuid)
 {
+    SetPreparationMagnetStatus(uuid, MagnetLinkPreparationStatus::IN_PROGRESS);
     lt::file_storage fs;
     lt::add_files(fs, path);
     if (fs.num_files() == 0)
     {
+        SetPreparationMagnetStatus(uuid, MagnetLinkPreparationStatus::FAILED);
         std::string errMsg = "No files specified for " + path;
         PLOG_WARNING << errMsg;
-        throw std::runtime_error(errMsg);
+        return;
     }
 
     lt::create_torrent t(fs);
     std::vector<char> tFile;
     auto e = t.generate();
     if (e.type() == lt::entry::undefined_t) {
+        SetPreparationMagnetStatus(uuid, MagnetLinkPreparationStatus::FAILED);
         std::string errMsg = "Can't create torent file for " + path;
         PLOG_ERROR << errMsg;
-        throw std::runtime_error(errMsg);
+        return;
     }
-
+    //TODO: write correct code to generate torrent file
     lt::bencode(std::back_inserter(tFile), e);
 
     std::string fileName = cfg.GetTorrentFilesDirectory() + "/" + common::filesystem::GetFileName(path) + ".torrent";
     common::filesystem::File outFile(fileName);
     outFile.Write(tFile.data(), tFile.size());
     AddTorrent(fileName, uuid);
+    SetPreparationMagnetStatus(uuid, MagnetLinkPreparationStatus::READY);
+}
+
+void Torrent::SetPreparationMagnetStatus(const std::string &uuid, const MagnetLinkPreparationStatus status)
+{
+    std::lock_guard<std::mutex> locker(prepareMagnetStatusMtx);
+    prepareMagnetStatusList[uuid] = status;
+}
+
+Torrent::MagnetLinkPreparationStatus Torrent::GetPreparationMagentLinkStatus(const std::string &uuid) const
+{
+    std::lock_guard<std::mutex> locker(prepareMagnetStatusMtx);
+    auto item = prepareMagnetStatusList.find(uuid);
+    if(item != prepareMagnetStatusList.end()) {
+        return item->second;
+    }
+    return MagnetLinkPreparationStatus::UNKNOWN;
 }
 
 std::string Torrent::GetMagnet(const std::string &uuid) const
@@ -124,7 +146,7 @@ std::string Torrent::GetMagnet(const std::string &uuid) const
     return magnet;
 }
 
-void Torrent::DownloadAsync(const std::string &link)
+void Torrent::DownloadAsync(const std::string &link) throw()
 {
     lt::add_torrent_params param;
 
@@ -255,7 +277,7 @@ void Torrent::FindTFilesAndAdd()
     }
 }
 
-void Torrent::AddTorrent(const std::string &fullPath, const std::string &uuid)
+void Torrent::AddTorrent(const std::string &fullPath, const std::string &uuid) throw()
 {
     lt::add_torrent_params param;
     param.save_path = cfg.GetDownloadDirectory();

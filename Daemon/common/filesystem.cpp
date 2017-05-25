@@ -67,19 +67,23 @@ void common::filesystem::CreateFolder(const std::string &dir)
 std::vector<std::string> common::filesystem::GetFilesInFolder(const std::string &dir, const std::string &fileMask)
 {
     std::vector<std::string> fileList;
+    try {
+        boost::filesystem::directory_iterator endItr;
+        for(boost::filesystem::directory_iterator it(dir); it != endItr; ++it)
+        {
+            if(!boost::filesystem::is_regular_file(it->status()))
+                continue;
 
-    boost::filesystem::directory_iterator endItr;
-    for(boost::filesystem::directory_iterator it(dir); it != endItr; ++it)
-    {
-        if(!boost::filesystem::is_regular_file(it->status()))
-            continue;
+            const std::regex filter(fileMask);
+            if(!std::regex_match(it->path().filename().string(), filter))
+                continue;
 
-        const std::regex filter(fileMask);
-        if(!std::regex_match(it->path().filename().string(), filter))
-            continue;
-
-        fileList.push_back(it->path().filename().string());
+            fileList.push_back(it->path().filename().string());
+        }
+    } catch(boost::filesystem::filesystem_error &/*ex*/) {
+        //Do nothing
     }
+
     return fileList;
 }
 
@@ -102,7 +106,7 @@ File::~File()
     Close();
 }
 
-void File::Open()
+void File::Open() throw()
 {
     if(IsOpened()) {
         return;
@@ -115,8 +119,9 @@ void File::Open()
     SetFileDescriptor(fd);
 }
 
-void File::Write(const std::string &data, ssize_t length)
+void File::Write(const std::string &data, ssize_t length) throw()
 {
+    Open();
     if(!IsOpened()) {
         throw std::ios_base::failure("File does not open: " + GetFullPath());
     }
@@ -128,14 +133,14 @@ void File::Write(const std::string &data, ssize_t length)
     }
 }
 
-void File::Trunc()
+void File::Trunc() throw()
 {
     if(-1 == truncate(GetFullPath().c_str(), 0)) {
         throw std::ios_base::failure("Can't truncate file: " + GetFullPath());
     }
 }
 
-void File::Remove()
+void File::Remove() throw()
 {
     Close();
     if(-1 == remove(GetFullPath().c_str())) {
@@ -143,7 +148,7 @@ void File::Remove()
     }
 }
 
-void File::Close()
+void File::Close() throw()
 {
     if(IsOpened()) {
         if(-1 == close(GetFileDescriptor())) {
@@ -153,7 +158,7 @@ void File::Close()
     }
 }
 
-void File::ForceClose()
+void File::ForceClose() noexcept
 {
     try {
         Close();
@@ -162,7 +167,7 @@ void File::ForceClose()
     }
 }
 
-void File::Move(std::string &newPath)
+void File::Move(std::string &newPath) throw()
 {
     if(IsOpened()){
         Close();
@@ -172,7 +177,7 @@ void File::Move(std::string &newPath)
     }
 }
 
-int File::GetFileSize() const
+int File::GetFileSize() const throw()
 {
     struct stat status;
     if(fstat(GetFileDescriptor(), &status) == -1){

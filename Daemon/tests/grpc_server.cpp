@@ -67,7 +67,7 @@ public:
         DaemonRPC::TorrentInfo tInfo;
         if(uuids.find(dInfo.uuid()) != uuids.end()) {
             tInfo.set_id(common::GenerateUUID());
-            tInfo.set_path("/opt/VeraAI/projects/1");
+            tInfo.set_path("/opt/VerAI/projects/1");
         }
         return vector<DaemonRPC::TorrentInfo>({tInfo});
     }

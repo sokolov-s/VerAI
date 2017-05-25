@@ -12,7 +12,7 @@ using namespace std;
 void WorkingThread::Run()
 {
     if (IsRunning()) return;
-    thrWork = thread(&WorkingThread::Runner, this);
+    workThr = thread(&WorkingThread::Runner, this);
     defferedTasksThr = std::thread(&WorkingThread::DefferedTasksHandler, this);
 }
 
@@ -24,7 +24,7 @@ WorkingThread::WorkingThread()
 WorkingThread::~WorkingThread()
 {
     Stop();
-    thrWork.join();
+    workThr.join();
     defferedTasksThr.join();
 }
 
@@ -33,10 +33,10 @@ void WorkingThread::EnqueueTask(shared_ptr<IRunnable> task)
     taskQueue.Push(task);
 }
 
-void WorkingThread::EnqueueTaskAfterTimeOut(std::shared_ptr<IRunnable> task, unsigned int timeout)
+void WorkingThread::EnqueueTaskAfterTimeOut(std::shared_ptr<IRunnable> task, unsigned int ms)
 {
     std::unique_lock<std::mutex> locker(defferedTasksMtx);
-    defferedTasksList.push_back(DefferedTask(task, timeout));
+    defferedTasksList.push_back(DefferedTask(task, ms));
     defferedTasksCnd.notify_one();
 }
 
@@ -121,14 +121,17 @@ void WorkingThread::SetMeLowPriority(int priority)
 void WorkingThread::DefferedTasksHandler()
 {
     std::unique_lock<std::mutex> locker(defferedTasksMtx);
-    unsigned int nextWait = 500;
+    unsigned int nextWait = updateDefferedTasksMS;
     bool isFirstWait = true;
     while(IsRunning()) {
         auto t1 = std::chrono::high_resolution_clock::now();
         defferedTasksCnd.wait_for(locker, std::chrono::milliseconds(nextWait));
         if(defferedTasksList.empty())
             continue;
-        std::sort(defferedTasksList.begin(), defferedTasksList.end());
+        std::qsort(defferedTasksList.data(), defferedTasksList.size(), sizeof(DefferedTask),
+                   [](const void * a, const void * b)->int {
+                       return (*(DefferedTask*)a).ms - (*(DefferedTask*)b).ms;
+                    });
         if(isFirstWait) {
             isFirstWait = false;
         } else {
@@ -144,7 +147,12 @@ void WorkingThread::DefferedTasksHandler()
                     ++it;
                 }
             }
+        }
+        if(!defferedTasksList.empty()) {
             nextWait = defferedTasksList.at(0).ms;
+        } else {
+            isFirstWait = true;
+            nextWait = updateDefferedTasksMS;
         }
     }
 }

@@ -62,7 +62,12 @@ public:
      */
     void EnqueueTask(std::shared_ptr<IRunnable> task);
 
-    void EnqueueTaskAfterTimeOut(std::shared_ptr<IRunnable> task, unsigned int timeout);
+    /**
+     * @brief EnqueueTaskAfterTimeOut - add task into the main task queue after some time
+     * @param task - runnable class to add into the queue.
+     * @param ms - time in milliseconds to wait before task will be added to main queue
+     */
+    void EnqueueTaskAfterTimeOut(std::shared_ptr<IRunnable> task, unsigned int ms);
     
     /**
      * @brief EnqueueTaskFront - add task into beginning of queue
@@ -109,7 +114,7 @@ private:
     int Work(void);
     std::atomic<bool> isRunning;
     MessageQueue<std::shared_ptr<IRunnable>> taskQueue;
-    std::thread thrWork;
+    std::thread workThr;
     std::thread defferedTasksThr;
     std::condition_variable defferedTasksCnd;
     std::mutex defferedTasksMtx;
@@ -117,11 +122,12 @@ private:
         DefferedTask(std::shared_ptr<IRunnable> task, const unsigned int millisec) : taskToRun(task), ms(millisec) {}
         std::shared_ptr<IRunnable> taskToRun;
         unsigned int ms = 0;
-        bool operator<(const DefferedTask &rhs) {
+        bool operator<(const DefferedTask &rhs) const {
             return std::tie(ms) < std::tie(rhs.ms);
         }
     };
     std::vector<DefferedTask> defferedTasksList;
+    unsigned int updateDefferedTasksMS = 500;
 };
 
 } // namespace common
