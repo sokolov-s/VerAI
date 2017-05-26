@@ -32,7 +32,7 @@ string Controller::GetClientUUID()
 
 void Controller::GenerateTorrent(const DaemonRPC::TorrentInfo &tInfo)
 {
-    torrent->PrepareMagnetLinkAsync(tInfo.path(), tInfo.id());
+    torrent->CreateTorrentAsync(tInfo.path(), tInfo.id());
 }
 
 void Controller::DownloadTorrent(const DaemonRPC::TorrentInfo &tInfo)

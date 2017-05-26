@@ -21,14 +21,19 @@ public:
     ~Torrent();
     void Start();
     void Stop();
-    void PrepareMagnetLinkAsync(const std::string &path, const std::string &uuid);
-    enum class MagnetLinkPreparationStatus {
-        UNKNOWN,
-        IN_PROGRESS,
-        READY,
-        FAILED,
+    void CreateTorrentAsync(const std::string &path, const std::string &uuid);
+    struct CreatingTorrentStatus {
+        enum Status {
+            UNKNOWN,
+            IN_PROGRESS,
+            READY,
+            FAILED,
+        };
+        CreatingTorrentStatus(Status st, int pr = 0) : status(st), progress(pr){}
+        Status status;
+        short int progress = 0;
     };
-    MagnetLinkPreparationStatus GetPreparationMagentLinkStatus(const std::string &uuid) const;
+    CreatingTorrentStatus GetCreationTorrentStatus(const std::string &uuid) const;
     std::string GetMagnet(const std::string &uuid) const;
     void DownloadAsync(const std::string &link) throw();
 
@@ -37,12 +42,14 @@ private:
     std::string State(libtorrent::torrent_status::state_t s);
     std::string GetResumeFilePath(const libtorrent::add_torrent_params &param) const;
     std::string GetResumeFilePath(const std::string &name) const;
-    void PrepareMagnet(const std::string &path, const std::string &uuid = "");
+    void CreateTorrent(const std::string &path, const std::string &uuid = "");
     void FindTFilesAndAdd();
     void AddTorrent(const std::string &fullPath, const std::string &uuid = "") throw();
     void AddTorrent(libtorrent::add_torrent_params && param, const std::string &uuid = "");
     bool IsWork() const;
-    void SetPreparationMagnetStatus(const std::string &uuid, const MagnetLinkPreparationStatus status);
+    void SetCreationTorrentStatus(const std::string &uuid, const CreatingTorrentStatus &status);
+    void UpdateCreationTorrentStatus(const std::string &uuid, CreatingTorrentStatus::Status status);
+    void UpdateCreationTorrentProgress(const std::string &uuid, int curPiece, int totalPieces);
 private:
     const config::ConfigTorrent &cfg;
     std::unique_ptr<libtorrent::session> session;
@@ -56,7 +63,7 @@ private:
     std::map<std::string, libtorrent::torrent_alert const *> tHandlers;
     std::map<std::string, params_type::iterator> torrents;
     mutable std::mutex prepareMagnetStatusMtx;
-    std::map<std::string, MagnetLinkPreparationStatus> prepareMagnetStatusList;
+    std::map<std::string, CreatingTorrentStatus> prepareMagnetStatusList;
 };
 
 } //namespace torrent
