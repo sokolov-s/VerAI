@@ -95,6 +95,8 @@ public:
                                             ::grpc::ServerWriter<DaemonRPC::TorrentInfo> *writer) override;
     grpc::Status GetTorrentsForDownload(grpc::ServerContext *context, const DaemonRPC::DaemonInfo *request,
                                         ::grpc::ServerWriter<DaemonRPC::TorrentInfo> *writer) override;
+    grpc::Status GetTorrentsForUpdateStatus(grpc::ServerContext *context, const DaemonRPC::DaemonInfo *request,
+                                            ::grpc::ServerWriter<DaemonRPC::TorrentInfo> *writer) override;
 };
 
 class ServerHandlerInterface {
@@ -105,6 +107,7 @@ public:
     virtual std::vector<DaemonRPC::Task> GetTaskList(const DaemonRPC::DaemonInfo &dInfo) = 0;
     virtual std::vector<DaemonRPC::TorrentInfo> GetInfoForGenerateTorrents(const DaemonRPC::DaemonInfo &dInfo) = 0;
     virtual std::vector<DaemonRPC::TorrentInfo> GetTorrentsForDownload(const DaemonRPC::DaemonInfo &dInfo) = 0;
+    virtual std::vector<DaemonRPC::TorrentInfo> GetTorrentsForUpdateStatus(const DaemonRPC::DaemonInfo &dInfo) = 0;
 };
 
 } //namespace grpcdaemon

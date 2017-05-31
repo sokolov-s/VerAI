@@ -25,7 +25,7 @@ public:
     {
     }
 
-    std::string operator()(const T & key) const
+    std::string operator()(const T & key) const noexcept(false)
     {
         auto resKey = keys.find(key);
         if(keys.end() == resKey) {

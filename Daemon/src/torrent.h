@@ -2,6 +2,7 @@
 #define TORRENT_H
 
 #include "config/config_torrent.h"
+#include "torrent_info_manager.h"
 #include <memory>
 #include <list>
 #include <thread>
@@ -21,49 +22,39 @@ public:
     ~Torrent();
     void Start();
     void Stop();
-    void CreateTorrentAsync(const std::string &path, const std::string &uuid);
-    struct CreatingTorrentStatus {
-        enum Status {
-            UNKNOWN,
-            IN_PROGRESS,
-            READY,
-            FAILED,
-        };
-        CreatingTorrentStatus(Status st, int pr = 0) : status(st), progress(pr){}
-        Status status;
-        short int progress = 0;
-    };
-    CreatingTorrentStatus GetCreationTorrentStatus(const std::string &uuid) const;
+    void CreateTorrentAsync(const std::string &uuid, const std::string &path);
+
+    TorrentInfo GetTorrentInfo(const std::string &uuid) const;
     std::string GetMagnet(const std::string &uuid) const;
-    void DownloadAsync(const std::string &link) throw();
+    void DownloadAsync(const std::string &uuid, const std::string &link) noexcept(false);
 
 private:
     void Handler();
     std::string State(libtorrent::torrent_status::state_t s);
     std::string GetResumeFilePath(const libtorrent::add_torrent_params &param) const;
     std::string GetResumeFilePath(const std::string &name) const;
-    void CreateTorrent(const std::string &path, const std::string &uuid = "");
+    void CreateTorrent(const std::string &uuid, const std::string &path);
+    void UpdateCreationProgress(const std::string &uuid, int curPiece, int totalPieces);
     void FindTFilesAndAdd();
-    void AddTorrent(const std::string &fullPath, const std::string &uuid = "") throw();
-    void AddTorrent(libtorrent::add_torrent_params && param, const std::string &uuid = "");
+    void AddTorrent(const std::string &uuid, const std::string &fullPath) noexcept(false);
+    void AddTorrent(const std::string &uuid, libtorrent::add_torrent_params && param);
     bool IsWork() const;
-    void SetCreationTorrentStatus(const std::string &uuid, const CreatingTorrentStatus &status);
-    void UpdateCreationTorrentStatus(const std::string &uuid, CreatingTorrentStatus::Status status);
-    void UpdateCreationTorrentProgress(const std::string &uuid, int curPiece, int totalPieces);
+    void UpdateStatus(const std::string &uuid, const TorrentInfo::Status &status, const uint progress);
+    std::string GetIdByName(const std::string &name) const;
 private:
     const config::ConfigTorrent &cfg;
     std::unique_ptr<libtorrent::session> session;
-    typedef std::list<libtorrent::add_torrent_params> params_type;
-    params_type params;
+    struct TorrentsInSystem {
+        libtorrent::add_torrent_params param;
+        libtorrent::torrent_alert const * handler = nullptr;
+    };
     std::thread handlersThread;
     std::thread addThread;
     mutable std::recursive_mutex workMtx;
-    mutable std::mutex paramsMtx;
+    mutable std::recursive_mutex torrentIdListMtx;
     bool isWork = false;
-    std::map<std::string, libtorrent::torrent_alert const *> tHandlers;
-    std::map<std::string, params_type::iterator> torrents;
-    mutable std::mutex prepareMagnetStatusMtx;
-    std::map<std::string, CreatingTorrentStatus> prepareMagnetStatusList;
+    std::map<std::string, TorrentsInSystem> torrentsIdList;
+    TorrentInfoManager infoManager;
 };
 
 } //namespace torrent

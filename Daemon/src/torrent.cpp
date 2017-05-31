@@ -57,7 +57,8 @@ void Torrent::Start()
     session.reset(new lt::session(settings));
     isWork = true;
     handlersThread = std::thread(&Torrent::Handler, this);
-    addThread = std::thread(&Torrent::FindTFilesAndAdd, this);
+    //TODO: we have a plan to get tasks only from server. So we are going to remove code with autoadding tfiles at startup.
+//    addThread = std::thread(&Torrent::FindTFilesAndAdd, this);
     PLOG_INFO << "Torrent started";
 }
 
@@ -74,27 +75,26 @@ void Torrent::Stop()
         addThread.join();
     }
     session.release();
-    params.clear();
-    torrents.clear();
+    std::lock_guard<std::recursive_mutex> lockerList(torrentIdListMtx);
+    torrentsIdList.clear();
     PLOG_INFO << "Torrent stoped";
 }
 
-void Torrent::CreateTorrentAsync(const std::string &path, const std::string &uuid)
+void Torrent::CreateTorrentAsync(const std::string &uuid, const std::string &path)
 {
-    std::lock_guard<std::mutex> locker(prepareMagnetStatusMtx);
-    if(prepareMagnetStatusList.find(uuid) == prepareMagnetStatusList.end()) {
-        std::thread(&Torrent::CreateTorrent, this, path, uuid).detach();
+    if(infoManager.GetInfo(uuid)->GetStatus() != TorrentInfo::Status::GENERATING &&
+            infoManager.GetInfo(uuid)->GetStatus() != TorrentInfo::Status::GENERATED) {
+        std::thread(&Torrent::CreateTorrent, this, uuid, path).detach();
     }
 }
 
-void Torrent::CreateTorrent(const std::string &path, const std::string &uuid)
+void Torrent::CreateTorrent(const std::string &uuid, const std::string &path)
 {
-    SetCreationTorrentStatus(uuid, CreatingTorrentStatus(CreatingTorrentStatus::IN_PROGRESS));
+    UpdateStatus(uuid, TorrentInfo::Status::GENERATING, 0);
     lt::file_storage fs;
     lt::add_files(fs, path);
-    if (fs.num_files() == 0)
-    {
-        UpdateCreationTorrentStatus(uuid, CreatingTorrentStatus::FAILED);
+    if (fs.num_files() == 0) {
+        UpdateStatus(uuid, TorrentInfo::Status::GENERATION_ERROR, 0);
         std::string errMsg = "No files specified for " + path;
         PLOG_WARNING << errMsg;
         return;
@@ -103,7 +103,7 @@ void Torrent::CreateTorrent(const std::string &path, const std::string &uuid)
     lt::create_torrent t(fs);
     lt::error_code ec;
     lt::set_piece_hashes(t, common::filesystem::GetDirectory(path),
-                         std::bind(&Torrent::UpdateCreationTorrentProgress, this, uuid,
+                         std::bind(&Torrent::UpdateCreationProgress, this, uuid,
                                    std::placeholders::_1, t.num_pieces()), ec);
     if(ec) {
         PLOG_ERROR << ec.message();
@@ -116,13 +116,16 @@ void Torrent::CreateTorrent(const std::string &path, const std::string &uuid)
 
     auto e = t.generate();
     if (e.type() == lt::entry::undefined_t) {
-        UpdateCreationTorrentStatus(uuid, CreatingTorrentStatus::FAILED);
+        UpdateStatus(uuid, TorrentInfo::Status::GENERATION_ERROR, 0);
         std::string errMsg = "Can't create torent file for " + path;
         PLOG_ERROR << errMsg;
         return;
     }
     std::string fileName = cfg.GetTorrentFilesDirectory() + "/" + common::filesystem::GetFileName(path) + ".torrent";
     common::filesystem::CreateFolder(cfg.GetTorrentFilesDirectory());
+    if(common::filesystem::IsFileExist(fileName)) {
+        common::filesystem::Remove(fileName);
+    }
     //TODO: write correct code to generate torrent file
 //    std::vector<char> torrentData;
 //    lt::bencode(std::back_inserter(torrentData), e);
@@ -133,69 +136,65 @@ void Torrent::CreateTorrent(const std::string &path, const std::string &uuid)
 //    tFile.close();
     std::ofstream outFile(fileName, std::ios_base::binary);
     lt::bencode(std::ostream_iterator<char>(outFile), e);
+    outFile.close();
     try {
-        AddTorrent(fileName, uuid);
-        UpdateCreationTorrentStatus(uuid, CreatingTorrentStatus::READY);
+//        AddTorrent(uuid, fileName);
+        UpdateStatus(uuid, TorrentInfo::Status::GENERATED, 100);
     } catch(const std::runtime_error &) {
-        UpdateCreationTorrentStatus(uuid, CreatingTorrentStatus::FAILED);
+        UpdateStatus(uuid, TorrentInfo::Status::GENERATION_ERROR, 0);
     }
 }
 
-void Torrent::SetCreationTorrentStatus(const std::string &uuid, const CreatingTorrentStatus &status)
+void Torrent::UpdateCreationProgress(const std::string &uuid, int curPiece, int totalPieces)
 {
-    std::lock_guard<std::mutex> locker(prepareMagnetStatusMtx);
-    prepareMagnetStatusList.insert(std::make_pair(uuid, status));
+    uint progress = 100 * totalPieces / (curPiece + 1);
+    UpdateStatus(uuid, TorrentInfo::Status::GENERATING, progress);
 }
 
-void Torrent::UpdateCreationTorrentStatus(const std::string &uuid, Torrent::CreatingTorrentStatus::Status status)
+void Torrent::UpdateStatus(const std::string &uuid, const TorrentInfo::Status &status, const uint progress)
 {
-    std::lock_guard<std::mutex> locker(prepareMagnetStatusMtx);
-    auto it = prepareMagnetStatusList.find(uuid);
-    if(prepareMagnetStatusList.end() != it) {
-        it->second.status = status;
-    }
+    auto info = infoManager.GetInfo(uuid);
+    info->SetStatus(status);
+    info->SetProgress(progress);
 }
 
-void Torrent::UpdateCreationTorrentProgress(const std::string &uuid, int curPiece, int totalPieces)
+std::string Torrent::GetIdByName(const std::string &name) const
 {
-    std::lock_guard<std::mutex> locker(prepareMagnetStatusMtx);
-    auto it = prepareMagnetStatusList.find(uuid);
-    if(prepareMagnetStatusList.end() != it) {
-        it->second.progress = 100 * totalPieces / (curPiece + 1);
+    std::lock_guard<std::recursive_mutex> locker(torrentIdListMtx);
+    for(const auto &it : torrentsIdList) {
+        if(it.second.handler->torrent_name() == name) {
+            return it.first;
+        }
     }
+    return "";
 }
 
-Torrent::CreatingTorrentStatus Torrent::GetCreationTorrentStatus(const std::string &uuid) const
+TorrentInfo Torrent::GetTorrentInfo(const std::string &uuid) const
 {
-    std::lock_guard<std::mutex> locker(prepareMagnetStatusMtx);
-    auto item = prepareMagnetStatusList.find(uuid);
-    if(item != prepareMagnetStatusList.end()) {
-        return item->second;
-    }
-    return CreatingTorrentStatus::UNKNOWN;
+    return *infoManager.GetInfo(uuid);
 }
 
 std::string Torrent::GetMagnet(const std::string &uuid) const
 {
-    std::lock_guard<std::mutex> locker(paramsMtx);
+    std::lock_guard<std::recursive_mutex> locker(torrentIdListMtx);
     std::string magnet;
-    if(torrents.find(uuid) != torrents.end()) {
-        magnet = lt::make_magnet_uri(*torrents.at(uuid)->ti);
+    if(torrentsIdList.find(uuid) != torrentsIdList.end()) {
+        magnet = lt::make_magnet_uri(*torrentsIdList.at(uuid).param.ti);
         PLOG_DEBUG << "Magnet link for " << uuid << " : " << magnet;
     }
     PLOG_DEBUG_IF(magnet.empty()) << "Can't find uuid " << uuid;
     return magnet;
 }
 
-void Torrent::DownloadAsync(const std::string &link) throw()
+void Torrent::DownloadAsync(const std::string &uuid, const std::string &link) noexcept(false)
 {
+    UpdateStatus(uuid, TorrentInfo::Status::DOWNLOADING, 0);
     lt::add_torrent_params param;
 
     lt::error_code ec;
     lt::parse_magnet_uri(link, param, ec);
 
     param.save_path = cfg.GetDownloadDirectory();
-    // TODO: use own File class
     std::ifstream ifs(GetResumeFilePath(param), std::ios_base::binary);
     ifs.unsetf(std::ios_base::skipws);
     param.resume_data.assign(std::istream_iterator<char>(ifs)
@@ -203,9 +202,10 @@ void Torrent::DownloadAsync(const std::string &link) throw()
     if (ec) {
         std::string errMsg = "Invalid magnet URI: " + ec.message();
         PLOG_ERROR << errMsg;
+        UpdateStatus(uuid, TorrentInfo::Status::DOWNLOADING_ERROR, 0);
         throw std::runtime_error(errMsg);
     }
-    AddTorrent(std::move(param));
+    AddTorrent(uuid, std::move(param));
 }
 
 void Torrent::Handler()
@@ -213,17 +213,24 @@ void Torrent::Handler()
     clk::time_point lastSaveResume = clk::now();
     while(IsWork()) {
         std::vector<lt::alert*> alerts;
-        std::lock_guard<std::mutex> locker(paramsMtx);
+        std::lock_guard<std::recursive_mutex> locker(torrentIdListMtx);
         session->pop_alerts(&alerts);
 
         for (lt::alert const* a : alerts) {
             if (auto at = lt::alert_cast<lt::add_torrent_alert>(a)) {
-                tHandlers[std::string(at->torrent_name())] = at;
+                auto id = GetIdByName(at->torrent_name());
+                if(!id.empty()) {
+                    torrentsIdList[id].handler = at;
+                }
             }
 
             if (auto t = lt::alert_cast<lt::torrent_finished_alert>(a)) {
                 t->handle.save_resume_data();
-                tHandlers.erase(t->torrent_name());
+                auto id = GetIdByName(t->torrent_name());
+                if(!id.empty()) {
+                    UpdateStatus(id, TorrentInfo::Status::DOWNLOADED, 100);
+                    torrentsIdList[id].handler = nullptr;
+                }
                 PLOG_DEBUG << "Downloading of " << t->torrent_name() << " has been finished : " << a->message();
             }
 
@@ -238,19 +245,26 @@ void Torrent::Handler()
                 lt::bencode(std::ostream_iterator<char>(of)
                             , *rd->resume_data);
             }
-
-//            if (auto st = lt::alert_cast<lt::state_update_alert>(a)) {
-//                if (st->status.empty()) continue;
-
-                // we only have a single torrent, so we know which one
-                // the status is for
+            //TODO: write correct code to update status
+            if (auto st = lt::alert_cast<lt::state_update_alert>(a)) {
+                if (st->status.empty()) {
+                    continue;
+                }
+                for(const auto &status : st->status) {
+                    auto id = GetIdByName(status.name);
+                    if(!id.empty()) {
+                        auto info = infoManager.GetInfo(id);
+                        info->SetProgress(status.progress_ppm / 10000);
+                        infoManager.UpdateInfo(*info);
+                    }
+                }
 //                lt::torrent_status const& s = st->status[0];
 //                cout << "\r" << State(s.state) << " "
-//                          << (s.download_payload_rate / 1000) << " kB/s "
-//                          << (s.total_done / 1000) << " kB ("
-//                          << (s.progress_ppm / 10000) << "%) downloaded\x1b[K";
+//                          << (status.download_payload_rate / 1000) << " kB/s "
+//                          << (status.total_done / 1000) << " kB ("
+//                          << (status.progress_ppm / 10000) << "%) downloaded\x1b[K";
 //                cout.flush();
-//            }
+            }
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
@@ -260,11 +274,9 @@ void Torrent::Handler()
 
         // save resume data once every 30 seconds
         if (clk::now() - lastSaveResume > std::chrono::seconds(30)) {
-            for(const auto &it : tHandlers) {
-                if(it.second) {
-                    it.second->handle.save_resume_data();
-                } else {
-                    tHandlers.erase(it.first);
+            for(const auto &it : torrentsIdList) {
+                if(it.second.handler) {
+                    it.second.handler->handle.save_resume_data();
                 }
             }
             lastSaveResume = clk::now();
@@ -304,22 +316,23 @@ std::string Torrent::GetResumeFilePath(const std::string &name) const
     return cfg.GetDownloadDirectory() + "/" + name + ".resume_file";
 }
 
+//TODO: function is deprecated
 void Torrent::FindTFilesAndAdd()
 {
-    auto dir = cfg.GetTorrentFilesDirectory();
-    auto files = common::filesystem::GetFilesInFolder(dir, ".*\\.torrent");
-    for(const auto &f : files) {
-        if(!IsWork())
-            return;
-        try {
-            AddTorrent(dir + "/" + f);
-        } catch(const std::runtime_error &) {
-            continue;
-        }
-    }
+//    auto dir = cfg.GetTorrentFilesDirectory();
+//    auto files = common::filesystem::GetFilesInFolder(dir, ".*\\.torrent");
+//    for(const auto &f : files) {
+//        if(!IsWork())
+//            return;
+//        try {
+//            AddTorrent(dir + "/" + f);
+//        } catch(const std::runtime_error &) {
+//            continue;
+//        }
+//    }
 }
 
-void Torrent::AddTorrent(const std::string &fullPath, const std::string &uuid) throw()
+void Torrent::AddTorrent(const std::string &uuid, const std::string &fullPath) noexcept(false)
 {
     lt::add_torrent_params param;
     param.save_path = cfg.GetDownloadDirectory();
@@ -331,19 +344,17 @@ void Torrent::AddTorrent(const std::string &fullPath, const std::string &uuid) t
         PLOG_ERROR << errMsg;
         throw std::runtime_error(errMsg);
     }
-    AddTorrent(std::move(param), uuid);
+    AddTorrent(uuid, std::move(param));
 }
 
-void Torrent::AddTorrent(lt::add_torrent_params && param, const std::string &uuid)
+void Torrent::AddTorrent(const std::string &uuid, lt::add_torrent_params && param)
 {
-    std::lock_guard<std::mutex> locker(paramsMtx);
+    std::lock_guard<std::recursive_mutex> locker(torrentIdListMtx);
     session->async_add_torrent(param);
-    params.push_back(std::move(param));
     std::string curUUID(uuid);
     if(curUUID.empty())
         curUUID = common::GenerateUUID();
-    params_type::iterator it = params.end();
-    torrents[curUUID] = --it;
+    torrentsIdList[curUUID].param = std::move(param);
 }
 
 bool Torrent::IsWork() const

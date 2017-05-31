@@ -47,6 +47,19 @@ bool GRPCClient::IsRun() const
     return isRun;
 }
 
+void GRPCClient::UpdateTorrentStatus(const TorrentInfo &tInfo)
+{
+    ClientContext context;
+    UpdateTorrentStatusRequest request;
+    request.mutable_agentinfo()->CopyFrom(GetClientInfo());
+    request.mutable_torrentinfo()->CopyFrom(tInfo);
+    BaseResponse response;
+    Status status = stub->UpdateTorrentStatus(&context, request, &response);
+    if (!status.ok()) {
+        PLOG_ERROR << "UpdateTorrentStatus failed : " << status.error_message() << " , error code : " << response.error_code();
+    }
+}
+
 DaemonInfo GRPCClient::GetClientInfo() const
 {
     std::lock_guard<std::recursive_mutex> locker(mtxTask);
@@ -135,7 +148,15 @@ void GRPCClient::DownloadTorrentClb()
 
 void GRPCClient::UpdateTorrentClb()
 {
-    //TODO: add update torrent info code
+    ClientContext context;
+    std::unique_ptr<ClientReader<TorrentInfo>> reader(
+                stub->GetTorrentsForUpdateStatus(&context, GetClientInfo()));
+    auto torrentList = ReadStream<TorrentInfo>(std::move(reader));
+    for(const auto &ti : torrentList) {
+        DaemonRPC::TorrentInfo tInfo;
+        tInfo = client->UpdateTorrentInfo(ti);
+        UpdateTorrentStatus(tInfo);
+    }
 }
 
 void GRPCClient::CreateTorrentClb()

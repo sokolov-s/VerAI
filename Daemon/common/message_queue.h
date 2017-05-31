@@ -48,7 +48,7 @@ public:
         return queueMessages.empty();
     }
     
-    void Pop(T* item)
+    void Pop(T* item) noexcept(false)
     {
         if(!item){
             throw std::invalid_argument("Argument can't be NULL");
@@ -69,7 +69,7 @@ public:
      * @param item - Last element of queue will be moved into this pointer. 
      *        If "item" is empty function throws std::invalid_argument exception
      */
-    void Wait(long timeout_ms, T *item)
+    void Wait(long timeout_ms, T *item) noexcept(false)
     {
         if(!item){
             throw std::invalid_argument("Argument can't be NULL");
@@ -93,7 +93,7 @@ public:
      * @param deq - All working deque will be moved into this pointer
      *        If "deq" is empty function throws std::invalid_argument exception
      */
-    void WaitAndReturnAll(long timeout_ms, std::deque<T> *deq)
+    void WaitAndReturnAll(long timeout_ms, std::deque<T> *deq) noexcept(false)
     {
         if(!deq){
             throw std::invalid_argument("Argument can't be NULL");

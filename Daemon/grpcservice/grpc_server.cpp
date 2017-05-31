@@ -88,3 +88,13 @@ grpc::Status ServerImpl::GetTorrentsForDownload(grpc::ServerContext */*context*/
     }
     return Status::OK;
 }
+
+grpc::Status ServerImpl::GetTorrentsForUpdateStatus(grpc::ServerContext */*context*/, const DaemonInfo *request,
+                                                    ::grpc::ServerWriter<TorrentInfo> *writer)
+{
+    auto torrents = GetHandler()->GetTorrentsForUpdateStatus(*request);
+    for (const TorrentInfo& tInfo : torrents) {
+        writer->Write(tInfo);
+    }
+    return Status::OK;
+}

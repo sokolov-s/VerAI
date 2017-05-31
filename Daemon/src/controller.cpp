@@ -32,16 +32,22 @@ string Controller::GetClientUUID()
 
 void Controller::GenerateTorrent(const DaemonRPC::TorrentInfo &tInfo)
 {
-    torrent->CreateTorrentAsync(tInfo.path(), tInfo.id());
+    torrent->CreateTorrentAsync(tInfo.id(), tInfo.path());
 }
 
 void Controller::DownloadTorrent(const DaemonRPC::TorrentInfo &tInfo)
 {
-    torrent->DownloadAsync(tInfo.link());
+    try {
+        torrent->DownloadAsync(tInfo.id(), tInfo.link());
+    } catch(const std::runtime_error &) {
+        //TODO: send error to the server
+        rpcClient->UpdateTorrentStatus(tInfo);
+    }
 }
 
 DaemonRPC::TorrentInfo Controller::UpdateTorrentInfo(const DaemonRPC::TorrentInfo &tInfo)
 {
     //TODO: write correct code to update torrent status
+
     return tInfo;
 }

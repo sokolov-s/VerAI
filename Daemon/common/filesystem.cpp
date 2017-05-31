@@ -87,6 +87,19 @@ std::vector<std::string> common::filesystem::GetFilesInFolder(const std::string 
     return fileList;
 }
 
+bool common::filesystem::IsFileExist(const std::string &filePath) noexcept
+{
+    struct stat buffer;
+    return (stat(filePath.c_str(), &buffer) == 0);
+}
+
+void common::filesystem::Remove(const std::string &filePath) noexcept(false)
+{
+    if(-1 == remove(filePath.c_str())) {
+        throw std::ios_base::failure("Can't remove file: " + filePath);
+    }
+}
+
 File::File(const std::string &fullPath, int params)
     : m_openFileParams(params)
     , m_fullPath(fullPath)
@@ -106,7 +119,7 @@ File::~File()
     Close();
 }
 
-void File::Open() throw()
+void File::Open() noexcept(false)
 {
     if(IsOpened()) {
         return;
@@ -119,7 +132,7 @@ void File::Open() throw()
     SetFileDescriptor(fd);
 }
 
-void File::Write(const std::string &data, ssize_t length) throw()
+void File::Write(const std::string &data, ssize_t length) noexcept(false)
 {
     Open();
     if(!IsOpened()) {
@@ -133,22 +146,20 @@ void File::Write(const std::string &data, ssize_t length) throw()
     }
 }
 
-void File::Trunc() throw()
+void File::Trunc() noexcept(false)
 {
     if(-1 == truncate(GetFullPath().c_str(), 0)) {
         throw std::ios_base::failure("Can't truncate file: " + GetFullPath());
     }
 }
 
-void File::Remove() throw()
+void File::Remove() noexcept(false)
 {
     Close();
-    if(-1 == remove(GetFullPath().c_str())) {
-        throw std::ios_base::failure("Can't remove file: " + GetFullPath());
-    }
+    common::filesystem::Remove(GetFileName());
 }
 
-void File::Close() throw()
+void File::Close() noexcept(false)
 {
     if(IsOpened()) {
         if(-1 == close(GetFileDescriptor())) {
@@ -167,7 +178,7 @@ void File::ForceClose() noexcept
     }
 }
 
-void File::Move(std::string &newPath) throw()
+void File::Move(std::string &newPath) noexcept(false)
 {
     if(IsOpened()){
         Close();
@@ -177,7 +188,7 @@ void File::Move(std::string &newPath) throw()
     }
 }
 
-int File::GetFileSize() const throw()
+int File::GetFileSize() const noexcept(false)
 {
     struct stat status;
     if(fstat(GetFileDescriptor(), &status) == -1){
@@ -186,17 +197,17 @@ int File::GetFileSize() const throw()
     return status.st_size;
 }
 
-std::string File::GetFullPath() const
+std::string File::GetFullPath() const noexcept
 {
     return m_fullPath;
 }
 
-std::string File::GetFileName() const
+std::string File::GetFileName() const noexcept
 {
     return m_fileName;
 }
 
-std::string File::GetDirectory() const
+std::string File::GetDirectory() const noexcept
 {
     return m_dirName;
 }
@@ -206,22 +217,22 @@ bool File::IsOpened() const
     return (-1 != GetFileDescriptor());
 }
 
-void File::SetFileDescriptor(int fd)
+void File::SetFileDescriptor(int fd) noexcept
 {
     m_fileDescriptor = fd;
 }
 
-int File::GetFileDescriptor() const
+int File::GetFileDescriptor() const noexcept
 {
     return m_fileDescriptor;
 }
 
-void File::SetFileParameters(int params)
+void File::SetFileParameters(int params) noexcept
 {
     m_openFileParams = params;
 }
 
-int File::GetFileParameters() const
+int File::GetFileParameters() const noexcept
 {
     return m_openFileParams;
 }

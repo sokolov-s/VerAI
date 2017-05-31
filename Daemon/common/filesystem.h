@@ -32,6 +32,9 @@ void CreateFolder(const std::string &dir);
  */
 std::vector<std::string> GetFilesInFolder(const std::string &dir, const std::string &fileMask);
 
+bool IsFileExist(const std::string &filePath) noexcept;
+void Remove(const std::string &filePath) noexcept(false);
+
 /**
  * @brief The File class - Class to work with files on filesystem.
  * It is the c++ wrapper around standard c functions (open, write, close).
@@ -52,34 +55,34 @@ public:
     File(const File &) = delete;
     File & operator=(const File &) = delete;
 
-    void Open() throw();
+    void Open() noexcept(false);
     bool IsOpened() const;
 
-    void Write(const std::string &data, ssize_t length = -1) throw();
-    void Trunc() throw();
-    void Remove() throw();
-    void Close() throw();
+    void Write(const std::string &data, ssize_t length = -1) noexcept(false);
+    void Trunc() noexcept(false);
+    void Remove() noexcept(false);
+    void Close() noexcept(false);
     void ForceClose() noexcept;
-    void Move(std::string &newPath) throw();
-    int GetFileSize() const throw();
+    void Move(std::string &newPath) noexcept(false);
+    int GetFileSize() const noexcept(false);
 
-    std::string GetFullPath() const;
+    std::string GetFullPath() const noexcept;
 
     /**
      * @brief GetFileName - Function returns filename without folder part.
      */
-    std::string GetFileName() const;
+    std::string GetFileName() const noexcept;
 
     /**
      * @brief GetDirectory - Function returns full directory path to the file without filename.
      */
-    std::string GetDirectory() const;
+    std::string GetDirectory() const noexcept;
 
 private:
-    void SetFileDescriptor(int fd);
-    int GetFileDescriptor() const;
-    void SetFileParameters(int params);
-    int GetFileParameters() const;
+    void SetFileDescriptor(int fd) noexcept;
+    int GetFileDescriptor() const noexcept;
+    void SetFileParameters(int params) noexcept;
+    int GetFileParameters() const noexcept;
 private:
     int m_openFileParams = O_CREAT | O_RDWR | O_TRUNC;
     std::string m_fullPath;

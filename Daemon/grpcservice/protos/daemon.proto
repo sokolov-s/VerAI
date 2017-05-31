@@ -7,6 +7,7 @@ service  ServerService {
     rpc GetTaskList(DaemonInfo) returns (stream Task) {}
     rpc GetInfoForGenerateTorrents(DaemonInfo) returns (stream TorrentInfo) {}
     rpc GetTorrentsForDownload(DaemonInfo) returns (stream TorrentInfo) {}
+    rpc GetTorrentsForUpdateStatus(DaemonInfo) returns (stream TorrentInfo) {}
     rpc UpdateTorrentStatus(UpdateTorrentStatusRequest) returns (BaseResponse) {}
 }
 
@@ -44,6 +45,7 @@ message TorrentInfo {
         ERROR = 6;
     }
     Status status = 4;
+    int32 workProgress = 5;
 }
 
 message GenerateTorrentRequest {

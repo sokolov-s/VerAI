@@ -2,7 +2,7 @@ project(VerAIDaemon CXX)
 cmake_minimum_required(VERSION 2.8)
 
 # Boost
-find_package(Boost REQUIRED COMPONENTS system filesystem)
+find_package(Boost REQUIRED COMPONENTS system thread filesystem)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
