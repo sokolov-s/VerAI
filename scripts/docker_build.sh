@@ -28,7 +28,7 @@ case "$op" in
 		$DOCKER run -t -v $SRC_ROOT:/tmp/build -i $DOCKER_IMAGE bash -c "$BUILD_CMD"
 		;;
 	console)
-		$DOCKER run -t -v $SRC_ROOT:/tmp/build -i $DOCKER_IMAGE bash -c \
+		$DOCKER run --privileged -t -v $SRC_ROOT:/tmp/build -i $DOCKER_IMAGE bash -c \
 			"/bin/bash"
 		;;
 	gitlab-ci)

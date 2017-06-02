@@ -59,7 +59,7 @@ void Torrent::Start()
     handlersThread = std::thread(&Torrent::Handler, this);
     //TODO: we have a plan to get tasks only from server. So we are going to remove code with autoadding tfiles at startup.
 //    addThread = std::thread(&Torrent::FindTFilesAndAdd, this);
-    PLOG_INFO << "Torrent started";
+    PLOG_DEBUG << "Torrent started";
 }
 
 void Torrent::Stop()
@@ -77,7 +77,7 @@ void Torrent::Stop()
     session.release();
     std::lock_guard<std::recursive_mutex> lockerList(torrentIdListMtx);
     torrentsIdList.clear();
-    PLOG_INFO << "Torrent stoped";
+    PLOG_DEBUG << "Torrent stoped";
 }
 
 void Torrent::CreateTorrentAsync(const std::string &uuid, const std::string &path)
@@ -90,9 +90,10 @@ void Torrent::CreateTorrentAsync(const std::string &uuid, const std::string &pat
 
 void Torrent::CreateTorrent(const std::string &uuid, const std::string &path)
 {
+    PLOG_INFO << "CreateTorrent : id = " << uuid << "; path to project = " << path;
     TorrentInfo info(uuid);
     info.SetStatus(TorrentInfo::Status::GENERATING);
-    info.SetPath(path);
+    info.SetPathToProject(path);
     infoManager.UpdateOrAdd(info);
 
     lt::file_storage fs;
@@ -148,9 +149,12 @@ void Torrent::CreateTorrent(const std::string &uuid, const std::string &path)
         auto tInfo = CreateInfoFromFile(fileName);
         std::string magnet = lt::make_magnet_uri(tInfo);
         info.SetLink(magnet);
+        info.SetPathToTFile(fileName);
         infoManager.UpdateOrAdd(info);
+        PLOG_DEBUG << "Torrent " << info.GetId() << " generating status : success";
     } catch(const std::runtime_error &) {
         UpdateStatus(uuid, TorrentInfo::Status::GENERATION_ERROR, 0);
+        PLOG_ERROR << "Torrent " << info.GetId() << " generating status : failed";
     }
 }
 
@@ -158,6 +162,7 @@ void Torrent::UpdateCreationProgress(const std::string &uuid, int curPiece, int 
 {
     uint progress = trunc(1.0 * curPiece * 100 / totalPieces);
     UpdateStatus(uuid, TorrentInfo::Status::GENERATING, progress);
+    PLOG_INFO << "Update working progress for " << uuid << " torrent file : " << std::to_string(progress);
 }
 
 void Torrent::UpdateStatus(const std::string &uuid, const TorrentInfo::Status &status, const uint progress)
@@ -172,7 +177,7 @@ std::string Torrent::GetIdByName(const std::string &name) const
 {
     std::lock_guard<std::recursive_mutex> locker(torrentIdListMtx);
     for(const auto &it : torrentsIdList) {
-        if(it.second.handler->torrent_name() == name) {
+        if(it.second.param.name == name) {
             return it.first;
         }
     }
@@ -186,6 +191,7 @@ TorrentInfo Torrent::GetTorrentInfo(const std::string &uuid) const
 
 std::string Torrent::GetMagnetFromHandler(const std::string &uuid) const
 {
+    PLOG_INFO << "Generate magnet link for " << uuid << " torrent file";
     std::lock_guard<std::recursive_mutex> locker(torrentIdListMtx);
     std::string magnet;
     if(torrentsIdList.find(uuid) != torrentsIdList.end()) {
@@ -198,6 +204,7 @@ std::string Torrent::GetMagnetFromHandler(const std::string &uuid) const
 
 void Torrent::DownloadAsync(const std::string &uuid, const std::string &link) noexcept(false)
 {
+    PLOG_INFO << "Download torrent file " << uuid << " with magnet link : " << link;
     TorrentInfo info(uuid);
     info.SetStatus(TorrentInfo::Status::DOWNLOADING);
     infoManager.UpdateOrAdd(info);
@@ -206,18 +213,17 @@ void Torrent::DownloadAsync(const std::string &uuid, const std::string &link) no
 
     lt::error_code ec;
     lt::parse_magnet_uri(link, param, ec);
-
-    param.save_path = cfg.GetDownloadDirectory();
-    std::ifstream ifs(GetResumeFilePath(param), std::ios_base::binary);
-    ifs.unsetf(std::ios_base::skipws);
-    param.resume_data.assign(std::istream_iterator<char>(ifs)
-                           , std::istream_iterator<char>());
     if (ec) {
         std::string errMsg = "Invalid magnet URI: " + ec.message();
         PLOG_ERROR << errMsg;
         UpdateStatus(uuid, TorrentInfo::Status::DOWNLOADING_ERROR, 0);
         throw std::runtime_error(errMsg);
     }
+    param.save_path = cfg.GetDownloadDirectory();
+    std::ifstream ifs(GetResumeFilePath(param), std::ios_base::binary);
+    ifs.unsetf(std::ios_base::skipws);
+    param.resume_data.assign(std::istream_iterator<char>(ifs)
+                           , std::istream_iterator<char>());
     AddTorrent(uuid, std::move(param));
 }
 

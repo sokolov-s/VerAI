@@ -28,8 +28,10 @@ public:
     std::string GetId() const noexcept;
     void SetLink(const std::string &link) noexcept;
     std::string GetLink() const noexcept;
-    void SetPath(const std::string &path) noexcept;
-    std::string GetPath() const noexcept;
+    void SetPathToProject(const std::string &path) noexcept;
+    std::string GetPathToProject() const noexcept;
+    void SetPathToTFile(const std::string &path) noexcept;
+    std::string GetPathToTFile() const noexcept;
     void SetStatus(const Status &status) noexcept;
     Status GetStatus() const noexcept;
     void SetProgress(const int &progress) noexcept;
@@ -41,6 +43,7 @@ private:
     std::string tId;
     std::string tLink;
     std::string tPath;
+    std::string pPath;
     Status tStatus = Status::UNKNOWN;
     uint tProgress = 0;
 };

@@ -68,13 +68,25 @@ std::string TorrentInfo::GetLink() const noexcept
     return tLink;
 }
 
-void TorrentInfo::SetPath(const std::string &path) noexcept
+void TorrentInfo::SetPathToProject(const std::string &path) noexcept
+{
+    std::lock_guard<std::mutex> locker(mtx);
+    pPath = path;
+}
+
+std::string TorrentInfo::GetPathToProject() const noexcept
+{
+    std::lock_guard<std::mutex> locker(mtx);
+    return pPath;
+}
+
+void TorrentInfo::SetPathToTFile(const std::string &path) noexcept
 {
     std::lock_guard<std::mutex> locker(mtx);
     tPath = path;
 }
 
-std::string TorrentInfo::GetPath() const noexcept
+std::string TorrentInfo::GetPathToTFile() const noexcept
 {
     std::lock_guard<std::mutex> locker(mtx);
     return tPath;

@@ -34,7 +34,7 @@ message DaemonInfo {
 message TorrentInfo {
     string id = 1;
     string link = 2;
-    string path = 3;
+    string pathToTFile = 3;
     enum Status {
         NONE = 0;
         DOWNLOADED = 1;
@@ -46,6 +46,7 @@ message TorrentInfo {
     }
     Status status = 4;
     int32 workProgress = 5;
+    string pathToProject = 6;
 }
 
 message GenerateTorrentRequest {

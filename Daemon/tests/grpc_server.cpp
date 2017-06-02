@@ -50,9 +50,11 @@ public:
         lock_guard<recursive_mutex> locker(mtx);
         std::cout << "Update torrent info for  " << dInfo.uuid()
                   << " : id = " << tInfo.id()
-                  << " ; link = " << tInfo.link() << " ; path = " << tInfo.path()
+                  << " ; link = " << tInfo.link()
+                  << " ; path to torrent = " << tInfo.pathtotfile()
+                  << " ; path to project = " << tInfo.pathtoproject()
                   << " ; status = " << to_string(tInfo.status())
-                  << " progress = " << to_string(tInfo.workprogress()) << endl;
+                  << " ; progress = " << to_string(tInfo.workprogress()) << endl;
         switch(tInfo.status()) {
         case DaemonRPC::TorrentInfo::Status::TorrentInfo_Status_GENERATED:
             if(!tInfo.link().empty()) {
@@ -100,10 +102,10 @@ public:
         DaemonRPC::TorrentInfo tInfo;
         if(uuids.find(dInfo.uuid()) != uuids.end()) {
             tInfo.set_id(common::GenerateUUID());
-            tInfo.set_path("/opt/VerAI/projects/1");
+            tInfo.set_pathtoproject("/opt/VerAI/projects/1");
             Add2UpdateList(dInfo.uuid(), tInfo);
             std::cout << "GetInfoForGenerateTorrents for  " << dInfo.uuid() << " daemon, torrent info : "
-                      << tInfo.id() <<  " , path = " << tInfo.path() << endl;
+                      << tInfo.id() <<  " , path to project = " << tInfo.pathtoproject() << endl;
         }
         return vector<DaemonRPC::TorrentInfo>({tInfo});
     }
