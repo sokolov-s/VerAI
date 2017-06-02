@@ -25,7 +25,7 @@ public:
     void CreateTorrentAsync(const std::string &uuid, const std::string &path);
 
     TorrentInfo GetTorrentInfo(const std::string &uuid) const;
-    std::string GetMagnet(const std::string &uuid) const;
+    std::string GetMagnetFromHandler(const std::string &uuid) const;
     void DownloadAsync(const std::string &uuid, const std::string &link) noexcept(false);
 
 private:
@@ -38,6 +38,7 @@ private:
     void FindTFilesAndAdd();
     void AddTorrent(const std::string &uuid, const std::string &fullPath) noexcept(false);
     void AddTorrent(const std::string &uuid, libtorrent::add_torrent_params && param);
+    libtorrent::torrent_info CreateInfoFromFile(const std::string &path) const;
     bool IsWork() const;
     void UpdateStatus(const std::string &uuid, const TorrentInfo::Status &status, const uint progress);
     std::string GetIdByName(const std::string &name) const;

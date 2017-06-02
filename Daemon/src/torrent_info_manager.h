@@ -11,12 +11,12 @@ namespace torrent {
 class TorrentInfoManager
 {
 public:
-    std::shared_ptr<TorrentInfo> AddInfo(TorrentInfo &&info);
-    std::shared_ptr<TorrentInfo> UpdateInfo(const TorrentInfo &info);
-    std::shared_ptr<TorrentInfo> GetInfo(const std::string &id) const;
+    std::shared_ptr<TorrentInfo> UpdateOrAdd(const TorrentInfo &info);
+    std::shared_ptr<TorrentInfo> Get(const std::string &id) const;
 private:
     mutable boost::shared_mutex mtx;
-    std::map<std::string, std::shared_ptr<TorrentInfo>> infoList;
+    typedef std::map<std::string, std::shared_ptr<TorrentInfo>> InfoList;
+    InfoList infoList;
 };
 
 } //namespace torrent

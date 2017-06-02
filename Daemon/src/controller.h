@@ -3,6 +3,7 @@
 
 #include <memory>
 #include "torrent.h"
+#include "torrent_info.h"
 #include "config/config_daemon.h"
 #include "grpcservice/grpc_client.h"
 
@@ -23,6 +24,8 @@ private:
     virtual void DownloadTorrent(const DaemonRPC::TorrentInfo &tInfo) override;
     virtual DaemonRPC::TorrentInfo UpdateTorrentInfo(const DaemonRPC::TorrentInfo &tInfo) override;
 
+    DaemonRPC::TorrentInfo ConvertTorrentInfo(const torrent::TorrentInfo &info) const;
+    DaemonRPC::TorrentInfo::Status ConvertTorrentStatus(const torrent::TorrentInfo::Status &status) const;
 private:
     std::unique_ptr<torrent::Torrent> torrent;
     const config::ConfigDaemon &daemonCfg;

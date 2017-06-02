@@ -82,15 +82,19 @@ void Torrent::Stop()
 
 void Torrent::CreateTorrentAsync(const std::string &uuid, const std::string &path)
 {
-    if(infoManager.GetInfo(uuid)->GetStatus() != TorrentInfo::Status::GENERATING &&
-            infoManager.GetInfo(uuid)->GetStatus() != TorrentInfo::Status::GENERATED) {
+    if(infoManager.Get(uuid)->GetStatus() != TorrentInfo::Status::GENERATING &&
+            infoManager.Get(uuid)->GetStatus() != TorrentInfo::Status::GENERATED) {
         std::thread(&Torrent::CreateTorrent, this, uuid, path).detach();
     }
 }
 
 void Torrent::CreateTorrent(const std::string &uuid, const std::string &path)
 {
-    UpdateStatus(uuid, TorrentInfo::Status::GENERATING, 0);
+    TorrentInfo info(uuid);
+    info.SetStatus(TorrentInfo::Status::GENERATING);
+    info.SetPath(path);
+    infoManager.UpdateOrAdd(info);
+
     lt::file_storage fs;
     lt::add_files(fs, path);
     if (fs.num_files() == 0) {
@@ -139,7 +143,12 @@ void Torrent::CreateTorrent(const std::string &uuid, const std::string &path)
     outFile.close();
     try {
 //        AddTorrent(uuid, fileName);
-        UpdateStatus(uuid, TorrentInfo::Status::GENERATED, 100);
+        info.SetProgress(100);
+        info.SetStatus(TorrentInfo::Status::GENERATED);
+        auto tInfo = CreateInfoFromFile(fileName);
+        std::string magnet = lt::make_magnet_uri(tInfo);
+        info.SetLink(magnet);
+        infoManager.UpdateOrAdd(info);
     } catch(const std::runtime_error &) {
         UpdateStatus(uuid, TorrentInfo::Status::GENERATION_ERROR, 0);
     }
@@ -147,15 +156,16 @@ void Torrent::CreateTorrent(const std::string &uuid, const std::string &path)
 
 void Torrent::UpdateCreationProgress(const std::string &uuid, int curPiece, int totalPieces)
 {
-    uint progress = 100 * totalPieces / (curPiece + 1);
+    uint progress = trunc(1.0 * curPiece * 100 / totalPieces);
     UpdateStatus(uuid, TorrentInfo::Status::GENERATING, progress);
 }
 
 void Torrent::UpdateStatus(const std::string &uuid, const TorrentInfo::Status &status, const uint progress)
 {
-    auto info = infoManager.GetInfo(uuid);
+    auto info = infoManager.Get(uuid);
     info->SetStatus(status);
     info->SetProgress(progress);
+    infoManager.UpdateOrAdd(*info);
 }
 
 std::string Torrent::GetIdByName(const std::string &name) const
@@ -171,10 +181,10 @@ std::string Torrent::GetIdByName(const std::string &name) const
 
 TorrentInfo Torrent::GetTorrentInfo(const std::string &uuid) const
 {
-    return *infoManager.GetInfo(uuid);
+    return *infoManager.Get(uuid);
 }
 
-std::string Torrent::GetMagnet(const std::string &uuid) const
+std::string Torrent::GetMagnetFromHandler(const std::string &uuid) const
 {
     std::lock_guard<std::recursive_mutex> locker(torrentIdListMtx);
     std::string magnet;
@@ -188,7 +198,10 @@ std::string Torrent::GetMagnet(const std::string &uuid) const
 
 void Torrent::DownloadAsync(const std::string &uuid, const std::string &link) noexcept(false)
 {
-    UpdateStatus(uuid, TorrentInfo::Status::DOWNLOADING, 0);
+    TorrentInfo info(uuid);
+    info.SetStatus(TorrentInfo::Status::DOWNLOADING);
+    infoManager.UpdateOrAdd(info);
+
     lt::add_torrent_params param;
 
     lt::error_code ec;
@@ -253,9 +266,9 @@ void Torrent::Handler()
                 for(const auto &status : st->status) {
                     auto id = GetIdByName(status.name);
                     if(!id.empty()) {
-                        auto info = infoManager.GetInfo(id);
+                        auto info = infoManager.Get(id);
                         info->SetProgress(status.progress_ppm / 10000);
-                        infoManager.UpdateInfo(*info);
+                        infoManager.UpdateOrAdd(*info);
                     }
                 }
 //                lt::torrent_status const& s = st->status[0];
@@ -336,14 +349,7 @@ void Torrent::AddTorrent(const std::string &uuid, const std::string &fullPath) n
 {
     lt::add_torrent_params param;
     param.save_path = cfg.GetDownloadDirectory();
-
-    lt::error_code ec;
-    param.ti = boost::make_shared<lt::torrent_info>(fullPath, boost::ref(ec), 0);
-    if (ec) {
-        std::string errMsg = "Can't init torrent file : " + ec.message();
-        PLOG_ERROR << errMsg;
-        throw std::runtime_error(errMsg);
-    }
+    param.ti = boost::make_shared<lt::torrent_info>(CreateInfoFromFile(fullPath));
     AddTorrent(uuid, std::move(param));
 }
 
@@ -355,6 +361,18 @@ void Torrent::AddTorrent(const std::string &uuid, lt::add_torrent_params && para
     if(curUUID.empty())
         curUUID = common::GenerateUUID();
     torrentsIdList[curUUID].param = std::move(param);
+}
+
+lt::torrent_info Torrent::CreateInfoFromFile(const std::string &path) const
+{
+    lt::error_code ec;
+    lt::torrent_info info(path, boost::ref(ec), 0);
+    if (ec) {
+        std::string errMsg = "Can't init torrent file : " + ec.message();
+        PLOG_ERROR << errMsg;
+        throw std::runtime_error(errMsg);
+    }
+    return info;
 }
 
 bool Torrent::IsWork() const

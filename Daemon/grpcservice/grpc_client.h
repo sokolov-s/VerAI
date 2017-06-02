@@ -51,11 +51,11 @@ private:
     void AddTask(const DaemonRPC::Task::TaskType &taskType);
     void AddTaskAfterTimeOut(const DaemonRPC::Task::TaskType &taskType, const unsigned int ms);
     std::shared_ptr<common::IRunnable> CreateTask(const DaemonRPC::Task::TaskType &taskType);
-    void UpdateTasksClb();
-    void HandshakeClb();
-    void DownloadTorrentClb();
-    void UpdateTorrentClb();
-    void CreateTorrentClb();
+    void UpdateTasksTask();
+    void HandshakeTask();
+    void DownloadTorrentTask();
+    void UpdateTorrentTask();
+    void CreateTorrentTask();
 
     template<typename T>
     std::vector<T> ReadStream(std::unique_ptr<grpc::ClientReader<T>> &&reader) {

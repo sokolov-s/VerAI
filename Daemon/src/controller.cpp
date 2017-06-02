@@ -47,7 +47,39 @@ void Controller::DownloadTorrent(const DaemonRPC::TorrentInfo &tInfo)
 
 DaemonRPC::TorrentInfo Controller::UpdateTorrentInfo(const DaemonRPC::TorrentInfo &tInfo)
 {
-    //TODO: write correct code to update torrent status
+    auto newInfo = torrent->GetTorrentInfo(tInfo.id());
+    return ConvertTorrentInfo(newInfo);
+}
 
-    return tInfo;
+DaemonRPC::TorrentInfo Controller::ConvertTorrentInfo(const torrent::TorrentInfo &info) const
+{
+    DaemonRPC::TorrentInfo resultInfo;
+    resultInfo.set_id(info.GetId());
+    resultInfo.set_link(info.GetLink());
+    resultInfo.set_path(info.GetLink());
+    resultInfo.set_status(ConvertTorrentStatus(info.GetStatus()));
+    resultInfo.set_workprogress(info.GetProgress());
+    return resultInfo;
+}
+
+DaemonRPC::TorrentInfo::Status Controller::ConvertTorrentStatus(const torrent::TorrentInfo::Status &status) const
+{
+    switch (status) {
+    case torrent::TorrentInfo::Status::DOWNLOADED:
+        return DaemonRPC::TorrentInfo::Status::TorrentInfo_Status_DOWNLOADED;
+    case torrent::TorrentInfo::Status::DOWNLOADING:
+        return DaemonRPC::TorrentInfo::Status::TorrentInfo_Status_DOWNLOADING;
+    case torrent::TorrentInfo::Status::DOWNLOADING_ERROR:
+        return DaemonRPC::TorrentInfo::Status::TorrentInfo_Status_ERROR;
+    case torrent::TorrentInfo::Status::GENERATED:
+        return DaemonRPC::TorrentInfo::Status::TorrentInfo_Status_GENERATED;
+    case torrent::TorrentInfo::Status::GENERATING:
+        return DaemonRPC::TorrentInfo::Status::TorrentInfo_Status_GENERATING;
+    case torrent::TorrentInfo::Status::GENERATION_ERROR:
+        return DaemonRPC::TorrentInfo::Status::TorrentInfo_Status_ERROR;
+    case torrent::TorrentInfo::Status::PAUSED:
+        return DaemonRPC::TorrentInfo::Status::TorrentInfo_Status_PAUSED;
+    default:
+        return DaemonRPC::TorrentInfo::Status::TorrentInfo_Status_NONE;
+    }
 }

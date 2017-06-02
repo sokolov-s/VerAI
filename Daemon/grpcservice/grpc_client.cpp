@@ -85,19 +85,19 @@ std::shared_ptr<common::IRunnable> GRPCClient::CreateTask(const Task::TaskType &
 {
     switch(taskType) {
     case DaemonRPC::Task::TaskType::Task_TaskType_DOWNLOAD_TORRENT:
-        return common::WrapTask(std::bind(&GRPCClient::DownloadTorrentClb, this));
+        return common::WrapTask(std::bind(&GRPCClient::DownloadTorrentTask, this));
 
     case DaemonRPC::Task::TaskType::Task_TaskType_GENERATE_MAGENT:
-        return common::WrapTask(std::bind(&GRPCClient::CreateTorrentClb, this));
+        return common::WrapTask(std::bind(&GRPCClient::CreateTorrentTask, this));
 
     case DaemonRPC::Task::TaskType::Task_TaskType_UPDATE_TORRENT_STATUS:
-        return common::WrapTask(std::bind(&GRPCClient::UpdateTorrentClb, this));
+        return common::WrapTask(std::bind(&GRPCClient::UpdateTorrentTask, this));
 
     case DaemonRPC::Task::TaskType::Task_TaskType_MAKE_HANDSHAKE:
-        return common::WrapTask(std::bind(&GRPCClient::HandshakeClb, this));
+        return common::WrapTask(std::bind(&GRPCClient::HandshakeTask, this));
 
     case DaemonRPC::Task::TaskType::Task_TaskType_UPDATE_TASK_LIST:
-        return common::WrapTask(std::bind(&GRPCClient::UpdateTasksClb, this));
+        return common::WrapTask(std::bind(&GRPCClient::UpdateTasksTask, this));
         break;
 
     default:
@@ -105,7 +105,7 @@ std::shared_ptr<common::IRunnable> GRPCClient::CreateTask(const Task::TaskType &
     }
 }
 
-void GRPCClient::UpdateTasksClb()
+void GRPCClient::UpdateTasksTask()
 {
     if(IsRun()) {
         ClientContext context;
@@ -119,7 +119,7 @@ void GRPCClient::UpdateTasksClb()
     }
 }
 
-void GRPCClient::HandshakeClb()
+void GRPCClient::HandshakeTask()
 {
     ClientContext context;
     HandshakeRequest request;
@@ -136,7 +136,7 @@ void GRPCClient::HandshakeClb()
     }
 }
 
-void GRPCClient::DownloadTorrentClb()
+void GRPCClient::DownloadTorrentTask()
 {
     ClientContext context;
     std::unique_ptr<ClientReader<TorrentInfo>> reader(
@@ -146,20 +146,19 @@ void GRPCClient::DownloadTorrentClb()
     AddTask(DaemonRPC::Task::TaskType::Task_TaskType_UPDATE_TORRENT_STATUS);
 }
 
-void GRPCClient::UpdateTorrentClb()
+void GRPCClient::UpdateTorrentTask()
 {
     ClientContext context;
     std::unique_ptr<ClientReader<TorrentInfo>> reader(
                 stub->GetTorrentsForUpdateStatus(&context, GetClientInfo()));
     auto torrentList = ReadStream<TorrentInfo>(std::move(reader));
     for(const auto &ti : torrentList) {
-        DaemonRPC::TorrentInfo tInfo;
-        tInfo = client->UpdateTorrentInfo(ti);
+        DaemonRPC::TorrentInfo tInfo = client->UpdateTorrentInfo(ti);
         UpdateTorrentStatus(tInfo);
     }
 }
 
-void GRPCClient::CreateTorrentClb()
+void GRPCClient::CreateTorrentTask()
 {
     ClientContext context;
     std::unique_ptr<ClientReader<TorrentInfo>> reader(
