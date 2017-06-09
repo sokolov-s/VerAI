@@ -8,44 +8,15 @@ TorrentInfo::TorrentInfo(const std::string &torrentId)
 }
 
 TorrentInfo::TorrentInfo(const TorrentInfo &info) noexcept
-    : tId(info.tId)
-    , tLink(info.tLink)
-    , tPath(info.tPath)
-    , tStatus(info.tStatus)
-    , tProgress(info.tProgress)
 {
-
-}
-
-TorrentInfo::TorrentInfo(TorrentInfo &&info) noexcept
-    : tId(std::move(info.tId))
-    , tLink(std::move(info.tLink))
-    , tPath(std::move(info.tPath))
-    , tStatus(std::move(info.tStatus))
-    , tProgress(std::move(info.tProgress))
-{
+    Copy(info);
 }
 
 TorrentInfo & TorrentInfo::operator=(const TorrentInfo &info) noexcept
 {
+    std::lock_guard<std::mutex> locker(mtx);
     if(&info != this) {
-        tId = info.tId;
-        tLink = info.tLink;
-        tPath = info.tPath;
-        tStatus = info.tStatus;
-        tProgress = info.tProgress;
-    }
-    return *this;
-}
-
-TorrentInfo & TorrentInfo::operator=(TorrentInfo &&info) noexcept
-{
-    if(&info != this) {
-        tId = (std::move(info.tId));
-        tLink = (std::move(info.tLink));
-        tPath = (std::move(info.tPath));
-        tStatus = (std::move(info.tStatus));
-        tProgress = (std::move(info.tProgress));
+        Copy(info);
     }
     return *this;
 }
@@ -114,4 +85,14 @@ uint TorrentInfo::GetProgress() const noexcept
 {
     std::lock_guard<std::mutex> locker(mtx);
     return tProgress;
+}
+
+void TorrentInfo::Copy(const TorrentInfo &info)
+{
+    tId = info.GetId();
+    tLink = info.GetLink();
+    tPath = info.GetPathToTFile();
+    pPath = info.GetPathToProject();
+    tStatus = info.GetStatus();
+    tProgress = info.GetProgress();
 }

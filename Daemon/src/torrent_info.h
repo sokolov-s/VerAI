@@ -21,9 +21,9 @@ public:
         PAUSED,
     };
     TorrentInfo(const TorrentInfo & info) noexcept;
-    TorrentInfo(TorrentInfo && info) noexcept;
     TorrentInfo & operator=(const TorrentInfo &info) noexcept;
-    TorrentInfo & operator=(TorrentInfo &&info) noexcept;
+    TorrentInfo(TorrentInfo && info) noexcept = default;
+    TorrentInfo & operator=(TorrentInfo &&info) noexcept = default;
 
     std::string GetId() const noexcept;
     void SetLink(const std::string &link) noexcept;
@@ -37,8 +37,10 @@ public:
     void SetProgress(const int &progress) noexcept;
     uint GetProgress() const noexcept;
 private:
+    void Copy(const TorrentInfo &info);
 
 private:
+    // NOTE: if you add new items do not forget to add it into Copy function;
     mutable std::mutex mtx;
     std::string tId;
     std::string tLink;

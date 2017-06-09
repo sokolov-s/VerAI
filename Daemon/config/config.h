@@ -29,10 +29,10 @@ public:
     {
         auto resKey = keys.find(key);
         if(keys.end() == resKey) {
-            std::ostringstream msg;
-            msg << "Key " << static_cast<int>(key) << " does not found in config keys";
-            PLOG_WARNING << msg.str();
-            throw std::invalid_argument(msg.str());
+            std::string msg;
+            msg = "Key " + std::to_string(static_cast<int>(key)) + " does not found in config keys";
+            PLOG_WARNING << msg;
+            throw std::invalid_argument(msg);
         }
         return resKey->second;
     }

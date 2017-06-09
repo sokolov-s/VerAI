@@ -11,7 +11,9 @@ namespace torrent {
 class TorrentInfoManager
 {
 public:
-    std::shared_ptr<TorrentInfo> UpdateOrAdd(const TorrentInfo &info);
+    std::shared_ptr<TorrentInfo> Create(const std::string &id);
+    std::shared_ptr<TorrentInfo> Create(const TorrentInfo &info);
+    void Update(const TorrentInfo &info);
     std::shared_ptr<TorrentInfo> Get(const std::string &id) const;
 private:
     mutable boost::shared_mutex mtx;

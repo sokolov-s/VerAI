@@ -29,28 +29,27 @@ public:
     void DownloadAsync(const std::string &uuid, const std::string &link) noexcept(false);
 
 private:
-    void Handler();
+    void HandlerAlerts();
     std::string State(libtorrent::torrent_status::state_t s);
     std::string GetResumeFilePath(const libtorrent::add_torrent_params &param) const;
-    std::string GetResumeFilePath(const std::string &name) const;
+    std::string GetResumeFilePath(const libtorrent::sha1_hash &infoHash) const;
     void CreateTorrent(const std::string &uuid, const std::string &path);
     void UpdateCreationProgress(const std::string &uuid, int curPiece, int totalPieces);
-    void FindTFilesAndAdd();
     void AddTorrent(const std::string &uuid, const std::string &fullPath) noexcept(false);
     void AddTorrent(const std::string &uuid, libtorrent::add_torrent_params && param);
     libtorrent::torrent_info CreateInfoFromFile(const std::string &path) const;
     bool IsWork() const;
     void UpdateStatus(const std::string &uuid, const TorrentInfo::Status &status, const uint progress);
     std::string GetIdByName(const std::string &name) const;
+
 private:
     const config::ConfigTorrent &cfg;
     std::unique_ptr<libtorrent::session> session;
     struct TorrentsInSystem {
         libtorrent::add_torrent_params param;
-        libtorrent::torrent_alert const * handler = nullptr;
+        libtorrent::torrent_handle handle;
     };
     std::thread handlersThread;
-    std::thread addThread;
     mutable std::recursive_mutex workMtx;
     mutable std::recursive_mutex torrentIdListMtx;
     bool isWork = false;

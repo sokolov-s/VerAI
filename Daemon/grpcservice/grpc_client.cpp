@@ -55,11 +55,6 @@ void GRPCClient::UpdateTorrentStatus(const TorrentInfo &tInfo)
     request.mutable_torrentinfo()->CopyFrom(tInfo);
     BaseResponse response;
     Status status = stub->UpdateTorrentStatus(&context, request, &response);
-    PLOG_INFO << "UpdateTorrentStatus for " << clientInfo.uuid() << " daemon : torrent = " << tInfo.id()
-              << "; project path = " << tInfo.pathtoproject()
-              << "; torrent file path = " << tInfo.pathtotfile()
-              << "; status = " << to_string(tInfo.status())
-              << "; work progress = " << tInfo.workprogress();
     if (!status.ok()) {
         PLOG_ERROR << "UpdateTorrentStatus failed : " << status.error_message() << " , error code : " << response.error_code();
     }
@@ -78,7 +73,6 @@ void GRPCClient::AddTask(const Task &task)
 
 void GRPCClient::AddTask(const Task::TaskType &taskType)
 {
-    PLOG_INFO << "Add task for " << clientInfo.uuid() << " : " << to_string(taskType);
     tasksWorker.EnqueueTask(CreateTask(taskType));
 }
 
@@ -171,5 +165,5 @@ void GRPCClient::CreateTorrentTask()
                 stub->GetInfoForGenerateTorrents(&context, GetClientInfo()));
     auto torrentList = ReadStream<TorrentInfo>(std::move(reader));
     client->GenerateTorrent(torrentList);
-    AddTask(DaemonRPC::Task::TaskType::Task_TaskType_UPDATE_TORRENT_STATUS);
+    AddTaskAfterTimeOut(DaemonRPC::Task::TaskType::Task_TaskType_UPDATE_TORRENT_STATUS, 30);
 }
