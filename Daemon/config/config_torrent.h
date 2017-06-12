@@ -12,7 +12,8 @@ class ConfigTorrent : private common::noncopyable::NonCopyable
         kPort,
         kInterface,
         kDownloadFolder,
-        kTFilesFolder
+        kTFilesFolder,
+        kProjectsFolder
     };
 
     ConfigTorrent();
@@ -30,6 +31,9 @@ public:
 
     std::string GetTorrentFilesDirectory() const;
     void SetTorrentFilesDirectory(const std::string &dir);
+
+    std::string GetProjectsDirectory() const;
+    void SetProjectsDirectory(const std::string &dir);
 private:
     void Init();
 
@@ -41,6 +45,7 @@ private:
     const std::string defInterface = "0.0.0.0";
     const std::string defDownloadDir = "downloads";
     const std::string defTFilesDir = "torrents";
+    const std::string defProjectsDir = "projects";
 };
 
 } //namespace config

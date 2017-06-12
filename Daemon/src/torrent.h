@@ -12,6 +12,7 @@
 #include <libtorrent/torrent_handle.hpp>
 #include <libtorrent/torrent_status.hpp>
 #include <libtorrent/alert_types.hpp>
+#include <libtorrent/create_torrent.hpp>
 
 namespace torrent {
 
@@ -36,12 +37,13 @@ private:
     void CreateTorrent(const std::string &uuid, const std::string &path);
     void UpdateCreationProgress(const std::string &uuid, int curPiece, int totalPieces);
     void AddTorrent(const std::string &uuid, const std::string &fullPath) noexcept(false);
-    void AddTorrent(const std::string &uuid, libtorrent::add_torrent_params && param);
+    void AddTorrent(const std::string &uuid, const libtorrent::add_torrent_params &param);
     libtorrent::torrent_info CreateInfoFromFile(const std::string &path) const;
     bool IsWork() const;
     void UpdateStatus(const std::string &uuid, const TorrentInfo::Status &status, const uint progress);
     std::string GetIdByName(const std::string &name) const;
-
+    std::string WriteTorrent(libtorrent::entry &en, const std::string &name);
+    void AddTorrentTest(const std::string &uuid, const libtorrent::add_torrent_params & param);
 private:
     const config::ConfigTorrent &cfg;
     std::unique_ptr<libtorrent::session> session;
@@ -55,6 +57,7 @@ private:
     bool isWork = false;
     std::map<std::string, TorrentsInSystem> torrentsIdList;
     TorrentInfoManager infoManager;
+    bool canAdd = false;
 };
 
 } //namespace torrent

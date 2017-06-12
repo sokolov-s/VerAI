@@ -10,6 +10,8 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 sudo apt-get update
 sudo apt-get install docker-ce
 
+cd ..
+
 cd grpc
 git checkout v1.3.1 || exit -1
 git submodule update --init

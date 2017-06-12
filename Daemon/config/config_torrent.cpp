@@ -12,6 +12,7 @@ ConfigTorrent::ConfigTorrent()
                {eKeys::kInterface, section("interface")},
                {eKeys::kDownloadFolder, section("downloadFolder")},
                {eKeys::kTFilesFolder, section("torrentFilesFolder")},
+               {eKeys::kProjectsFolder, section("projectsFolder")},
            })
 {
     Init();
@@ -61,6 +62,16 @@ string ConfigTorrent::GetTorrentFilesDirectory() const
 void ConfigTorrent::SetTorrentFilesDirectory(const string &dir)
 {
     cnfg.WriteString(keys(eKeys::kTFilesFolder), dir);
+}
+
+string ConfigTorrent::GetProjectsDirectory() const
+{
+    return cnfg.GetString(keys(eKeys::kProjectsFolder), cnfg.GetFolder() + "/" + defProjectsDir);
+}
+
+void ConfigTorrent::SetProjectsDirectory(const string &dir)
+{
+    cnfg.WriteString(keys(eKeys::kProjectsFolder), dir);
 }
 
 void ConfigTorrent::Init()
