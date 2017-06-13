@@ -10,19 +10,27 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 sudo apt-get update
 sudo apt-get install docker-ce
 
-cd ..
+pushd ..
 
-cd grpc
+git submodule update --init
+
+pushd grpc
 git checkout v1.3.1 || exit -1
 git submodule update --init
 
-cd third_party/protobuf
+pushd third_party/protobuf
 git checkout v3.2.0 || exit -1
 ./autogen.sh || exit -1
 ./configure || exit -1
 make -j$(nproc --all) || exit -1
 make install || exit -1
 
-cd ../..
+popd
 make -j$(nproc --all) || exit -1
 make install || exit -1
+
+popd
+
+pushd libtorrent
+git checkout libtorrent-1_1_3 || exit -1
+

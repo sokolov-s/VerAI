@@ -55,13 +55,13 @@ void Torrent::Start()
 //    settings.set_str(lt::settings_pack::listen_interfaces, cfg.GetInterface() + ":" + cfg.GetPort());
     settings.set_str(lt::settings_pack::user_agent, "VerAI_client/" LIBTORRENT_VERSION);
     settings.set_int(lt::settings_pack::alert_mask
-                     , lt::alert::all_categories
-                     /*lt::alert::error_notification
+                     , /*lt::alert::all_categories*/
+                     lt::alert::error_notification
                      | lt::alert::storage_notification
                      | lt::alert::status_notification
                      | lt::alert::progress_notification
                      | lt::alert::dht_notification
-                     | lt::alert::dht_log_notification*/);
+                     | lt::alert::dht_log_notification);
     settings.set_bool(lt::settings_pack::enable_dht, true);
     settings.set_bool(lt::settings_pack::enable_lsd, true);
     settings.set_bool(lt::settings_pack::enable_natpmp, true);
@@ -70,7 +70,12 @@ void Torrent::Start()
     settings.set_bool(lt::settings_pack::enable_outgoing_tcp, true);
     settings.set_bool(lt::settings_pack::enable_incoming_utp, true);
     settings.set_bool(lt::settings_pack::enable_outgoing_utp, true);
-    settings.set_str(lt::settings_pack::dht_bootstrap_nodes, "dht.libtorrent.org:25401, router.utorrent.com:6881,router.bittorrent.com:6881,dht.transmissionbt.com:6881,router.bitcomet.com:6881,dht.aelitis.com:6881");
+    settings.set_str(lt::settings_pack::dht_bootstrap_nodes, "dht.libtorrent.org:25401,"
+                                                             "router.utorrent.com:6881,"
+                                                             "router.bittorrent.com:6881,"
+                                                             "dht.transmissionbt.com:6881,"
+                                                             "router.bitcomet.com:6881,"
+                                                             "dht.aelitis.com:6881");
 
     session.reset(new lt::session(settings));
 
@@ -132,23 +137,8 @@ void Torrent::CreateTorrent(const std::string &uuid, const std::string &path)
         return;
     }
     //TODO: add full information.
-    // set_creator - set the created-by field
     // set_comment - sets the comment
-    // set_piece_hashes -
-//    t.add_node(std::make_pair("router.utorrent.com", 6881));
-//    t.add_node(std::make_pair("192.168.150.130", 6881));
     t.set_creator("VerAI libtorrent");
-    t.add_tracker("http://router.utorrent.com:6881");
-    t.add_tracker("http://router.bittorrent.com:6881");
-    t.add_tracker("http://dht.transmissionbt.com:6881");
-    t.add_tracker("http://router.bitcomet.com:6881");
-    t.add_tracker("http://dht.aelitis.com:6881");
-    t.add_tracker("http://192.168.150.130:80");
-    t.add_tracker("http://192.168.150.130:6881");
-    t.add_url_seed("http://192.168.150.130/1.torrent");
-    t.add_node(std::make_pair("192.168.150.130", 6881));
-    t.add_node(std::make_pair("router.bitcomet.com", 6881));
-    t.add_node(std::make_pair("dht.libtorrent.org", 25401));
     auto e = t.generate();
     if (e.type() == lt::entry::undefined_t) {
         UpdateStatus(uuid, TorrentInfo::Status::GENERATION_ERROR, 0);
@@ -210,14 +200,6 @@ std::string Torrent::WriteTorrent(libtorrent::entry &en, const std::string &name
     if(common::filesystem::IsFileExist(fileName)) {
         common::filesystem::Remove(fileName);
     }
-    //TODO: write correct code to generate torrent file
-//    std::vector<char> torrentData;
-//    lt::bencode(std::back_inserter(torrentData), en);
-//    std::fstream tFile;
-//    tFile.exceptions(std::ifstream::failbit);
-//    tFile.open(fileName, std::ios_base::out | std::ios_base::binary);
-//    tFile.write(&torrentData[0], torrentData.size());
-//    tFile.close();
     std::ofstream outFile(fileName, std::ios_base::binary);
     lt::bencode(std::ostream_iterator<char>(outFile), en);
     outFile.close();
@@ -274,9 +256,9 @@ void Torrent::DownloadAsync(const std::string &uuid, const std::string &link) no
 void Torrent::HandlerAlerts()
 {
     while(IsWork()) {
-//        auto a = session->wait_for_alert(lt::milliseconds(1000 * 5));
-//        if (a == nullptr)
-//            continue;
+        auto a = session->wait_for_alert(lt::milliseconds(1000));
+        if (a == nullptr)
+            continue;
         std::vector<lt::alert*> alerts;
         session->pop_alerts(&alerts);
 
@@ -310,7 +292,7 @@ void Torrent::HandlerAlerts()
                         std::lock_guard<std::recursive_mutex> locker(torrentIdListMtx);
                         torrentsIdList[id].handle = handle;
                     }
-//                    handle.save_resume_data(lt::torrent_handle::save_info_dict | lt::torrent_handle::only_if_modified);
+                    handle.save_resume_data(lt::torrent_handle::save_info_dict | lt::torrent_handle::only_if_modified);
                 }
                 continue;
             }
@@ -409,22 +391,14 @@ void Torrent::HandlerAlerts()
                         }
                     }
                 }
-//                lt::torrent_status const& s = st->status[0];
-//                cout << "\r" << State(s.state) << " "
-//                          << (status.download_payload_rate / 1000) << " kB/s "
-//                          << (status.total_done / 1000) << " kB ("
-//                          << (status.progress_ppm / 10000) << "%) downloaded\x1b[K";
-//                cout.flush();
                 continue;
             }
 
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
-
-        session->post_torrent_updates();
-        session->post_session_stats();
-        session->post_dht_stats();
+//        session->post_torrent_updates();
+//        session->post_session_stats();
+//        session->post_dht_stats();
     }
 }
 
@@ -471,41 +445,12 @@ void Torrent::AddTorrent(const std::string &uuid, const std::string &fullPath) n
 void Torrent::AddTorrent(const std::string &uuid, const lt::add_torrent_params & param)
 {
     std::lock_guard<std::recursive_mutex> locker(torrentIdListMtx);
-//    while(!canAdd) {
-//        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-//        usleep(1000 * 200);
-//    }
     session->async_add_torrent(param);
     std::string curUUID(uuid);
     if(curUUID.empty())
         curUUID = common::GenerateUUID();
     torrentsIdList[curUUID].param = param;
     PLOG_INFO << "Add torrent to system :" << uuid;
-}
-
-void Torrent::AddTorrentTest(const std::string &uuid, const lt::add_torrent_params & param)
-{
-    std::lock_guard<std::recursive_mutex> locker(torrentIdListMtx);
-    lt::error_code ec;
-    auto handler = session->add_torrent(param, ec);
-    if(ec) {
-        std::string errMsg = "Can't add torrent : " + ec.message();
-        PLOG_ERROR << errMsg;
-        UpdateStatus(uuid, TorrentInfo::Status::DOWNLOADING_ERROR, 0);
-    }
-    std::string curUUID(uuid);
-    if(curUUID.empty())
-        curUUID = common::GenerateUUID();
-    torrentsIdList[curUUID].param = param;
-    while(!handler.status().has_metadata){
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    };
-
-    auto tInfo = handler.torrent_file();
-    lt::create_torrent creator(*tInfo);
-    auto te = creator.generate();
-    auto tPath = WriteTorrent(te, tInfo->name());
-    AddTorrent(uuid, tPath);
 }
 
 lt::torrent_info Torrent::CreateInfoFromFile(const std::string &path) const
@@ -517,7 +462,6 @@ lt::torrent_info Torrent::CreateInfoFromFile(const std::string &path) const
         PLOG_ERROR << errMsg;
         throw std::runtime_error(errMsg);
     }
-    info.add_url_seed("http://192.168.150.130:80");
     return info;
 }
 

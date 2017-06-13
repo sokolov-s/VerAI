@@ -43,7 +43,6 @@ private:
     void UpdateStatus(const std::string &uuid, const TorrentInfo::Status &status, const uint progress);
     std::string GetIdByName(const std::string &name) const;
     std::string WriteTorrent(libtorrent::entry &en, const std::string &name);
-    void AddTorrentTest(const std::string &uuid, const libtorrent::add_torrent_params & param);
 private:
     const config::ConfigTorrent &cfg;
     std::unique_ptr<libtorrent::session> session;
