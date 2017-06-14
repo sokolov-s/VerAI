@@ -9,12 +9,13 @@ set(LIBTORRENT_BIN_DIR ${CMAKE_BINARY_DIR}/libtorrent CACHE STRING "Path to the 
 
 set(PLOG_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/plog" CACHE STRING "Path to the plog project sources" FORCE)
 
-add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
+#add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
-    COMMAND cd ${LIBTORRENT_SRC_DIR} && git checkout libtorrent-1_1_3
-    )
+#add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
+#    COMMAND cd ${LIBTORRENT_SRC_DIR} && git checkout libtorrent-1_1_3
+#    )
 
+add_subdirectory(grpc)
 add_subdirectory(libtorrent)
 add_subdirectory(Daemon)
