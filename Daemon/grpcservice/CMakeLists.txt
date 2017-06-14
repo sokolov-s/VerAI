@@ -29,6 +29,7 @@ include_directories(
     ${PROTO_GEN_DIR}
     ${PROTOBUF_INCLUDE_DIRS}
     ${GRPC_INCLUDE_DIR}
+    ${GRPCSERVICE_GEN_DIR}
     )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
@@ -56,6 +57,9 @@ add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME}
     pthread
-    ${PROTOBUF_LIBRARIES}
+    protobuf::libprotoc
+    protobuf
     gRPC::grpc++_reflection
     )
+add_custom_target(generate_grpc DEPENDS "${GRPCSERVICE_GEN_DIR}/daemon.grpc.pb.cc")
+add_dependencies(${PROJECT_NAME} generate_grpc)

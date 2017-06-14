@@ -3,12 +3,16 @@ sudo apt-get install python-xattr cmake automake autoconf libtool bison gcc g++ 
 apt-transport-https ca-certificates curl software-properties-common linux-image-extra-$(uname -r) linux-image-extra-virtual libprotobuf-dev protobuf-compiler pkg-config \
 google-mock libgflags-dev libgtest-dev clang libc++-dev golang-any
 
-#curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+checkDocker=`which docker`
+if [ -z "$checkDocker" ]
+then
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
-#sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
-#sudo apt-get update
-#sudo apt-get install docker-ce
+    sudo apt-get update
+    sudo apt-get install docker-ce
+fi
 
 pushd ..
 
@@ -21,13 +25,14 @@ git submodule update --init
 pushd third_party/protobuf
 git checkout v3.2.0 || exit -1
 ./autogen.sh || exit -1
-./configure || exit -1
-#make -j$(nproc --all) || exit -1
-#make install || exit -1
+./configure --prefix=/usr || exit -1
+make -j$(nproc --all) || exit -1
+sudo make install || exit -1
+sudo ldconfig || exit -1
 
 popd
-#make -j$(nproc --all) || exit -1
-#make install || exit -1
+make -j$(nproc --all) || exit -1
+sudo make install || exit -1
 
 popd
 
