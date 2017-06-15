@@ -61,5 +61,5 @@ target_link_libraries(${PROJECT_NAME}
     protobuf
     gRPC::grpc++_reflection
     )
-add_custom_target(generate_grpc DEPENDS "${GRPCSERVICE_GEN_DIR}/daemon.grpc.pb.cc")
+add_custom_target(generate_grpc DEPENDS ${GRPCSERVICE_GEN_DIR}/daemon.grpc.pb.cc ${GRPCSERVICE_GEN_DIR}/daemon.grpc.pb.h)
 add_dependencies(${PROJECT_NAME} generate_grpc)
