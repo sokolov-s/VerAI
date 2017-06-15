@@ -1,22 +1,16 @@
 project(VerAI)
 cmake_minimum_required(VERSION 2.8)
-include(ExternalProject)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set(LIBTORRENT_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libtorrent)
+set(LIBTORRENT_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libtorrent" CACHE STRING "Path to the libtorrent project sources" FORCE)
+set(LIBTORRENT_BIN_DIR ${CMAKE_BINARY_DIR}/libtorrent CACHE STRING "Path to the libtorrent project libraries" FORCE)
 
-set(LIBTORRENT_BIN_DIR ${CMAKE_BINARY_DIR}/libtorrent)
+set(PLOG_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/plog" CACHE STRING "Path to the plog project sources" FORCE)
 
-ExternalProject_Add(libtorrent
-    SOURCE_DIR ${LIBTORRENT_SRC_DIR}
-    CONFIGURE_COMMAND cd ${LIBTORRENT_SRC_DIR} &&
-        ./autotool.sh &&
-        ./configure --prefix=${LIBTORRENT_BIN_DIR} --enable-logging --enable-debug --enable-dht --enable-python-binding --enable-examples=no --enable-encryption --enable-tests=yes --with-libiconv
+add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-    BUILD_COMMAND cd ${LIBTORRENT_SRC_DIR} && make
-    INSTALL_COMMAND  cd ${LIBTORRENT_SRC_DIR} && make install
-    )
-
+add_subdirectory(${LIBTORRENT_SRC_DIR})
 add_subdirectory(Daemon)

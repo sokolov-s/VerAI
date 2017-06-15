@@ -13,6 +13,7 @@
 #include <execinfo.h>
 #include <syslog.h>
 #include <memory>
+#include "controller.h"
 
 using namespace std;
 
@@ -22,6 +23,7 @@ enum eDaemonStatus {
     NeedToTerminate
 };
 const unsigned int kFdLimit = 2048;
+std::unique_ptr<daemonspace::Controller> dmn;
 
 int VerAIDaemonProc();
 void CreatePidFile(const char* fileName);
@@ -153,11 +155,14 @@ int WorkProc()
 
     syslog(LOG_INFO, "[VerAIDaemon] Started\n");
 
+    dmn.reset(new daemonspace::Controller());
     try {
+        dmn->Start();
         for (;;) {
             sigwait(&sigset, &signo);
             break;
         }
+        dmn->Stop();
     } catch(...) {
         syslog(LOG_ERR, "[VerAIDaemon] Create work thread failed\n");
     }
@@ -200,6 +205,8 @@ void SignalError(int sig, siginfo_t *si, void *ptr)
 
     syslog(LOG_INFO, "[VerAIDaemon] Stopped\n");
 
+    dmn->Stop();
+    dmn.release();
     exit(NeedToWork);
 }
 

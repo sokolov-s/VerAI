@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package DaemonRPC;
+
+service  ServerService {
+    rpc Handshake(HandshakeRequest) returns (DaemonInfo) {}
+    rpc GetTaskList(DaemonInfo) returns (stream Task) {}
+    rpc GetInfoForGenerateTorrents(DaemonInfo) returns (stream TorrentInfo) {}
+    rpc GetTorrentsForDownload(DaemonInfo) returns (stream TorrentInfo) {}
+    rpc GetTorrentsForUpdateStatus(DaemonInfo) returns (stream TorrentInfo) {}
+    rpc UpdateTorrentStatus(UpdateTorrentStatusRequest) returns (BaseResponse) {}
+}
+
+service ClientService {
+    rpc GenerateTorrent(GenerateTorrentRequest) returns (TorrentInfo) {}
+    rpc UpdateTorrentStatus(TorrentInfo) returns (BaseResponse) {}
+    rpc DownloadTorrent(TorrentInfo) returns (BaseResponse) {}
+}
+
+message HandshakeRequest {
+    string uuid = 1;
+}
+
+message DaemonInfo {
+    string uuid = 1;
+    string authTocken = 2;
+    enum Status {
+        FAILED = 0;
+        OK = 1;
+    }
+    Status authStatus = 3;
+}
+
+message TorrentInfo {
+    string id = 1;
+    string link = 2;
+    string pathToTFile = 3;
+    enum Status {
+        NONE = 0;
+        DOWNLOADED = 1;
+        DOWNLOADING = 2;
+        GENERATED = 3;
+        GENERATING = 4;
+        PAUSED = 5;
+        ERROR = 6;
+    }
+    Status status = 4;
+    int32 workProgress = 5;
+    string pathToProject = 6;
+}
+
+message GenerateTorrentRequest {
+    string dir = 1;
+}
+
+message UpdateTorrentStatusRequest {
+    DaemonInfo agentInfo = 1;
+    TorrentInfo torrentInfo = 2;
+}
+
+message BaseResponse {
+    string error_code = 1;
+}
+
+message Task {
+    enum TaskType {
+        GENERATE_MAGENT = 0;
+        DOWNLOAD_TORRENT = 1;
+        UPDATE_TORRENT_STATUS = 2;
+        UPDATE_TASK_LIST = 3;
+        MAKE_HANDSHAKE = 4;
+    }
+    TaskType task = 1;
+}
