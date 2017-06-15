@@ -36,7 +36,7 @@ private:
     std::string GetResumeFilePath(const libtorrent::sha1_hash &infoHash) const;
     void CreateTorrent(const std::string &uuid, const std::string &path);
     void UpdateCreationProgress(const std::string &uuid, int curPiece, int totalPieces);
-    void AddTorrent(const std::string &uuid, const std::string &fullPath) noexcept(false);
+    void AddTorrent(const std::string &uuid, const std::string &pathToTorrent, const std::string &downloadPath) noexcept(false);
     void AddTorrent(const std::string &uuid, const libtorrent::add_torrent_params &param);
     libtorrent::torrent_info CreateInfoFromFile(const std::string &path) const;
     bool IsWork() const;

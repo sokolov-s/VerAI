@@ -156,13 +156,7 @@ void Torrent::CreateTorrent(const std::string &uuid, const std::string &path)
         info->SetProgress(100);
         info->SetStatus(TorrentInfo::Status::GENERATED);
         PLOG_DEBUG << "Torrent " << info->GetId() << " generating status : success";
-//        DownloadAsync(uuid, magnet);
-//        AddTorrent(uuid, fileName);
-        lt::add_torrent_params param;
-        param.ti = boost::make_shared<lt::torrent_info>(CreateInfoFromFile(fileName));
-        param.save_path = cfg.GetProjectsDirectory();
-        param.seed_mode = true;
-        session->async_add_torrent(param);
+        AddTorrent(uuid, fileName, cfg.GetProjectsDirectory());
     } catch(const std::runtime_error &) {
         UpdateStatus(uuid, TorrentInfo::Status::GENERATION_ERROR, 0);
         PLOG_ERROR << "Torrent " << info->GetId() << " generating status : failed";
@@ -434,11 +428,12 @@ std::string Torrent::GetResumeFilePath(lt::sha1_hash const& infoHash) const
     return cfg.GetDownloadDirectory() + "/.resume/" + ToString(infoHash) + ".resume";
 }
 
-void Torrent::AddTorrent(const std::string &uuid, const std::string &fullPath) noexcept(false)
+void Torrent::AddTorrent(const std::string &uuid, const std::string &pathToTorrent, const std::string &downloadPath) noexcept(false)
 {
     lt::add_torrent_params param;
-    param.save_path = cfg.GetDownloadDirectory();
-    param.ti = boost::make_shared<lt::torrent_info>(CreateInfoFromFile(fullPath));
+    param.save_path = downloadPath;
+    param.ti = boost::make_shared<lt::torrent_info>(CreateInfoFromFile(pathToTorrent));
+    param.seed_mode = true;
     AddTorrent(uuid, param);
 }
 
