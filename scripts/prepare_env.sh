@@ -1,18 +1,38 @@
 #!/bin/bash
-sudo apt-get install python-xattr cmake automake autoconf libtool bison gcc g++ libboost-all-dev libboost-dev python libicu-dev openssl libssl-dev checkinstall \
+packages="python-xattr cmake automake autoconf libtool bison gcc g++ libboost-all-dev libboost-dev python libicu-dev openssl libssl-dev checkinstall \
 apt-transport-https ca-certificates curl software-properties-common linux-image-extra-$(uname -r) linux-image-extra-virtual pkg-config \
-google-mock libgflags-dev libgtest-dev clang libc++-dev golang-any
+google-mock libgflags-dev libgtest-dev clang libc++-dev golang-any python3-pip python3-dev python3-virtualenv"
 
-checkDocker=`which docker`
-if [ -z "$checkDocker" ]
+function CheckBinary()
+{
+    local result=`which $1`;
+    if [ -z "${result}" ]
+    then
+        return 1
+    else
+        return 0
+    fi
+}
+
+if ! $(CheckBinary "python3.5")
 then
+    echo "Add python ver 3.5"
+    packages="$packages,python3.5,python3-setuptools"
+fi
+
+if ! $(CheckBinary docker)
+then
+    echo "Add docker repository ..."
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
-    sudo apt-get update
-    sudo apt-get install docker-ce
+    packages="$packages,docker-ce"
 fi
+
+echo "install packages: ${packages}"
+sudo apt-get update
+sudo apt-get install ${packages}
 
 pushd ..
 
@@ -38,4 +58,7 @@ popd
 
 pushd libtorrent
 git checkout libtorrent-1_1_3 || exit -1
+
+popd
+pip3 install tensorflow numpy
 

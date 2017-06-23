@@ -1,0 +1,107 @@
+{
+  "DatasetInput" : {
+    "type" : "dataset",
+    "data_type" : "int32",
+    "init" : {
+      "db_type" : "file",
+      "path" : "./input.data"
+    },
+    "output" : [
+      "value"
+    ]
+  },
+  "Reader" : {
+    "type" : "reader",
+    "init" : {
+        "dataset" : "DatasetInput.value"
+    },
+    "output" : [
+      "x"
+    ]
+  },
+  "A" : {
+    "type" : "variable",
+    "init" : {
+      "initial_value": 0.7,
+      "trainable" : true,
+      "collections" : null,
+      "validate_shape" : true,
+      "caching_device" : null,
+      "name" : null,
+      "variable_def" : null,
+      "dtype" : null,
+      "expected_shape" : null,
+      "import_scope" : null
+    },
+    "output" : [
+      "value"
+    ]
+  },
+  "B" : {
+    "type" : "variable",
+    "init" : {
+      "initial_value": 0.1,
+      "trainable" : true,
+      "collections" : null,
+      "validate_shape" : true,
+      "caching_device" : null,
+      "name" : null,
+      "variable_def" : null,
+      "dtype" : null,
+      "expected_shape" : null,
+      "import_scope" : null
+    },
+    "output" : [
+      "value"
+    ]
+  },
+  "MulA" : {
+    "type" : "transform",
+    "init" : {
+      "a" : {
+        "type" : "obj",
+        "value" : "A.output.value"
+      },
+      "b" : {
+        "type": "obj",
+        "value": "Reader.output.x"
+      }
+    },
+    "output" : [
+      "value"
+    ]
+  },
+  "MulB" : {
+    "type" : "transform",
+    "init" : {
+      "a" : {
+        "type": "obj",
+        "value": "B.output.value"
+      },
+      "b" : {
+        "type": "obj",
+        "value": "Reader.output.x"
+      }
+    },
+    "output" : [
+      "value"
+    ]
+  },
+  "MulAB" : {
+    "type" : "transform",
+    "operation" : "multiply",
+    "init" : {
+      "a" : {
+        "type": "obj",
+        "value": "MulA.output.value"
+      },
+      "b" : {
+        "type": "obj",
+        "value": "MulB.output.value"
+      }
+    },
+    "output" : [
+      "value"
+    ]
+  }
+}

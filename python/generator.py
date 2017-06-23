@@ -1,0 +1,91 @@
+#!/usr/bin/env python3.5
+import sys
+import getopt
+import json
+import os.path
+from collections import OrderedDict
+
+import reader
+
+json_file = None
+output_file = None
+
+def print_no_argument_and_exit():
+    print("Bad parameters")
+    print("Run script with command --help to show usage page")
+    exit(2)
+
+try:
+    if len(sys.argv) <= 1:
+        print_no_argument_and_exit()
+    opts, args = getopt.getopt(sys.argv[1:], "hi:o:", ["help", "ifile=", "ofile="])
+except getopt.GetoptError:
+    print_no_argument_and_exit()
+
+for opt, arg in opts:
+    if opt in ('-h', "--help"):
+        print("""Script parse json file and generate python code to import it to tensorflow library
+        
+Usage: generator.py [OPTIONS]
+Example: python3 generator.py -i file_with_info.json -o generated_script.py
+
+Options:
+    -h, --help          : show help dialog
+    -i, --ifile=FILE    : path to json file
+    -o, --ofile=FILE    : path to generate file
+        """)
+        sys.exit()
+    elif opt in ("-i", "--ifile"):
+        json_file = arg
+    elif opt in ("-o", "--ofile"):
+        output_file = arg
+    else:
+        print("Unknown parameter %s" % opt)
+        exit(2)
+
+if json_file is None or not os.path.isfile(json_file):
+    print("Can't find json file")
+    exit(2)
+
+if output_file is None:
+    output_file = json_file[:-5] + ".py"
+
+print("Generating %s from file %s" % (output_file, json_file))
+data = None
+with open(json_file) as fp:
+    try:
+        data = json.load(fp,  object_pairs_hook=OrderedDict)
+
+    except ValueError:
+        print("Bad json format in file %s" % json_file)
+        sys.exit(2)
+
+
+imports = []
+
+
+def import_string(name):
+    return "import " + name
+
+
+def decalre_function(obj):
+    body = "\n\ndef Get" + obj + ""
+
+    return
+
+
+for key, value in data.items():
+    if reader.Reader(key).is_json_known(value):
+        print("find reader for object %s" % key)
+        r = reader.Reader(key)
+        r.set_json(value)
+        dname = r.get_dataset_name()
+        print("find dataset : %s" % dname)
+        # r.set_dataset()
+        r.parse()
+    else:
+        print(key)
+        # objects.append(create_object(obj))
+
+
+# print("Objects %s" % objects)
