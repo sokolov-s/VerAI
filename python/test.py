@@ -31,8 +31,8 @@ sess = tf.Session()
 # sess = tf_debug.LocalCLIDebugWrapperSession(sess)
 sess.run(init)
 
-x_train = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-y_train = [4, 9, 16, 25, 36, 49, 64, 81, 100, 121]
+x_train = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+y_train = {4, 9, 16, 25, 36, 49, 64, 81, 100, 121}
 
 for i in range(10000):
     sess.run(train, {x: x_train, y: y_train})
@@ -76,19 +76,19 @@ print(sess.run(linear_model, {x: 1}))
 #     c.instantiate()
 #     map_tensors[c.OUTPUTS.Result.key] = c.OUTPUTS.Result
 
-#json
-[
-    {
-    "Component1" : {
-        INTPUT : [
-        ]
-    OUTPUT : [
-        ]
-    TARGET :[
-        Component2 : {
-        }
-    ]
-    }
-    }
-}
-]
+# #json
+# [
+#     {
+#     "Component1" : {
+#         INTPUT : [
+#         ]
+#     OUTPUT : [
+#         ]
+#     TARGET :[
+#         Component2 : {
+#         }
+#     ]
+#     }
+#     }
+# }
+# ]

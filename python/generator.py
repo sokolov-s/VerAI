@@ -1,14 +1,14 @@
 #!/usr/bin/env python3.5
+
 import sys
 import getopt
-import json
 import os.path
-from collections import OrderedDict
 
-import reader
+import factory
 
 json_file = None
 output_file = None
+
 
 def print_no_argument_and_exit():
     print("Bad parameters")
@@ -50,42 +50,14 @@ if json_file is None or not os.path.isfile(json_file):
 if output_file is None:
     output_file = json_file[:-5] + ".py"
 
+creator = factory.Factory()
+tensors = creator.create(json_file)
+
+f_out = open(output_file, "w+")
+f_out.write("#!/usr/bin/env python3.5\n\n")
+for obj in tensors:
+    obj.parse()
+    f_out.write(obj.generate_code())
 print("Generating %s from file %s" % (output_file, json_file))
-data = None
-with open(json_file) as fp:
-    try:
-        data = json.load(fp,  object_pairs_hook=OrderedDict)
-
-    except ValueError:
-        print("Bad json format in file %s" % json_file)
-        sys.exit(2)
-
-
-imports = []
-
-
-def import_string(name):
-    return "import " + name
-
-
-def decalre_function(obj):
-    body = "\n\ndef Get" + obj + ""
-
-    return
-
-
-for key, value in data.items():
-    if reader.Reader(key).is_json_known(value):
-        print("find reader for object %s" % key)
-        r = reader.Reader(key)
-        r.set_json(value)
-        dname = r.get_dataset_name()
-        print("find dataset : %s" % dname)
-        # r.set_dataset()
-        r.parse()
-    else:
-        print(key)
-        # objects.append(create_object(obj))
-
-
+f_out.close()
 # print("Objects %s" % objects)

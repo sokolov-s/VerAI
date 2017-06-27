@@ -3,6 +3,6 @@ import tensorflow as tf
 from enum import Enum
 
 
-class Value(object):
+class Variable(object):
     def __init__(self, *params):
         self.value = tf.Variable(*params)
