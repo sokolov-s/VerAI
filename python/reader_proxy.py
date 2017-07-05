@@ -3,7 +3,7 @@
 import baseparser as bp
 import reader_file as freader
 
-class ReaderBridge(bp.BaseParser):
+class ReaderProxy(bp.BaseParser):
     """
     Some text about class
     """
@@ -14,7 +14,7 @@ class ReaderBridge(bp.BaseParser):
         self.reader = None
 
     def get_dataset_name(self):
-        name = self.js_obj["init"]["dataset"]
+        name = self.get_json()["init"]["dataset"]
         name = name.split('.')
         return name[0]
 
@@ -28,5 +28,5 @@ class ReaderBridge(bp.BaseParser):
             self.reader = freader.ReaderFile(path)
 
     def generate_code(self):
-        code = self.js_obj["output"][0] + " = " + self.reader.read()
+        code = self.get_json()["output"][0] + " = " + self.reader.read()
         return code

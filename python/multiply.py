@@ -3,26 +3,17 @@
 import collections
 import baseparser as bp
 
-from pyparsing import col
 
-
-class Variable(bp.BaseParser):
+class Multiply(bp.BaseParser):
 
     def __init__(self, name):
         params = collections.OrderedDict(
-            {"initial_value": None,
-             "trainable": None,
-             "collections": None,
-             "validate_shape": None,
-             "caching_device": None,
-             "name": None,
-             "variable_def": None,
-             "dtype": None,
-             "expected_shape": None,
-             "import_scope": None
+            {"x": None,
+             "y": None,
+             "name": None
              }
         )
-        bp.BaseParser.__init__(self, name, "variable", params)
+        bp.BaseParser.__init__(self, name, "multiply", params)
 
     def parse(self):
         self.params["name"] = self.get_name()
@@ -31,12 +22,11 @@ class Variable(bp.BaseParser):
                 self.params[key] = bp.BaseParser.to_tf_param(value)
 
     def generate_code(self):
-        code = self.get_json()["output"][0] + " = tf.Variable("
+        code = self.get_json()["output"][0] + " = tf.multiply("
         for key, value in self.get_params().items():
-            if value is not None:
-                code += key + "="
+            if value:
                 if key == "name":
-                    code += "\"" + value + "\""
+                    code += "name=\"" + value + "\""
                 else:
                     code += value
                 code += ", "
