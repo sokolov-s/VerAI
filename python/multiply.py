@@ -8,10 +8,10 @@ class Multiply(bp.BaseParser):
 
     def __init__(self, name):
         params = collections.OrderedDict(
-            {"x": None,
-             "y": None,
-             "name": None
-             }
+            [("x", None),
+             ("y", None),
+             ("name", None)
+             ]
         )
         bp.BaseParser.__init__(self, name, "multiply", params)
 

@@ -2,6 +2,8 @@
 
 import baseparser as bp
 import reader_file as freader
+from pydoc import locate
+
 
 class ReaderProxy(bp.BaseParser):
     """
@@ -28,5 +30,16 @@ class ReaderProxy(bp.BaseParser):
             self.reader = freader.ReaderFile(path)
 
     def generate_code(self):
-        code = self.get_json()["output"][0] + " = " + self.reader.read()
+        code = ""
+        i = 0
+        data = self.reader.read()
+        for value in data:
+            if len(self.get_json()["output"]) > i:
+                code += self.get_json()["output"][i] + " = " + \
+                        str(list(map(locate(self.dataset["data_type"]), value))) + "\n"
+                code += self.get_json()["output"][i] + " = tf.placeholder(tf.float32, name="Output")"
+            else:
+                break
+            i += 1
+        print(code)
         return code

@@ -10,17 +10,17 @@ class Variable(bp.BaseParser):
 
     def __init__(self, name):
         params = collections.OrderedDict(
-            {"initial_value": None,
-             "trainable": None,
-             "collections": None,
-             "validate_shape": None,
-             "caching_device": None,
-             "name": None,
-             "variable_def": None,
-             "dtype": None,
-             "expected_shape": None,
-             "import_scope": None
-             }
+            [("initial_value", None),
+             ("trainable", None),
+             ("collections", None),
+             ("validate_shape", None),
+             ("caching_device", None),
+             ("name", None),
+             ("variable_def", None),
+             ("dtype", None),
+             ("expected_shape", None),
+             ("import_scope", None)
+             ]
         )
         bp.BaseParser.__init__(self, name, "variable", params)
 

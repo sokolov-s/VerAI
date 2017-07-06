@@ -6,10 +6,10 @@ import collections
 
 class BaseParser(ABC):
 
-    def __init__(self, name, type, params=collections.OrderedDict({})):
+    def __init__(self, name, obj_type, params=collections.OrderedDict({})):
         self.name = name
         self.js_obj = None
-        self.type = type
+        self.obj_type = obj_type
         self.params = params
 
     def get_name(self):
@@ -35,7 +35,7 @@ class BaseParser(ABC):
         obj = json_obj if json_obj is not None else self.get_json()
         if obj is None:
             return False
-        return obj["type"] == self.type
+        return obj["type"] == self.obj_type
 
     @staticmethod
     def to_tf_param(param):

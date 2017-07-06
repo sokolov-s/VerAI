@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.5
 
+import re
 
 class ReaderFile(object):
     """
@@ -14,8 +15,10 @@ class ReaderFile(object):
         self.fp.close()
 
     def read(self):
-        result = [x.strip('\n') for x in self.fp.readlines()]
-        return str(result)
-
-    def readline(self):
-        return self.fp.readline()
+        data = []
+        res = []
+        for value in self.fp.readlines():
+            re_res = re.split("\W+", value)
+            data.append(re_res[0])
+            res.append(re_res[1])
+        return data, res

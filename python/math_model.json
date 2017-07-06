@@ -1,22 +1,24 @@
 {
   "DatasetInput" : {
     "type" : "dataset",
-    "data_type" : "int32",
+    "data_type" : "int",
     "init" : {
       "db_type" : "file",
       "path" : "/home/serhii/Projects/VerAI/python/input.data"
     },
     "output" : [
-      "value"
+      "input_data",
+      "result_data"
     ]
   },
   "Reader" : {
     "type" : "reader",
     "init" : {
-        "dataset" : "DatasetInput.value"
+        "dataset" : "DatasetInput"
     },
     "output" : [
-      "x"
+      "x_input",
+      "x_result"
     ]
   },
   "A" : {
@@ -27,14 +29,14 @@
       "collections" : null,
       "validate_shape" : true,
       "caching_device" : null,
-      "name" : null,
+      "name" : "Weight_a",
       "variable_def" : null,
       "dtype" : null,
       "expected_shape" : null,
       "import_scope" : null
     },
     "output" : [
-      "value"
+      "a"
     ]
   },
   "B" : {
@@ -45,63 +47,50 @@
       "collections" : null,
       "validate_shape" : true,
       "caching_device" : null,
-      "name" : null,
+      "name" : "Weight_b",
       "variable_def" : null,
       "dtype" : null,
       "expected_shape" : null,
       "import_scope" : null
     },
     "output" : [
-      "value"
+      "b"
     ]
   },
   "MulA" : {
     "type" : "transform",
+    "operation" : "multiply",
     "init" : {
-      "a" : {
-        "type" : "obj",
-        "value" : "A.output.value"
-      },
-      "b" : {
-        "type": "obj",
-        "value": "Reader.output.x"
-      }
+      "x" : "A.output.a",
+      "y" : "Reader.output.x_input",
+      "name" : "mul_a"
     },
     "output" : [
-      "value"
+      "mul_a"
     ]
   },
   "MulB" : {
     "type" : "transform",
+    "operation" : "multiply",
     "init" : {
-      "a" : {
-        "type": "obj",
-        "value": "B.output.value"
-      },
-      "b" : {
-        "type": "obj",
-        "value": "Reader.output.x"
-      }
+      "x" : "B.output.b",
+      "y" : "Reader.output.x_input",
+      "name" : "mul_b"
     },
     "output" : [
-      "value"
+      "mul_b"
     ]
   },
   "MulAB" : {
     "type" : "transform",
     "operation" : "multiply",
     "init" : {
-      "a" : {
-        "type": "obj",
-        "value": "MulA.output.value"
-      },
-      "b" : {
-        "type": "obj",
-        "value": "MulB.output.value"
-      }
+      "x" : "MulA.output.mul_a",
+      "y" : "MulB.output.mul_b",
+      "name" : "mul_ab"
     },
     "output" : [
-      "value"
+      "mul_ab"
     ]
   }
 }
