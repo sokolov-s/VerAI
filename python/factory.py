@@ -6,6 +6,8 @@ from collections import OrderedDict
 import reader_proxy as reader
 import variable as var
 import transform_proxy as transform
+import baseparser as bp
+
 
 class Factory(object):
     """
@@ -43,6 +45,8 @@ class Factory(object):
                 action = transform.TransofrmProxy(key)
                 action.set_json(value)
                 result.append(action)
+            elif bp.BaseParser.get_json_type(value) == "dataset":
+                continue
             else:
                 print("Unknown json object : %s (%s)" % (key, value))
                 continue

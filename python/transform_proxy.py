@@ -23,6 +23,4 @@ class TransofrmProxy(bp.BaseParser):
 
     def generate_code(self):
         if self.action_obj:
-            return self.action_obj.generate_code()
-        else:
-            return ""
+            self.action_obj.generate_code()

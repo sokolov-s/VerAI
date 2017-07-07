@@ -3,10 +3,11 @@
 import collections
 import baseparser as bp
 
-from pyparsing import col
-
 
 class Variable(bp.BaseParser):
+    """
+    Some text about class
+    """
 
     def __init__(self, name):
         params = collections.OrderedDict(
@@ -31,7 +32,7 @@ class Variable(bp.BaseParser):
                 self.params[key] = bp.BaseParser.to_tf_param(value)
 
     def generate_code(self):
-        code = self.get_json()["output"][0] + " = tf.Variable("
+        code = self.var_name_form_json(self.get_name(), self.get_json(), 0) + " = tf.Variable("
         for key, value in self.get_params().items():
             if value is not None:
                 code += key + "="
@@ -41,4 +42,4 @@ class Variable(bp.BaseParser):
                     code += value
                 code += ", "
         code = code[:-2] + ")"
-        return code
+        self.set_body_code(code)

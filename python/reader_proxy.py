@@ -3,6 +3,7 @@
 import baseparser as bp
 import reader_file as freader
 from pydoc import locate
+import numpy
 
 
 class ReaderProxy(bp.BaseParser):
@@ -29,17 +30,25 @@ class ReaderProxy(bp.BaseParser):
         if db_type == "file":
             self.reader = freader.ReaderFile(path)
 
+    def generate_imports(self):
+        code = "import numpy as np\n"
+        code += self.reader.generate_imports()
+        return code
+
     def generate_code(self):
         code = ""
         i = 0
         data = self.reader.read()
+        value_type = self.dataset["data_type"]
         for value in data:
             if len(self.get_json()["output"]) > i:
-                code += self.get_json()["output"][i] + " = " + \
-                        str(list(map(locate(self.dataset["data_type"]), value))) + "\n"
-                code += self.get_json()["output"][i] + " = tf.placeholder(tf.float32, name="Output")"
+
+                code += self.var_name_form_json(self.get_dataset_name(), self.dataset, i) + " = " + \
+                        str(list(map(locate("numpy." + value_type), value))) + "\n"
+                code += self.var_name_form_json(self.get_name(), self.get_json(), i) + " = tf.placeholder(tf." + value_type + \
+                        ", name=\"" + self.get_json()["output"][i] + "\")\n"
             else:
                 break
             i += 1
-        print(code)
-        return code
+        self.set_head_code("import numpy\n")
+        self.set_body_code(code)

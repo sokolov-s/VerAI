@@ -50,20 +50,38 @@ if json_file is None or not os.path.isfile(json_file):
 if output_file is None:
     output_file = json_file[:-5] + ".py"
 
+print("Generating %s from file %s" % (output_file, json_file))
+
 creator = factory.Factory()
 tensors = creator.create(json_file)
 
 f_out = open(output_file, "w+")
 f_out.write("#!/usr/bin/env python3.5\n\n")
 f_out.write("import tensorflow as tf\n\n")
+
 for obj in tensors:
     obj.parse()
-    f_out.write(obj.generate_code())
-    f_out.write("\n")
+    obj.generate_code()
+
+for obj in tensors:
+    if obj.get_head_code():
+        f_out.write(obj.get_head_code())
+        f_out.write("\n")
+
+for obj in tensors:
+    if obj.get_body_code():
+        f_out.write(obj.get_body_code())
+        f_out.write("\n")
 
 f_out.write("init = tf.global_variables_initializer()\n")
 f_out.write("sess = tf.Session()\n")
 f_out.write("sess.run(init)\n")
-print("Generating %s from file %s" % (output_file, json_file))
+
+for obj in tensors:
+    if obj.get_action_code():
+        f_out.write(obj.get_action_code())
+        f_out.write("\n")
+
+f_out.write("sess.run.(" +  + ")\n")
 f_out.close()
-# print("Objects %s" % objects)
+

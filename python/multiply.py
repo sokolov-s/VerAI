@@ -5,6 +5,9 @@ import baseparser as bp
 
 
 class Multiply(bp.BaseParser):
+    """
+    Some text about class
+    """
 
     def __init__(self, name):
         params = collections.OrderedDict(
@@ -22,13 +25,13 @@ class Multiply(bp.BaseParser):
                 self.params[key] = bp.BaseParser.to_tf_param(value)
 
     def generate_code(self):
-        code = self.get_json()["output"][0] + " = tf.multiply("
+        code = self.var_name_form_json(self.get_name(), self.get_json(), 0) + " = tf.multiply("
         for key, value in self.get_params().items():
             if value:
                 if key == "name":
                     code += "name=\"" + value + "\""
                 else:
-                    code += value
+                    code += self.to_python_var(value)
                 code += ", "
         code = code[:-2] + ")"
-        return code
+        self.set_body_code(code)

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
 import tensorflow as tf
-from tensorflow.python import debug as tf_debug
+#from tensorflow.python import debug as tf_debug
 
 # model parameters
 a = tf.Variable(0.7, name="Weight_a")
-b = tf.Variable(0.1, name="Weight_b", trainable=False)
+b = tf.Variable(0.1, name="Weight_b")
 
 # model input and output
 x = tf.placeholder(tf.float32, name="Input")
@@ -31,15 +31,15 @@ sess = tf.Session()
 # sess = tf_debug.LocalCLIDebugWrapperSession(sess)
 sess.run(init)
 
-x_train = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
-y_train = {4, 9, 16, 25, 36, 49, 64, 81, 100, 121}
+x_train = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+y_train = [4, 9, 16, 25, 36, 49, 64, 81, 100, 121]
 
 for i in range(10000):
     sess.run(train, {x: x_train, y: y_train})
 
 print("a=%f , b=%f " % (sess.run(a), sess.run(b)))
-print(sess.run(linear_model, {x: 16}))
-summary_writer = tf.summary.FileWriter('./', sess.graph)
+print(sess.run(linear_model, {x: x_train}))
+# summary_writer = tf.summary.FileWriter('./', sess.graph)
 print(sess.run(linear_model, {x: 12}))
 print(sess.run(linear_model, {x: 1}))
 
