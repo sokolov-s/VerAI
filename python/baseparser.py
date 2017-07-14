@@ -28,19 +28,19 @@ class BaseParser(ABC):
     def get_params(self):
         return self.params
 
-    def set_head_code(self, code):
+    def _set_head_code(self, code):
         self.head_code = code
 
     def get_head_code(self):
         return self.head_code
 
-    def set_body_code(self, code):
+    def _set_body_code(self, code):
         self.body_code = code
 
     def get_body_code(self):
         return self.body_code
 
-    def set_action_code(self, code):
+    def _set_action_code(self, code):
         self.action_code = code
 
     def get_action_code(self):
@@ -68,7 +68,7 @@ class BaseParser(ABC):
 
     @staticmethod
     def var_name_form_json(json_obj_name, json_obj, var_number):
-        return str(json_obj_name + "_output_" + json_obj["output"][var_number]).lower()
+        return str(json_obj_name + "_output_" + json_obj["output"][var_number]["name"]).lower()
 
     @staticmethod
     def to_tf_param(param):
@@ -85,9 +85,17 @@ class BaseParser(ABC):
     def to_python_var(json_string):
         return json_string.replace('.', '_').lower()
 
-    @abstractmethod
+    def parse_params(self):
+        params = self.get_params()
+        if "name" in params:
+            params["name"] = self.get_name()
+        for key, value in self.get_json()["init"].items():
+            if key in params:
+                params[key] = BaseParser.to_tf_param(value)
+        self.set_params(params)
+
     def parse(self):
-        pass
+        self.parse_params()
 
     @abstractmethod
     def generate_code(self):

@@ -73,6 +73,7 @@ for obj in tensors:
         f_out.write(obj.get_body_code())
         f_out.write("\n")
 
+f_out.write("\n# Init tensorflow session\n")
 f_out.write("init = tf.global_variables_initializer()\n")
 f_out.write("sess = tf.Session()\n")
 f_out.write("sess.run(init)\n")
@@ -82,6 +83,5 @@ for obj in tensors:
         f_out.write(obj.get_action_code())
         f_out.write("\n")
 
-f_out.write("sess.run.(" +  + ")\n")
 f_out.close()
 

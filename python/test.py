@@ -2,17 +2,33 @@
 # -*- coding: utf-8 -*-
 import tensorflow as tf
 #from tensorflow.python import debug as tf_debug
+import reader_file as freader
+from threading import Thread
+
+# input_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+# result_values = [4, 9, 16, 25, 36, 49, 64, 81, 100, 121]
 
 # model parameters
 a = tf.Variable(0.7, name="Weight_a")
 b = tf.Variable(0.1, name="Weight_b")
 
-# model input and output
-x = tf.placeholder(tf.float32, name="Input")
+future_input = tf.placeholder(tf.float32, name="future_input")
+future_result = tf.placeholder(tf.float32, name="future_result")
+
+# create queue
+queue_size = 15
+queue_input = tf.FIFOQueue(queue_size, tf.float32, name="input_queue")
+queue_result = tf.FIFOQueue(queue_size, tf.float32, name="result_queue")
+enqueue_op_input = queue_input.enqueue_many([future_input])
+enqueue_op_result = queue_result.enqueue_many([future_result])
+
+x = queue_input.dequeue()
+y = queue_result.dequeue()
+
+# create model and learning model
 a1 = tf.multiply(a, x)
 a2 = tf.multiply(b, x)
 linear_model = tf.multiply(a1, a2, name="linear_model")
-y = tf.placeholder(tf.float32, name="Output")
 
 # loss
 squared_deltas = tf.square(linear_model - y)
@@ -25,70 +41,48 @@ train = optimizer.minimize(loss)
 # Add ops to save and restore all the variables.
 # saver = tf.train.Saver()
 
-# training loop
 init = tf.global_variables_initializer()
-sess = tf.Session()
+
+# add coordinator
+coord = tf.train.Coordinator()
+
 # sess = tf_debug.LocalCLIDebugWrapperSession(sess)
+sess = tf.Session()
+# with tf.Session() as sess:
 sess.run(init)
 
-x_train = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-y_train = [4, 9, 16, 25, 36, 49, 64, 81, 100, 121]
 
+def read_db():
+    reader = freader.ReaderFile("/home/serhii/Projects/VerAI/python/input.data", ["int32", "int32"])
+    while not coord.should_stop():
+        input_values, result_values = reader.readline()
+        if not input_values:
+            reader.set_position(0)
+            continue
+        sess.run([enqueue_op_input, enqueue_op_result],
+                 feed_dict={future_input: input_values, future_result: result_values})
+    return
+
+    # run threads
+thread = Thread(target=read_db)
+threads = [thread]
+thread.start()
+
+    # check the accuracy before training
+    # sess.run(linear_model)
+
+    # training loop
 for i in range(10000):
-    sess.run(train, {x: x_train, y: y_train})
+        # sess.run(tf.Print(queue, [queue], "Queue = "))
+    sess.run(train)
 
+    # stop data queue
+coord.request_stop()
+coord.join(threads)
+
+    # check our learning model
 print("a=%f , b=%f " % (sess.run(a), sess.run(b)))
-print(sess.run(linear_model, {x: x_train}))
-# summary_writer = tf.summary.FileWriter('./', sess.graph)
-print(sess.run(linear_model, {x: 12}))
+print(sess.run(linear_model, {x: 2.2}))
+    # summary_writer = tf.summary.FileWriter('./', sess.graph)
+print(sess.run(linear_model, {x: 3.12}))
 print(sess.run(linear_model, {x: 1}))
-
-
-
-#---
-
-# class Add:
-#     INPUTS:
-#     {
-#         Op1: { shape: None, desc: "First operand for Add" },
-#         Op2: { shape: None, desc: "Second operand for Add" }
-#     }
-#     OUTPUTS:
-#     {
-#         Result: { shape: None, desc: "Result" }
-#     }
-#     PARAMETERS: { }
-#
-#     def instantiate():
-#         OUTPUTS.Result = tf.add(INPUTS.Op1, INPUTS.Op2)
-#
-# def CommitHook:
-#     cls = git.Get()
-#     structure = parse(cls)
-#     structure.filter("INPUTS, OUTPUTS, PARAMETERS")
-#     json = structure.toJSON()
-#     db.insert(json)
-#
-# def create_tf():
-#     c = new comp()
-#     c.INPUTS["Op1"] = map_tensors[t1];
-#     c.INPUTS["Op2"] = map_tensors[t2];
-#     c.instantiate()
-#     map_tensors[c.OUTPUTS.Result.key] = c.OUTPUTS.Result
-
-# #json
-# [
-#     {
-#     "Component1" : {
-#         INTPUT : [
-#         ]
-#     OUTPUT : [
-#         ]
-#     TARGET :[
-#         Component2 : {
-#         }
-#     ]
-#     }
-#     }
-# }
-# ]

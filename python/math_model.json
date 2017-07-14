@@ -1,24 +1,37 @@
 {
   "DatasetInput" : {
     "type" : "dataset",
-    "data_type" : "int32",
     "init" : {
       "db_type" : "file",
       "path" : "/home/serhii/Projects/VerAI/python/input.data"
     },
     "output" : [
-      "input_data",
-      "result_data"
+      {
+        "name" : "input_data",
+        "type" : "int32"
+      },
+      {
+        "name" : "result_data",
+        "type" : "int32"
+      }
     ]
   },
   "Reader" : {
     "type" : "reader",
     "init" : {
-        "dataset" : "DatasetInput"
+      "dataset" : "DatasetInput",
+      "queue_capacity" : 10,
+      "name" : "text_reader"
     },
     "output" : [
-      "x_input",
-      "x_result"
+      {
+        "name" : "x_input",
+        "type" : "float32"
+      },
+      {
+        "name" : "x_result",
+        "type" : "float32"
+      }
     ]
   },
   "A" : {
@@ -36,7 +49,10 @@
       "import_scope" : null
     },
     "output" : [
-      "a"
+      {
+        "name": "a",
+        "type" : "float32"
+      }
     ]
   },
   "B" : {
@@ -54,7 +70,10 @@
       "import_scope" : null
     },
     "output" : [
-      "b"
+      {
+        "name": "b",
+        "type" : "float32"
+      }
     ]
   },
   "MulA" : {
@@ -66,7 +85,9 @@
       "name" : "mul_a"
     },
     "output" : [
-      "mul_a"
+      {
+        "name": "mul_a"
+      }
     ]
   },
   "MulB" : {
@@ -78,7 +99,9 @@
       "name" : "mul_b"
     },
     "output" : [
-      "mul_b"
+      {
+        "name": "mul_b"
+      }
     ]
   },
   "MulAB" : {
@@ -90,7 +113,23 @@
       "name" : "mul_ab"
     },
     "output" : [
-      "mul_ab"
+      {
+        "name": "mul_ab"
+      }
+    ]
+  },
+  "Square" : {
+    "type" : "transform",
+    "operation" : "multiply",
+    "init" : {
+      "x" : "MulA.output.mul_a",
+      "y" : "MulB.output.mul_b",
+      "name" : "mul_ab"
+    },
+    "output" : [
+      {
+        "name": "mul_ab"
+      }
     ]
   }
 }

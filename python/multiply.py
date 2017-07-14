@@ -18,14 +18,9 @@ class Multiply(bp.BaseParser):
         )
         bp.BaseParser.__init__(self, name, "multiply", params)
 
-    def parse(self):
-        self.params["name"] = self.get_name()
-        for key, value in self.get_json()["init"].items():
-            if key in self.params:
-                self.params[key] = bp.BaseParser.to_tf_param(value)
-
     def generate_code(self):
-        code = self.var_name_form_json(self.get_name(), self.get_json(), 0) + " = tf.multiply("
+        code = "\n# Multiply\n"
+        code += self.var_name_form_json(self.get_name(), self.get_json(), 0) + " = tf.multiply("
         for key, value in self.get_params().items():
             if value:
                 if key == "name":
@@ -34,4 +29,4 @@ class Multiply(bp.BaseParser):
                     code += self.to_python_var(value)
                 code += ", "
         code = code[:-2] + ")"
-        self.set_body_code(code)
+        self._set_body_code(code)
