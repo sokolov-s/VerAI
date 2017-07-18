@@ -2,7 +2,9 @@
 
 import baseparser as bp
 import multiply as mul
-
+import minus
+import square
+import reduce_sum
 
 class TransofrmProxy(bp.BaseParser):
     """
@@ -14,13 +16,19 @@ class TransofrmProxy(bp.BaseParser):
         self.action_obj = None
 
     def parse(self):
-        method = self.get_json()["operation"]
+        json_obj = self.get_json()
+        method = json_obj["operation"]
         if method == "multiply" or method == "mul":
-            self.action_obj = mul.Multiply(self.get_name())
+            self.set_proxy(mul.Multiply(self.get_name()))
+        elif method == "minus":
+            self.set_proxy(minus.Minus(self.get_name()))
+        elif method == "square":
+            self.set_proxy(square.Square(self.get_name()))
+        elif method == "reduce_sum":
+            self.set_proxy(reduce_sum.ReduceSum(self.get_name()))
+        else:
+            print("Unknown operation : object %s, operation %s" % (self.get_name(), method))
+            return
 
-        self.action_obj.set_json(self.get_json())
-        self.action_obj.parse()
-
-    def generate_code(self):
-        if self.action_obj:
-            self.action_obj.generate_code()
+        self.get_proxy().set_json(json_obj)
+        self.get_proxy().parse()

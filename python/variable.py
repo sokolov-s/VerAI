@@ -25,7 +25,7 @@ class Variable(bp.BaseParser):
         )
         bp.BaseParser.__init__(self, name, "variable", params)
 
-    def generate_code(self):
+    def generate_body_code(self):
         code = "\n# Create tf.Variable\n"
         code += self.var_name_form_json(self.get_name(), self.get_json(), 0) + " = tf.Variable("
         for key, value in self.get_params().items():
@@ -37,4 +37,4 @@ class Variable(bp.BaseParser):
                     code += value
                 code += ", "
         code = code[:-2] + ")"
-        self._set_body_code(code)
+        self.set_body_code(code)

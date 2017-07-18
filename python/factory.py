@@ -3,11 +3,10 @@
 import sys
 import json
 from collections import OrderedDict
-import reader_proxy as reader
+import reader
 import variable as var
 import transform_proxy as transform
 import baseparser as bp
-
 
 class Factory(object):
     """
@@ -31,8 +30,8 @@ class Factory(object):
         print("Parse json file %s" % path_to_json)
         result = []
         for key, value in data.items():
-            if reader.ReaderProxy(key).is_json_known(value):
-                r = reader.ReaderProxy(key)
+            if reader.Reader(key).is_json_known(value):
+                r = reader.Reader(key)
                 r.set_json(value)
                 dname = r.get_dataset_name()
                 r.set_dataset(data[dname])
@@ -48,7 +47,7 @@ class Factory(object):
             elif bp.BaseParser.get_json_type(value) == "dataset":
                 continue
             else:
-                print("Unknown json object : %s (%s)" % (key, value))
+                print("\033[91mUnknown json object : %s (%s)\033[0m" % (key, value))
                 continue
         return result
 

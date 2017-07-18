@@ -17,14 +17,12 @@ future_result = tf.placeholder(tf.float32, name="future_result")
 
 # create queue
 queue_size = 15
-queue_input = tf.FIFOQueue(queue_size, tf.float32, name="input_queue")
-queue_result = tf.FIFOQueue(queue_size, tf.float32, name="result_queue")
-enqueue_op_input = queue_input.enqueue_many([future_input])
-enqueue_op_result = queue_result.enqueue_many([future_result])
+queue_input = tf.FIFOQueue(queue_size, [tf.float32, tf.float32], shapes=[[1], [1]], name="input_queue")
+enqueue_op_input = queue_input.enqueue([future_input, future_result])
 
-x = queue_input.dequeue()
-y = queue_result.dequeue()
-
+x, y = queue_input.dequeue()
+# x = tf.Print(x, [x], "x = ")
+# y = tf.Print(y, [y], "y = ")
 # create model and learning model
 a1 = tf.multiply(a, x)
 a2 = tf.multiply(b, x)
@@ -59,7 +57,7 @@ def read_db():
         if not input_values:
             reader.set_position(0)
             continue
-        sess.run([enqueue_op_input, enqueue_op_result],
+        sess.run(enqueue_op_input,
                  feed_dict={future_input: input_values, future_result: result_values})
     return
 
@@ -68,21 +66,26 @@ thread = Thread(target=read_db)
 threads = [thread]
 thread.start()
 
-    # check the accuracy before training
-    # sess.run(linear_model)
+# check the accuracy before training
+sess.run(linear_model)
 
-    # training loop
+# training loop
 for i in range(10000):
-        # sess.run(tf.Print(queue, [queue], "Queue = "))
     sess.run(train)
 
     # stop data queue
 coord.request_stop()
 coord.join(threads)
 
-    # check our learning model
+
+def clear():
+    size = sess.run(queue_input.size())
+    for i in range(size):
+        sess.run(queue_input.dequeue())
+
+clear()
 print("a=%f , b=%f " % (sess.run(a), sess.run(b)))
-print(sess.run(linear_model, {x: 2.2}))
-    # summary_writer = tf.summary.FileWriter('./', sess.graph)
-print(sess.run(linear_model, {x: 3.12}))
-print(sess.run(linear_model, {x: 1}))
+print(sess.run([enqueue_op_input, linear_model], feed_dict={future_input: [2.0], future_result: [0.0]}))
+print(sess.run([enqueue_op_input, linear_model], feed_dict={future_input: [3.12], future_result: [0.0]}))
+print(sess.run([enqueue_op_input, linear_model], feed_dict={future_input: [1.0], future_result: [0.0]}))
+#     # summary_writer = tf.summary.FileWriter('./', sess.graph)

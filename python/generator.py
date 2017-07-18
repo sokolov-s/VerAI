@@ -64,13 +64,15 @@ for obj in tensors:
     obj.generate_code()
 
 for obj in tensors:
-    if obj.get_head_code():
-        f_out.write(obj.get_head_code())
+    code = obj.get_head_code()
+    if code:
+        f_out.write(code)
         f_out.write("\n")
 
 for obj in tensors:
-    if obj.get_body_code():
-        f_out.write(obj.get_body_code())
+    code = obj.get_body_code()
+    if code:
+        f_out.write(code)
         f_out.write("\n")
 
 f_out.write("\n# Init tensorflow session\n")
@@ -79,8 +81,15 @@ f_out.write("sess = tf.Session()\n")
 f_out.write("sess.run(init)\n")
 
 for obj in tensors:
-    if obj.get_action_code():
-        f_out.write(obj.get_action_code())
+    code = obj.get_action_code()
+    if code:
+        f_out.write(code)
+        f_out.write("\n")
+
+for obj in tensors:
+    code = obj.get_post_action_code()
+    if code:
+        f_out.write(code)
         f_out.write("\n")
 
 f_out.close()
