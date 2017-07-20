@@ -7,6 +7,7 @@ import reader
 import variable as var
 import transform_proxy as transform
 import baseparser as bp
+import train
 
 class Factory(object):
     """
@@ -44,6 +45,10 @@ class Factory(object):
                 action = transform.TransofrmProxy(key)
                 action.set_json(value)
                 result.append(action)
+            elif train.Train(key).is_json_known(value):
+                tr = train.Train(key)
+                tr.set_json(value)
+                result.append(tr)
             elif bp.BaseParser.get_json_type(value) == "dataset":
                 continue
             else:

@@ -26,7 +26,7 @@ class Multiply(bp.BaseParser):
                 if key == "name":
                     code += "name=\"" + value + "\""
                 else:
-                    code += self.to_python_var(value)
+                    code += key + "=" + self.to_python_var(value)
                 code += ", "
         code = code[:-2] + ")"
         self.set_body_code(code)

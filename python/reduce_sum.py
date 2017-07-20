@@ -22,11 +22,12 @@ class ReduceSum(bp.BaseParser):
 
     def generate_body_code(self):
         code = "\n# Square\n"
-        code += self.var_name_form_json(self.get_name(), self.get_json(), 0) + " = tf.square("
+        code += self.var_name_form_json(self.get_name(), self.get_json(), 0) + " = tf.reduce_sum("
         for key, value in self.get_params().items():
             if value:
+                code += key + "="
                 if key == "name":
-                    code += "name=\"" + value + "\""
+                    code += "\"" + value + "\""
                 elif key == "input_tensor":
                     code += self.to_python_var(value)
                 else:

@@ -5,6 +5,7 @@ import tensorflow as tf
 import reader_file as freader
 from threading import Thread
 
+
 # input_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 # result_values = [4, 9, 16, 25, 36, 49, 64, 81, 100, 121]
 
@@ -34,7 +35,7 @@ loss = tf.reduce_sum(squared_deltas, name="loss")
 
 # optimizer
 optimizer = tf.train.AdamOptimizer(0.001)
-train = optimizer.minimize(loss)
+train = optimizer.minimize(loss, gate_gradients=tf.train.AdamOptimizer.GATE_OP)
 
 # Add ops to save and restore all the variables.
 # saver = tf.train.Saver()
@@ -62,10 +63,11 @@ def read_db():
     return
 
     # run threads
-thread = Thread(target=read_db)
-threads = [thread]
-thread.start()
-
+# thread = Thread(target=read_db)
+# threads = [thread]
+# thread.start()
+threads = [Thread(target=read_db)]
+for thr in threads: thr.start()
 # check the accuracy before training
 sess.run(linear_model)
 

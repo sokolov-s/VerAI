@@ -169,24 +169,32 @@
   "TrainModel" : {
     "type" : "train",
     "operation" : "AdamOptimizer",
+    "iteration_count": 10000,
     "init" : {
       "learning_rate" : 0.001,
       "beta1" : 0.9,
       "beta2" : 0.999,
       "epsilon" : 1e-08,
       "use_locking" : false,
-      "name" : "TrainModel",
-      "iteration_count": 10000
+      "name" : "train_model"
     },
-    "minimize_options" : {
-      "loss" : "Loss.output.loss",
-      "global_step": null,
-      "var_list": null,
-      "gate_gradients": "GATE_OP",
-      "aggregation_method": null,
-      "colocate_gradients_with_ops": false,
-      "name": null,
-      "grad_loss": null
-    }
+    "optimize_function" : {
+      "name" : "minimize",
+      "init" : {
+        "loss": "Loss.output.loss",
+        "global_step": null,
+        "var_list": null,
+        "gate_gradients": "GATE_OP",
+        "aggregation_method": null,
+        "colocate_gradients_with_ops": false,
+        "name": null,
+        "grad_loss": null
+      }
+    },
+    "output" : [
+      {
+        "name": "train"
+      }
+    ]
   }
 }

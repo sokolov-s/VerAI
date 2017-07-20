@@ -21,9 +21,10 @@ class Square(bp.BaseParser):
         code = "\n# Square\n"
         code += self.var_name_form_json(self.get_name(), self.get_json(), 0) + " = tf.square("
         for key, value in self.get_params().items():
+            code += key + "="
             if value:
                 if key == "name":
-                    code += "name=\"" + value + "\""
+                    code += "\"" + value + "\""
                 else:
                     code += self.to_python_var(value)
                 code += ", "
