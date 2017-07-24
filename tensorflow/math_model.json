@@ -1,0 +1,241 @@
+{
+  "DatasetInput" : {
+    "class" : "DataSet",
+    "version" : "1.0",
+    "params" : {
+      "db_type" : "file",
+      "path" : "/home/serhii/Projects/VerAI/python/input.data"
+    },
+    "output" : [
+      {
+        "name" : "input_data",
+        "type" : "int32"
+      },
+      {
+        "name" : "result_data",
+        "type" : "int32"
+      }
+    ]
+  },
+  "Reader" : {
+    "class" : "Reader",
+    "version" : "1.0",
+    "params" : {
+      "dataset" : "DatasetInput",
+      "queue_capacity" : 10,
+      "name" : "text_reader"
+    },
+    "output" : [
+      {
+        "name" : "x_input",
+        "type" : "float32"
+      },
+      {
+        "name" : "x_result",
+        "type" : "float32"
+      }
+    ]
+  },
+  "A" : {
+    "class" : "Variable",
+    "version" : "1.0",
+    "input" : null,
+    "params" : {
+      "initial_value": 0.7,
+      "trainable" : true,
+      "collections" : null,
+      "validate_shape" : true,
+      "caching_device" : null,
+      "name" : "Weight_a",
+      "variable_def" : null,
+      "dtype" : null,
+      "expected_shape" : null,
+      "import_scope" : null
+    },
+    "output" : [
+      {
+        "name": "a",
+        "type" : "float32"
+      }
+    ]
+  },
+  "B" : {
+    "class" : "Variable",
+    "version" : "1.0",
+    "params" : {
+      "initial_value": 0.1,
+      "trainable" : true,
+      "collections" : null,
+      "validate_shape" : true,
+      "caching_device" : null,
+      "name" : "Weight_b",
+      "variable_def" : null,
+      "dtype" : null,
+      "expected_shape" : null,
+      "import_scope" : null
+    },
+    "output" : [
+      {
+        "name": "b",
+        "type" : "float32"
+      }
+    ]
+  },
+  "MulA" : {
+    "class" : "Multiply",
+    "version" : "1.0",
+    "input" : [
+      {
+        "x": "A.a"
+      },
+      {
+        "y": "Reader.x_input"
+      }
+    ],
+    "params" : {
+      "name" : "mul_a"
+    },
+    "output" : [
+      {
+        "name": "mul_a",
+        "type" : "float32"
+      }
+    ]
+  },
+  "MulB" : {
+    "class" : "Multiply",
+    "version" : "1.0",
+    "input" : [
+      {
+        "x" : "B.b"
+      },
+      {
+        "y": "Reader.x_input"
+      }
+    ],
+    "params" : {
+      "name" : "mul_b"
+    },
+    "output" : [
+      {
+        "name": "mul_b",
+        "type" : "float32"
+      }
+    ]
+  },
+  "MulAB" : {
+    "class" : "Multiply",
+    "version" : "1.0",
+    "input" : [
+      {
+        "x" : "MulA.mul_a"
+      },
+      {
+        "y": "MulB.mul_b"
+      }
+    ],
+    "params" : {
+      "name" : "mul_ab"
+    },
+    "output" : [
+      {
+        "name": "mul_ab",
+        "type" : "float32"
+      }
+    ]
+  },
+  "Delta" : {
+    "class" : "Minus",
+    "version" : "1.0",
+    "input" : [
+      {
+        "x" : "MulAB.mul_ab"
+      },
+      {
+        "y": "Reader.x_result"
+      }
+    ],
+    "params" : {
+      "name" : "result_delta"
+    },
+    "output" : [
+      {
+        "name": "result_delta"
+      }
+    ]
+  },
+  "SquareDelta" : {
+    "class" : "Square",
+    "version" : "1.0",
+    "input" : [
+      {
+        "x" : "Delta.result_delta"
+      }
+    ],
+    "params" : {
+      "name" : "result_delta"
+    },
+    "output" : [
+      {
+        "name": "squared_delta",
+        "type" : "float32"
+      }
+    ]
+  },
+  "Loss" : {
+    "class" : "ReduceSum",
+    "version" : "1.0",
+    "input" : [
+      {
+        "input_tensor" : "SquareDelta.squared_delta"
+      }
+    ],
+    "params" : {
+      "axis" : null,
+      "keep_dims" : false,
+      "name" : "loss",
+      "reduction_indices" : null
+    },
+    "output" : [
+      {
+        "name": "loss",
+        "type" : "float32"
+      }
+    ]
+  },
+  "TrainModel" : {
+    "class" : "AdamOptimizer",
+    "version" : "1.0",
+    "input" : [
+      {
+        "iteration_count": 10000
+      }
+    ],
+    "params" : {
+      "learning_rate" : 0.001,
+      "beta1" : 0.9,
+      "beta2" : 0.999,
+      "epsilon" : 1e-08,
+      "use_locking" : false,
+      "name" : "train_model"
+    },
+    "optimize_function" : {
+      "name" : "minimize",
+      "init" : {
+        "loss": "Loss.output.loss",
+        "global_step": null,
+        "var_list": null,
+        "gate_gradients": "GATE_OP",
+        "aggregation_method": null,
+        "colocate_gradients_with_ops": false,
+        "name": null,
+        "grad_loss": null
+      }
+    },
+    "output" : [
+      {
+        "name": "train"
+      }
+    ]
+  }
+}
