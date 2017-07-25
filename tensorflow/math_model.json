@@ -208,10 +208,12 @@
     "version" : "1.0",
     "input" : [
       {
+        "input_tensor": "Loss.output.loss",
         "iteration_count": 10000
       }
     ],
     "params" : {
+      "iteration_count": null,
       "learning_rate" : 0.001,
       "beta1" : 0.9,
       "beta2" : 0.999,
@@ -221,8 +223,7 @@
     },
     "optimize_function" : {
       "name" : "minimize",
-      "init" : {
-        "loss": "Loss.output.loss",
+      "params" : {
         "global_step": null,
         "var_list": null,
         "gate_gradients": "GATE_OP",

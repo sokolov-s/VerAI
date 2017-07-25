@@ -12,7 +12,9 @@ class Variable(base.Base):
     def __init__(self, name):
         base.Base.__init__(self, name=name)
 
-        self.add_output("out", desc="A Tensor. Has the same type as x")
+        self._add_input("value", desc="A Tensor")
+
+        self._add_output("out", desc="A Tensor")
 
         self._add_param("initial_value")
         self._add_param("trainable", value=True)
@@ -33,8 +35,9 @@ class Variable(base.Base):
     def get_version():
         return "1.0"
 
-    def run(self):
-        res = tf.Variable(initial_value=self.get_param("initial_value"),
+    def init(self):
+        value = self.get_input("value") if self.get_input("value") else self.get_param("initial_value")
+        res = tf.Variable(initial_value=value,
                           trainable=self.get_param("trainable"),
                           collections=self.get_param("collections"),
                           validate_shape=self.get_param("validate_shape"),
