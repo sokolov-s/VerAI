@@ -12,20 +12,20 @@ class Variable(base.Base):
     def __init__(self, name):
         base.Base.__init__(self, name=name)
 
-        self._add_input("value", desc="A Tensor")
+        self._add_input("value", desc="A Tensor", important=False)
 
         self._add_output("out", desc="A Tensor")
 
-        self._add_param("initial_value")
-        self._add_param("trainable", value=True)
-        self._add_param("collections", value=None)
-        self._add_param("validate_shape", value=True)
-        self._add_param("caching_device")
-        self._add_param("variable_def")
-        self._add_param("dtype")
-        self._add_param("expected_shape")
-        self._add_param("import_scope")
-        self._add_param("name", desc="A name for the operation (optional)", value=name)
+        self._add_param("initial_value", important=True)
+        self._add_param("trainable", value=True, important=True)
+        self._add_param("collections", value=None, important=False)
+        self._add_param("validate_shape", value=True, important=False)
+        self._add_param("caching_device", important=False)
+        self._add_param("variable_def", important=False)
+        self._add_param("dtype", important=False)
+        self._add_param("expected_shape", important=False)
+        self._add_param("import_scope", important=False)
+        self._add_param("name", desc="A name for the operation (optional)", value=name, important=False)
 
     @staticmethod
     def get_operation_name():
@@ -51,4 +51,8 @@ class Variable(base.Base):
         self.set_output("out", res)
         return {"out": res}
 
+    def run(self):
+        pass
 
+    def stop(self):
+        pass

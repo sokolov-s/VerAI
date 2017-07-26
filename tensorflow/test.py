@@ -52,7 +52,7 @@ sess.run(init)
 
 
 def read_db():
-    reader = freader.ReaderFile("/home/serhii/Projects/VerAI/python/input.data", ["int32", "int32"])
+    reader = freader.ReaderFile("./input.data", ["int32", "int32"])
     while not coord.should_stop():
         input_values, result_values = reader.readline()
         if not input_values:

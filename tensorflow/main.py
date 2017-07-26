@@ -12,6 +12,7 @@ from ast import ClassDef, parse
 import importlib
 import inspect
 from enum import Enum
+import subprocess
 
 json_file = None
 
@@ -51,21 +52,22 @@ if json_file is None or not os.path.isfile(json_file):
     exit(2)
 
 
-class TensorInfo(Enum):
+class ModelInfo(Enum):
     INSTANCE = "instance"
     CLASS_NAME = "class_name"
     PATH = "path"
     VERSION = "version"
 
-know_classes = {}
+known_classes = {}
 
 
-def load_tensors():
-    folder = "./tensors/"
+def load_models():
+    folder = "./components/"
+    print("Load models from %s" % folder)
     sys.path.append(folder)
     files = glob.glob(folder + "./*.py")
     module_names = [basename(f)[:-3] for f in files if isfile(f) and not f.endswith('__init__.py')]
-    tensors = {}
+    models = {}
     for mod_name in module_names:
         mod = importlib.import_module(mod_name)
         p = parse(inspect.getsource(mod))
@@ -73,19 +75,22 @@ def load_tensors():
         for class_name in classes_in_module:
             if class_name == "Base":
                 continue
-            tensors[mod_name] = {TensorInfo.INSTANCE: getattr(mod, class_name),
-                                 TensorInfo.CLASS_NAME: class_name,
-                                 TensorInfo.PATH: os.path.abspath(folder + mod_name + ".py"),
-                                 TensorInfo.VERSION: getattr(mod, class_name).get_version()
-                                 }
-    return tensors
+            models[mod_name] = {ModelInfo.INSTANCE: getattr(mod, class_name),
+                                ModelInfo.CLASS_NAME: class_name,
+                                ModelInfo.PATH: os.path.abspath(folder + mod_name + ".py"),
+                                ModelInfo.VERSION: subprocess.check_output(['git', 'rev-parse',
+                                                                            ":./" + mod_name + ".py"])
+                                }
+            print("Add component %s version %s" % (models[mod_name][ModelInfo.CLASS_NAME],
+                                                   models[mod_name][ModelInfo.VERSION]))
+    return models
 
 
-def get_t_instance(class_name, version):
-    global know_classes
-    for inst in know_classes:
-        if inst[TensorInfo.CLASS_NAME] == class_name and inst[TensorInfo.VERSION] == version:
-            return inst[TensorInfo.INSTANCE]
+def get_model_instance(class_name: str, version: str, obj_name: str):
+    global known_classes
+    for obj in known_classes:
+        if obj[ModelInfo.CLASS_NAME] == class_name and obj[ModelInfo.VERSION] == version:
+            return obj[ModelInfo.INSTANCE](obj_name)
     return None
 
 with open(json_file) as fp:
@@ -96,5 +101,16 @@ with open(json_file) as fp:
         print("Bad json format in file %s" % json_file)
         sys.exit(2)
 
-    known_classes = load_tensors()
+    known_classes = load_models()
+    json_items = []
+    for key in js_data.keys():
+        json_items.append(key)
 
+    i = 0
+    while len(json_items) > 0:
+
+        i = i + 1 if i < len(json_items) else 0
+
+    for key, value in known_classes.items():
+        print("Init %s" % key)
+        value[ModelInfo.INSTANCE](key).init()

@@ -13,11 +13,11 @@ class Square(base.Base):
         base.Base.__init__(self, name=name)
         desc = "A Tensor or SparseTensor. Must be one of the following types: half, float32, float64, int32, int64, " \
                "complex64, complex128"
-        self._add_input("x", desc=desc)
+        self._add_input("x", desc=desc, important=True)
 
         self._add_output("out", desc="A Tensor or SparseTensor. Has the same type as x")
 
-        self._add_param("name", desc="Operation square", value=name)
+        self._add_param("name", desc="Operation square", value=name, important=False)
 
     @staticmethod
     def get_operation_name():
@@ -32,4 +32,8 @@ class Square(base.Base):
         self.set_output("out", res)
         return {"out": res}
 
+    def run(self):
+        pass
 
+    def stop(self):
+        pass

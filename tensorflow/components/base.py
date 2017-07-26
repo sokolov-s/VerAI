@@ -14,6 +14,7 @@ class Base(metaclass=ABCMeta):
     class ParamType(Enum):
         VALUE = "value"
         DESC = "description"
+        IMPORTANT = "important"
 
     def __init__(self, name):
         self.name = name
@@ -30,8 +31,8 @@ class Base(metaclass=ABCMeta):
         return [var_name for var_name, var_val in callers_local_vars if var_val is var]
 
     @staticmethod
-    def _add_param_to_obj(obj: dict, name: str, value=None, desc=""):
-        obj[name] = {Base.ParamType.DESC: desc, Base.ParamType.VALUE: value}
+    def _add_param_to_obj(obj: dict, name: str, value=None, desc="", important=True):
+        obj[name] = {Base.ParamType.DESC: desc, Base.ParamType.VALUE: value, Base.ParamType.IMPORTANT: important}
 
     @staticmethod
     def _check_param_name_in_obj(obj: dict, name: str):
@@ -48,8 +49,8 @@ class Base(metaclass=ABCMeta):
         Base._check_param_name_in_obj(obj=obj, name=name)
         return obj[name][Base.ParamType.VALUE]
 
-    def _add_input(self, name: str, value=None, desc=""):
-        self._add_param_to_obj(obj=self.inputs, name=name, value=value, desc=desc)
+    def _add_input(self, name: str, value=None, desc="", important=True):
+        self._add_param_to_obj(obj=self.inputs, name=name, value=value, desc=desc, important=important)
 
     def set_input(self, name, value):
         self._set_param_value_in_obj(obj=self.inputs, name=name, value=value)
@@ -66,8 +67,8 @@ class Base(metaclass=ABCMeta):
     def get_output(self, name):
         return self._get_param_value_from_obj(self.outputs, name)
 
-    def _add_param(self, name: str, value=None, desc=""):
-        self._add_param_to_obj(obj=self.params, name=name, value=value, desc=desc)
+    def _add_param(self, name: str, value=None, desc="", important=True):
+        self._add_param_to_obj(obj=self.params, name=name, value=value, desc=desc, important=important)
 
     def set_param(self, name, value):
         self._set_param_value_in_obj(obj=self.params, name=name, value=value)

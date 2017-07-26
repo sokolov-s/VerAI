@@ -40,18 +40,48 @@
     "class" : "Variable",
     "version" : "1.0",
     "input" : null,
-    "params" : {
-      "initial_value": 0.7,
-      "trainable" : true,
-      "collections" : null,
-      "validate_shape" : true,
-      "caching_device" : null,
-      "name" : "Weight_a",
-      "variable_def" : null,
-      "dtype" : null,
-      "expected_shape" : null,
-      "import_scope" : null
-    },
+    "params" : [
+      {
+        "initial_value": 0.7,
+        "important": true
+      },
+      {
+        "trainable": true,
+        "important": true
+      },
+      {
+        "collections": null,
+        "important": false
+      },
+      {
+        "validate_shape": true,
+        "important": false
+      },
+      {
+        "caching_device": null,
+        "important": false
+      },
+      {
+        "name": "Weight_a",
+        "important": false
+      },
+      {
+        "variable_def": null,
+        "important": false
+      },
+      {
+        "dtype": null,
+        "important": false
+      },
+      {
+        "expected_shape": null,
+        "important": false
+      },
+      {
+        "import_scope": null,
+        "important": false
+      }
+    ],
     "output" : [
       {
         "name": "a",
@@ -62,18 +92,48 @@
   "B" : {
     "class" : "Variable",
     "version" : "1.0",
-    "params" : {
-      "initial_value": 0.1,
-      "trainable" : true,
-      "collections" : null,
-      "validate_shape" : true,
-      "caching_device" : null,
-      "name" : "Weight_b",
-      "variable_def" : null,
-      "dtype" : null,
-      "expected_shape" : null,
-      "import_scope" : null
-    },
+    "params" : [
+      {
+        "initial_value": 0.1,
+        "important": true
+      },
+      {
+        "trainable": true,
+        "important": true
+      },
+      {
+        "collections": null,
+        "important": false
+      },
+      {
+        "validate_shape": true,
+        "important": false
+      },
+      {
+        "caching_device": null,
+        "important": false
+      },
+      {
+        "name": "Weight_a",
+        "important": false
+      },
+      {
+        "variable_def": null,
+        "important": false
+      },
+      {
+        "dtype": null,
+        "important": false
+      },
+      {
+        "expected_shape": null,
+        "important": false
+      },
+      {
+        "import_scope": null,
+        "important": false
+      }
+    ],
     "output" : [
       {
         "name": "b",
@@ -86,15 +146,21 @@
     "version" : "1.0",
     "input" : [
       {
-        "x": "A.a"
+        "x": "A.a",
+        "important": true
+
       },
       {
-        "y": "Reader.x_input"
+        "y": "Reader.x_input",
+        "important": true
       }
     ],
-    "params" : {
-      "name" : "mul_a"
-    },
+    "params" : [
+      {
+        "name": "mul_a",
+        "important": false
+      }
+    ],
     "output" : [
       {
         "name": "mul_a",
@@ -107,15 +173,20 @@
     "version" : "1.0",
     "input" : [
       {
-        "x" : "B.b"
+        "x" : "B.b",
+        "important": true
       },
       {
-        "y": "Reader.x_input"
+        "y": "Reader.x_input",
+        "important": true
       }
     ],
-    "params" : {
-      "name" : "mul_b"
-    },
+    "params" : [
+      {
+        "name": "mul_b",
+        "important": false
+      }
+    ],
     "output" : [
       {
         "name": "mul_b",
@@ -128,15 +199,20 @@
     "version" : "1.0",
     "input" : [
       {
-        "x" : "MulA.mul_a"
+        "x" : "MulA.mul_a",
+        "important": true
       },
       {
-        "y": "MulB.mul_b"
+        "y": "MulB.mul_b",
+        "important": true
       }
     ],
-    "params" : {
-      "name" : "mul_ab"
-    },
+    "params" : [
+      {
+        "name": "mul_ab",
+        "important": false
+      }
+    ],
     "output" : [
       {
         "name": "mul_ab",
@@ -145,19 +221,24 @@
     ]
   },
   "Delta" : {
-    "class" : "Minus",
+    "class" : "Subtract",
     "version" : "1.0",
     "input" : [
       {
-        "x" : "MulAB.mul_ab"
+        "x" : "MulAB.mul_ab",
+        "important": true
       },
       {
-        "y": "Reader.x_result"
+        "y": "Reader.x_result",
+        "important": true
       }
     ],
-    "params" : {
-      "name" : "result_delta"
-    },
+    "params" : [
+      {
+        "name": "result_delta",
+        "important": false
+      }
+    ],
     "output" : [
       {
         "name": "result_delta"
@@ -169,12 +250,16 @@
     "version" : "1.0",
     "input" : [
       {
-        "x" : "Delta.result_delta"
+        "x" : "Delta.result_delta",
+        "important": true
       }
     ],
-    "params" : {
-      "name" : "result_delta"
-    },
+    "params" : [
+      {
+        "name": "result_delta",
+        "important": false
+      }
+    ],
     "output" : [
       {
         "name": "squared_delta",
@@ -187,15 +272,28 @@
     "version" : "1.0",
     "input" : [
       {
-        "input_tensor" : "SquareDelta.squared_delta"
+        "input_tensor" : "SquareDelta.squared_delta",
+        "important": true
       }
     ],
-    "params" : {
-      "axis" : null,
-      "keep_dims" : false,
-      "name" : "loss",
-      "reduction_indices" : null
-    },
+    "params" : [
+      {
+        "axis": null,
+        "important": false
+      },
+      {
+        "keep_dims": false,
+        "important": false
+      },
+      {
+        "name": "loss",
+        "important": false
+      },
+      {
+        "reduction_indices": null,
+        "important": false
+      }
+    ],
     "output" : [
       {
         "name": "loss",
@@ -209,29 +307,75 @@
     "input" : [
       {
         "input_tensor": "Loss.output.loss",
-        "iteration_count": 10000
+        "important": true
+      },
+      {
+        "iteration_count": 10000,
+        "important": false
       }
     ],
-    "params" : {
-      "iteration_count": null,
-      "learning_rate" : 0.001,
-      "beta1" : 0.9,
-      "beta2" : 0.999,
-      "epsilon" : 1e-08,
-      "use_locking" : false,
-      "name" : "train_model"
-    },
+    "params" : [
+      {
+        "iteration_count": null,
+        "important": true
+      },
+      {
+        "learning_rate": 0.001,
+        "important": false
+      },
+      {
+        "beta1": 0.9,
+        "important": false
+      },
+      {
+        "beta2": 0.999,
+        "important": false
+      },
+      {
+        "epsilon": 1e-08,
+        "important": false
+      },
+      {
+        "use_locking": false,
+        "important": false
+      },
+      {
+        "name": "train_model",
+        "important": false
+      }
+    ],
     "optimize_function" : {
       "name" : "minimize",
-      "params" : {
-        "global_step": null,
-        "var_list": null,
-        "gate_gradients": "GATE_OP",
-        "aggregation_method": null,
-        "colocate_gradients_with_ops": false,
-        "name": null,
-        "grad_loss": null
-      }
+      "params" : [
+        {
+          "global_step": null,
+          "important": false
+        },
+        {
+          "var_list": null,
+          "important": false
+        },
+        {
+          "gate_gradients": "GATE_OP",
+          "important": false
+        },
+        {
+          "aggregation_method": null,
+          "important": false
+        },
+        {
+          "colocate_gradients_with_ops": false,
+          "important": false
+        },
+        {
+          "name": null,
+          "important": false
+        },
+        {
+          "grad_loss": null,
+          "important": false
+        }
+      ]
     },
     "output" : [
       {
