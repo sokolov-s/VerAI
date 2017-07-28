@@ -40,14 +40,6 @@ class AdamOptimizer(base.Base):
         self._add_optimize_param(fn_name="minimize", param_name="name", important=False)
         self._add_optimize_param(fn_name="minimize", param_name="grad_loss", important=False)
 
-    @staticmethod
-    def get_operation_name():
-        return "AdamOptimizer"
-
-    @staticmethod
-    def get_version():
-        return "1.0"
-
     def __get_optimize_param_obj(self, fn_name=None):
         name = fn_name if fn_name else self.optimize_function
         if name == "minimize":

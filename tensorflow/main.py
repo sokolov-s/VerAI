@@ -75,11 +75,12 @@ def load_models():
         for class_name in classes_in_module:
             if class_name == "Base":
                 continue
+            version = subprocess.check_output(['git', 'rev-parse', ":" + folder + mod_name + ".py"])
+            version = version.decode("utf-8")[:-1]
             models[mod_name] = {ModelInfo.INSTANCE: getattr(mod, class_name),
                                 ModelInfo.CLASS_NAME: class_name,
                                 ModelInfo.PATH: os.path.abspath(folder + mod_name + ".py"),
-                                ModelInfo.VERSION: subprocess.check_output(['git', 'rev-parse',
-                                                                            ":./" + mod_name + ".py"])
+                                ModelInfo.VERSION: version
                                 }
             print("Add component %s version %s" % (models[mod_name][ModelInfo.CLASS_NAME],
                                                    models[mod_name][ModelInfo.VERSION]))

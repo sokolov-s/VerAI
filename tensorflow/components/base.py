@@ -76,16 +76,6 @@ class Base(metaclass=ABCMeta):
     def get_param(self, name):
         return self._get_param_value_from_obj(self.params, name)
 
-    @staticmethod
-    @abstractmethod
-    def get_operation_name():
-        pass
-
-    @staticmethod
-    @abstractmethod
-    def get_version():
-        pass
-
     @abstractmethod
     def init(self):
         pass

@@ -1,30 +1,57 @@
 {
-  "DatasetInput" : {
+  "DataSetInput" : {
     "class" : "DataSet",
     "version" : "1.0",
-    "params" : {
-      "db_type" : "file",
-      "path" : "/home/serhii/Projects/VerAI/python/input.data"
-    },
-    "output" : [
+    "params" : [
       {
-        "name" : "input_data",
-        "type" : "int32"
+        "db_type": "file",
+        "important": true
       },
       {
-        "name" : "result_data",
-        "type" : "int32"
+        "folder": "/home/serhii/Projects/VerAI/python",
+        "important": true
+      },
+      {
+        "files": [
+          "input.data"
+        ],
+        "important": true
+      },
+      {
+        "name" : "input.data",
+        "important": false
+      }
+    ],
+    "output" : [
+      {
+        "name" : "instance"
       }
     ]
   },
   "Reader" : {
     "class" : "Reader",
     "version" : "1.0",
-    "params" : {
-      "dataset" : "DatasetInput",
-      "queue_capacity" : 10,
-      "name" : "text_reader"
-    },
+    "input" : [
+      {
+        "dataset" : [
+          "DataSetInput.out"
+          ]
+      }
+    ],
+    "params" : [
+      {
+        "module": "reader_file",
+        "important": true
+      },
+      {
+        "queue_capacity": 10,
+        "important": false
+      },
+      {
+        "name": "text_reader",
+        "important": false
+      }
+    ],
     "output" : [
       {
         "name" : "x_input",
@@ -38,7 +65,7 @@
   },
   "A" : {
     "class" : "Variable",
-    "version" : "1.0",
+    "version" : "5f92ff71b6328fc6991df92c9ba32257dd3ea7d8",
     "input" : null,
     "params" : [
       {
@@ -91,7 +118,7 @@
   },
   "B" : {
     "class" : "Variable",
-    "version" : "1.0",
+    "version" : "5f92ff71b6328fc6991df92c9ba32257dd3ea7d8",
     "params" : [
       {
         "initial_value": 0.1,
@@ -143,7 +170,7 @@
   },
   "MulA" : {
     "class" : "Multiply",
-    "version" : "1.0",
+    "version" : "7d80fe244b42bc31f2abfd7aba8f5bffe5d5d5e1",
     "input" : [
       {
         "x": "A.a",
@@ -163,14 +190,13 @@
     ],
     "output" : [
       {
-        "name": "mul_a",
-        "type" : "float32"
+        "name": "result"
       }
     ]
   },
   "MulB" : {
     "class" : "Multiply",
-    "version" : "1.0",
+    "version" : "7d80fe244b42bc31f2abfd7aba8f5bffe5d5d5e1",
     "input" : [
       {
         "x" : "B.b",
@@ -189,14 +215,13 @@
     ],
     "output" : [
       {
-        "name": "mul_b",
-        "type" : "float32"
+        "name": "result"
       }
     ]
   },
   "MulAB" : {
     "class" : "Multiply",
-    "version" : "1.0",
+    "version" : "7d80fe244b42bc31f2abfd7aba8f5bffe5d5d5e1",
     "input" : [
       {
         "x" : "MulA.mul_a",
@@ -215,14 +240,13 @@
     ],
     "output" : [
       {
-        "name": "mul_ab",
-        "type" : "float32"
+        "name": "result"
       }
     ]
   },
   "Delta" : {
     "class" : "Subtract",
-    "version" : "1.0",
+    "version" : "b9e79283f66c490540f50470deb380ef2f42153e",
     "input" : [
       {
         "x" : "MulAB.mul_ab",
@@ -235,19 +259,19 @@
     ],
     "params" : [
       {
-        "name": "result_delta",
+        "name": "result",
         "important": false
       }
     ],
     "output" : [
       {
-        "name": "result_delta"
+        "name": "result"
       }
     ]
   },
   "SquareDelta" : {
     "class" : "Square",
-    "version" : "1.0",
+    "version" : "c3b5af8855945bb3007e39ea9ee1cd4ad1c1114e",
     "input" : [
       {
         "x" : "Delta.result_delta",
@@ -262,17 +286,16 @@
     ],
     "output" : [
       {
-        "name": "squared_delta",
-        "type" : "float32"
+        "name": "result"
       }
     ]
   },
   "Loss" : {
     "class" : "ReduceSum",
-    "version" : "1.0",
+    "version" : "5f92ff71b6328fc6991df92c9ba32257dd3ea7d8",
     "input" : [
       {
-        "input_tensor" : "SquareDelta.squared_delta",
+        "x" : "SquareDelta.squared_delta",
         "important": true
       }
     ],
@@ -296,14 +319,13 @@
     ],
     "output" : [
       {
-        "name": "loss",
-        "type" : "float32"
+        "name": "result"
       }
     ]
   },
   "TrainModel" : {
     "class" : "AdamOptimizer",
-    "version" : "1.0",
+    "version" : "244362a6b7c606290d84fef7da9f034b4e7f8ab3",
     "input" : [
       {
         "input_tensor": "Loss.output.loss",

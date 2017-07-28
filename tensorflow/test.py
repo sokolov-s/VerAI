@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import tensorflow as tf
 #from tensorflow.python import debug as tf_debug
-import reader_file as freader
+import components.reader_file as freader
 from threading import Thread
 
 

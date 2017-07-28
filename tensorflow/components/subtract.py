@@ -2,36 +2,40 @@
 
 import base
 import tensorflow as tf
+import enum as Enum
+
 
 class Subtract(base.Base):
     """
     Some text about class
     """
+    class Input(Enum):
+        X = "x"
+        Y = "y"
+
+    class Output(Enum):
+        RESULT = "result"
+
+    class Params(Enum):
+        NAME = "name"
 
     def __init__(self, name):
         base.Base.__init__(self, name=name)
 
         desc = "A Tensor. Must be one of the following types: half, float32, float64, int32, " \
                "int64, complex64, complex128"
-        self._add_input("x", desc=desc, important=True)
-        self._add_input("y", desc=desc, important=True)
+        self._add_input(self.Input.X, desc=desc, important=True)
+        self._add_input(self.Input.Y, desc=desc, important=True)
 
-        self._add_output("out", desc="A Tensor")
+        self._add_output(self.Output.RESULT, desc="A Tensor")
 
-        self._add_param("name", desc="Operation subtract", value=name, important=False)
-
-    @staticmethod
-    def get_operation_name():
-        return "minus"
-
-    @staticmethod
-    def get_version():
-        return "1.0"
+        self._add_param(self.Params.NAME, desc="Operation subtract", value=name, important=False)
 
     def init(self):
-        res = tf.subtract(x=self.get_input("x"), y=self.get_input("y"), name=self.get_param("name"))
-        self.set_output("out", res)
-        return {"out": res}
+        res = tf.subtract(x=self.get_input(self.Input.X), y=self.get_input(self.Input.Y),
+                          name=self.get_param(self.Params.NAME))
+        self.set_output(self.Output.RESULT, res)
+        return {self.Output.RESULT: res}
 
     def run(self):
         pass
