@@ -4,21 +4,25 @@
     "version" : "1.0",
     "params" : [
       {
-        "db_type": "file",
+        "name": "db_type",
+        "value": "file",
         "important": true
       },
       {
-        "folder": "/home/serhii/Projects/VerAI/python",
+        "name": "folder",
+        "value": "/home/serhii/Projects/VerAI/python",
         "important": true
       },
       {
-        "files": [
+        "name": "files",
+        "value": [
           "input.data"
         ],
         "important": true
       },
       {
-        "name" : "input.data",
+        "name": "name",
+        "value": "dataset1",
         "important": false
       }
     ],
@@ -33,22 +37,26 @@
     "version" : "1.0",
     "input" : [
       {
-        "dataset" : [
+        "name": "dataset",
+        "value" : [
           "DataSetInput.out"
           ]
       }
     ],
     "params" : [
       {
-        "module": "reader_file",
+        "name": "module",
+        "value": "reader_file",
         "important": true
       },
       {
-        "queue_capacity": 10,
+        "name": "queue_capacity",
+        "value": 10,
         "important": false
       },
       {
-        "name": "text_reader",
+        "name": "name",
+        "value": "text_reader",
         "important": false
       }
     ],
@@ -69,43 +77,53 @@
     "input" : null,
     "params" : [
       {
-        "initial_value": 0.7,
+        "name": "initial_value",
+        "value": 0.7,
         "important": true
       },
       {
-        "trainable": true,
+        "name": "trainable",
+        "value": true,
         "important": true
       },
       {
-        "collections": null,
+        "name": "collections",
+        "value": null,
         "important": false
       },
       {
-        "validate_shape": true,
+        "name": "validate_shape",
+        "value": true,
         "important": false
       },
       {
-        "caching_device": null,
+        "name": "caching_device",
+        "value": null,
         "important": false
       },
       {
-        "name": "Weight_a",
+        "name": "name",
+        "value": "Weight_a",
         "important": false
       },
       {
-        "variable_def": null,
+        "name": "variable_def",
+        "value": null,
         "important": false
       },
       {
-        "dtype": null,
+        "name": "dtype",
+        "value": null,
         "important": false
       },
       {
-        "expected_shape": null,
+        "name": "expected_shape",
+        "value": null,
         "important": false
       },
       {
-        "import_scope": null,
+        "name": "import_scope",
+        "value": null,
         "important": false
       }
     ],
@@ -121,49 +139,60 @@
     "version" : "5f92ff71b6328fc6991df92c9ba32257dd3ea7d8",
     "params" : [
       {
-        "initial_value": 0.1,
+        "name": "initial_value",
+        "value": 0.1,
         "important": true
       },
       {
-        "trainable": true,
+        "name": "trainable",
+        "value": true,
         "important": true
       },
       {
-        "collections": null,
+        "name": "collections",
+        "value": null,
         "important": false
       },
       {
-        "validate_shape": true,
+        "name": "validate_shape",
+        "value": true,
         "important": false
       },
       {
-        "caching_device": null,
+        "name": "caching_device",
+        "value": null,
         "important": false
       },
       {
-        "name": "Weight_a",
+        "name": "name",
+        "value": "Weight_a",
         "important": false
       },
       {
-        "variable_def": null,
+        "name": "variable_def",
+        "value": null,
         "important": false
       },
       {
-        "dtype": null,
+        "name": "dtype",
+        "value": null,
         "important": false
       },
       {
-        "expected_shape": null,
+        "name": "expected_shape",
+        "value": null,
         "important": false
       },
       {
-        "import_scope": null,
+        "name": "import_scope",
+        "value": null,
         "important": false
       }
     ],
     "output" : [
       {
-        "name": "b",
+        "name": "name",
+        "value": "b",
         "type" : "float32"
       }
     ]
@@ -173,18 +202,21 @@
     "version" : "7d80fe244b42bc31f2abfd7aba8f5bffe5d5d5e1",
     "input" : [
       {
-        "x": "A.a",
+        "name": "x",
+        "value": "A.a",
         "important": true
 
       },
       {
-        "y": "Reader.x_input",
+        "name": "y",
+        "value": "Reader.x_input",
         "important": true
       }
     ],
     "params" : [
       {
-        "name": "mul_a",
+        "name": "name",
+        "value": "mul_a",
         "important": false
       }
     ],
@@ -199,17 +231,20 @@
     "version" : "7d80fe244b42bc31f2abfd7aba8f5bffe5d5d5e1",
     "input" : [
       {
-        "x" : "B.b",
+        "name": "x",
+        "value" : "B.b",
         "important": true
       },
       {
-        "y": "Reader.x_input",
+        "name": "y",
+        "value": "Reader.x_input",
         "important": true
       }
     ],
     "params" : [
       {
-        "name": "mul_b",
+        "name": "name",
+        "value": "mul_b",
         "important": false
       }
     ],
@@ -224,17 +259,20 @@
     "version" : "7d80fe244b42bc31f2abfd7aba8f5bffe5d5d5e1",
     "input" : [
       {
-        "x" : "MulA.mul_a",
+        "name": "x",
+        "value" : "MulA.mul_a",
         "important": true
       },
       {
-        "y": "MulB.mul_b",
+        "name": "y",
+        "value": "MulB.mul_b",
         "important": true
       }
     ],
     "params" : [
       {
-        "name": "mul_ab",
+        "name": "name",
+        "value": "mul_ab",
         "important": false
       }
     ],
@@ -249,17 +287,20 @@
     "version" : "b9e79283f66c490540f50470deb380ef2f42153e",
     "input" : [
       {
-        "x" : "MulAB.mul_ab",
+        "name": "x",
+        "value" : "MulAB.mul_ab",
         "important": true
       },
       {
-        "y": "Reader.x_result",
+        "name": "y",
+        "value": "Reader.x_result",
         "important": true
       }
     ],
     "params" : [
       {
-        "name": "result",
+        "name": "name",
+        "value": "result",
         "important": false
       }
     ],
@@ -274,13 +315,15 @@
     "version" : "c3b5af8855945bb3007e39ea9ee1cd4ad1c1114e",
     "input" : [
       {
-        "x" : "Delta.result_delta",
+        "name": "x",
+        "value" : "Delta.result_delta",
         "important": true
       }
     ],
     "params" : [
       {
-        "name": "result_delta",
+        "name": "name",
+        "value": "result_delta",
         "important": false
       }
     ],
@@ -295,25 +338,30 @@
     "version" : "5f92ff71b6328fc6991df92c9ba32257dd3ea7d8",
     "input" : [
       {
-        "x" : "SquareDelta.squared_delta",
+        "name": "x",
+        "value" : "SquareDelta.squared_delta",
         "important": true
       }
     ],
     "params" : [
       {
-        "axis": null,
+        "name": "axis",
+        "value": null,
         "important": false
       },
       {
-        "keep_dims": false,
+        "name": "keep_dims",
+        "value": false,
         "important": false
       },
       {
-        "name": "loss",
+        "name": "name",
+        "value": "loss",
         "important": false
       },
       {
-        "reduction_indices": null,
+        "name": "reduction_indices",
+        "value": null,
         "important": false
       }
     ],
@@ -328,41 +376,50 @@
     "version" : "244362a6b7c606290d84fef7da9f034b4e7f8ab3",
     "input" : [
       {
-        "input_tensor": "Loss.output.loss",
+        "name": "loss",
+        "value": "Loss.output.loss",
         "important": true
       },
       {
-        "iteration_count": 10000,
+        "name": "iteration_count",
+        "value": 10000,
         "important": false
       }
     ],
     "params" : [
       {
-        "iteration_count": null,
+        "name": "iteration_count",
+        "value": null,
         "important": true
       },
       {
-        "learning_rate": 0.001,
+        "name": "learning_rate",
+        "value": 0.001,
         "important": false
       },
       {
-        "beta1": 0.9,
+        "name": "beta1",
+        "value": 0.9,
         "important": false
       },
       {
-        "beta2": 0.999,
+        "name": "beta2",
+        "value": 0.999,
         "important": false
       },
       {
-        "epsilon": 1e-08,
+        "name": "epsilon",
+        "value": 1e-08,
         "important": false
       },
       {
-        "use_locking": false,
+        "name": "use_locking",
+        "value": false,
         "important": false
       },
       {
-        "name": "train_model",
+        "name": "name",
+        "value": "train_model",
         "important": false
       }
     ],
@@ -370,31 +427,38 @@
       "name" : "minimize",
       "params" : [
         {
-          "global_step": null,
+          "name": "global_step",
+          "value": null,
           "important": false
         },
         {
-          "var_list": null,
+          "name": "var_list",
+          "value": null,
           "important": false
         },
         {
-          "gate_gradients": "GATE_OP",
+          "name": "gate_gradients",
+          "value": "GATE_OP",
           "important": false
         },
         {
-          "aggregation_method": null,
+          "name": "aggregation_method",
+          "value": null,
           "important": false
         },
         {
-          "colocate_gradients_with_ops": false,
+          "name": "colocate_gradients_with_ops",
+          "value": false,
           "important": false
         },
         {
-          "name": null,
+          "name": "name",
+          "value": null,
           "important": false
         },
         {
-          "grad_loss": null,
+          "name": "grad_loss",
+          "value": null,
           "important": false
         }
       ]

@@ -2,7 +2,7 @@
 
 import base
 import tensorflow as tf
-import enum as Enum
+from enum import Enum
 
 
 class Square(base.Base):

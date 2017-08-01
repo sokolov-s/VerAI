@@ -104,12 +104,41 @@ with open(json_file) as fp:
 
     known_classes = load_models()
     json_items = []
+    created_models = {}
     for key in js_data.keys():
         json_items.append(key)
 
     i = 0
     while len(json_items) > 0:
+        item_name = json_items[i]
+        item = js_data[item_name]
+        print("Parse object %s" % item)
+        ready_to_create = True
+        dep_obj_name = ""
+        dep_var_name = ""
+        for dependence in item["input"]:
+            if dependence["important"]:
+                dep_obj_name, dep_var_name = str(dependence["value"]).split('.')
+                print("Find dependence: object = %s, variable = %s" % (dep_obj_name, dep_var_name))
+                if dep_obj_name in created_models.keys():
+                    if dep_var_name in created_models[dep_obj_name].keys():
+                        ready_to_create = True
+                    else:
+                        print("Can't find dependence variable in object %s: %s" % (dep_obj_name, dep_var_name))
+                        ready_to_create = False
+                        break
+                else:
+                    print("Can't find dependence: %s" % dep_obj_name)
+                    ready_to_create = False
+                    break
+        if ready_to_create:
+            print("Crate object :%s" % item)
+            new_obj = known_classes[item_name][ModelInfo.INSTANCE](item_name)
+            #TODO: Correct creation code
+            # for param in item["params"]:
 
+            new_obj.init()
+            created_models[item_name] = {}
         i = i + 1 if i < len(json_items) else 0
 
     for key, value in known_classes.items():

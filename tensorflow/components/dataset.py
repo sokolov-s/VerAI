@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.5
 
 import base
-import enum as Enum
+from enum import Enum
 
 
 class DataSet(base.Base):
