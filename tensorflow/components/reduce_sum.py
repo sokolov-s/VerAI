@@ -25,16 +25,16 @@ class ReduceSum(base.Base):
     def __init__(self, name):
         base.Base.__init__(self, name=name)
 
-        self._add_input(self.Input.X, desc="The tensor to reduce. Should have numeric type", important=True)
+        self.add_input(self.Input.X, desc="The tensor to reduce. Should have numeric type", important=True)
 
-        self._add_output(self.Output.RESULT, desc="A Tensor")
+        self.add_output(self.Output.RESULT, desc="A Tensor")
 
-        self._add_param(self.Params.AXIS, desc="The dimensions to reduce. If None (the default), reduces all dimensions",
+        self.add_param(self.Params.AXIS, desc="The dimensions to reduce. If None (the default), reduces all dimensions",
                         important=False)
-        self._add_param(self.Params.KEEP_DIMS, value=False, desc="If true, retains reduced dimensions with length 1",
+        self.add_param(self.Params.KEEP_DIMS, value=False, desc="If true, retains reduced dimensions with length 1",
                         important=False)
-        self._add_param(self.Params.NAME, value=name, desc="Operation reduce_sum", important=False)
-        self._add_param(self.Params.REDUCE_INDICES, desc="The old (deprecated) name for axis", important=False)
+        self.add_param(self.Params.NAME, value=name, desc="Operation reduce_sum", important=False)
+        self.add_param(self.Params.REDUCE_INDICES, desc="The old (deprecated) name for axis", important=False)
 
     def init(self):
         res = tf.reduce_sum(input_tensor=self.get_input(self.Input.X),

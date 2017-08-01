@@ -49,7 +49,7 @@ class Base(metaclass=ABCMeta):
         Base._check_param_name_in_obj(obj=obj, name=name)
         return obj[name][Base.ParamType.VALUE]
 
-    def _add_input(self, name: str, value=None, desc="", important=True):
+    def add_input(self, name: str, value=None, desc="", important=True):
         self._add_param_to_obj(obj=self.inputs, name=name, value=value, desc=desc, important=important)
 
     def set_input(self, name, value):
@@ -58,7 +58,7 @@ class Base(metaclass=ABCMeta):
     def get_input(self, name):
         return self._get_param_value_from_obj(self.inputs, name)
 
-    def _add_output(self, name: str, value=None, desc=""):
+    def add_output(self, name: str, value=None, desc=""):
         self._add_param_to_obj(obj=self.outputs, name=name, value=value, desc=desc)
 
     def set_output(self, name, value):
@@ -67,7 +67,7 @@ class Base(metaclass=ABCMeta):
     def get_output(self, name):
         return self._get_param_value_from_obj(self.outputs, name)
 
-    def _add_param(self, name: str, value=None, desc="", important=True):
+    def add_param(self, name: str, value=None, desc="", important=True):
         self._add_param_to_obj(obj=self.params, name=name, value=value, desc=desc, important=important)
 
     def set_param(self, name, value):

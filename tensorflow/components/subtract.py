@@ -24,12 +24,12 @@ class Subtract(base.Base):
 
         desc = "A Tensor. Must be one of the following types: half, float32, float64, int32, " \
                "int64, complex64, complex128"
-        self._add_input(self.Input.X, desc=desc, important=True)
-        self._add_input(self.Input.Y, desc=desc, important=True)
+        self.add_input(self.Input.X, desc=desc, important=True)
+        self.add_input(self.Input.Y, desc=desc, important=True)
 
-        self._add_output(self.Output.RESULT, desc="A Tensor")
+        self.add_output(self.Output.RESULT, desc="A Tensor")
 
-        self._add_param(self.Params.NAME, desc="Operation subtract", value=name, important=False)
+        self.add_param(self.Params.NAME, desc="Operation subtract", value=name, important=False)
 
     def init(self):
         res = tf.subtract(x=self.get_input(self.Input.X), y=self.get_input(self.Input.Y),

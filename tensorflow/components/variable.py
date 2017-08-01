@@ -30,20 +30,20 @@ class Variable(base.Base):
     def __init__(self, name):
         base.Base.__init__(self, name=name)
 
-        self._add_input(self.Input.X, desc="A Tensor", important=False)
+        self.add_input(self.Input.X, desc="A Tensor", important=False)
 
-        self._add_output(self.Output.RESULT, desc="A Tensor")
+        self.add_output(self.Output.RESULT, desc="A Tensor")
 
-        self._add_param(self.Params.INIT_VALUE, important=True)
-        self._add_param(self.Params.TRAINABLE, value=True, important=True)
-        self._add_param(self.Params.COLLECTIONS, value=None, important=False)
-        self._add_param(self.Params.VALIDATE_SHAPES, value=True, important=False)
-        self._add_param(self.Params.CACHING_DEVICE, important=False)
-        self._add_param(self.Params.VARIABLE_DEF, important=False)
-        self._add_param(self.Params.DTYPE, important=False)
-        self._add_param(self.Params.EXPECTED_SHAPE, important=False)
-        self._add_param(self.Params.IMPORT_SCOPE, important=False)
-        self._add_param(self.Params.NAME, desc="A name for the operation (optional)", value=name, important=False)
+        self.add_param(self.Params.INIT_VALUE, important=True)
+        self.add_param(self.Params.TRAINABLE, value=True, important=True)
+        self.add_param(self.Params.COLLECTIONS, value=None, important=False)
+        self.add_param(self.Params.VALIDATE_SHAPES, value=True, important=False)
+        self.add_param(self.Params.CACHING_DEVICE, important=False)
+        self.add_param(self.Params.VARIABLE_DEF, important=False)
+        self.add_param(self.Params.DTYPE, important=False)
+        self.add_param(self.Params.EXPECTED_SHAPE, important=False)
+        self.add_param(self.Params.IMPORT_SCOPE, important=False)
+        self.add_param(self.Params.NAME, desc="A name for the operation (optional)", value=name, important=False)
 
     def init(self):
         value = self.get_input(self.Input.X) if self.get_input(self.Input.X) else self.get_param(self.Params.INIT_VALUE)

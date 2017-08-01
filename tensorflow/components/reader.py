@@ -2,6 +2,7 @@
 
 import base
 import enum as Enum
+import dataset
 
 
 class Reader(base.Base):
@@ -17,23 +18,27 @@ class Reader(base.Base):
         QUEUE_CAPACITY = "queue_capacity"
         NAME = "name"
 
-    class Output(Enum):
-        INSTANCE = "instance"
+    # class Output(Enum):
+    #     INSTANCE = "instance"
 
     def __init__(self, name):
         base.Base.__init__(self, name=name)
 
-        self._add_input(self.Input, important=True, value=[])
+        self.add_input(self.Input.DATASET, important=True)
 
-        self._add_param(self.Params.NAME, important=False)
-        self._add_param(self.Params.QUEUE_CAPACITY, important=False)
-        self._add_param(self.Params.MODULE, important=True)
+        self.add_param(self.Params.NAME, important=False)
+        self.add_param(self.Params.QUEUE_CAPACITY, important=False)
+        self.add_param(self.Params.MODULE, important=True)
+        self.reader = None
 
     # Base class interface implementation
+
     def init(self):
-        res = self
-        self.set_output(self.Output.INSTANCE, res)
-        return {self.Output.INSTANCE: res}
+        # dataset = self.get_input(self.Input.DATASET)
+        # if dataset.get_param(dataset.DataSet.Params.DB_TYPE) == "file":
+        #
+        #     self.reader =
+        pass
 
     def run(self):
         pass
