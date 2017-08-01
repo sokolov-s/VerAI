@@ -52,7 +52,7 @@ if json_file is None or not os.path.isfile(json_file):
     exit(2)
 
 
-class ModelInfo(Enum):
+class ModelInfo:
     INSTANCE = "instance"
     CLASS_NAME = "class_name"
     PATH = "path"
@@ -87,11 +87,11 @@ def load_models():
     return models
 
 
-def get_model_instance(class_name: str, version: str, obj_name: str):
+def get_model_instance(class_name: str, version: str, name: str):
     global known_classes
-    for obj in known_classes:
-        if obj[ModelInfo.CLASS_NAME] == class_name and obj[ModelInfo.VERSION] == version:
-            return obj[ModelInfo.INSTANCE](obj_name)
+    for obj_name, obj_value in known_classes.items():
+        if obj_value[ModelInfo.CLASS_NAME] == class_name and obj_value[ModelInfo.VERSION] == version:
+            return obj_value[ModelInfo.INSTANCE](name)
     return None
 
 with open(json_file) as fp:
@@ -116,29 +116,31 @@ with open(json_file) as fp:
         ready_to_create = True
         dep_obj_name = ""
         dep_var_name = ""
-        for dependence in item["input"]:
-            if dependence["important"]:
-                dep_obj_name, dep_var_name = str(dependence["value"]).split('.')
-                print("Find dependence: object = %s, variable = %s" % (dep_obj_name, dep_var_name))
-                if dep_obj_name in created_models.keys():
-                    if dep_var_name in created_models[dep_obj_name].keys():
-                        ready_to_create = True
+        if "input" in item and item["input"]:
+            for dependence in item["input"]:
+                if dependence["important"]:
+                    dep_obj_name, dep_var_name = str(dependence["value"]).split('.')
+                    print("Find dependence: object = %s, variable = %s" % (dep_obj_name, dep_var_name))
+                    if dep_obj_name in created_models.keys():
+                        if dep_var_name in created_models[dep_obj_name].keys():
+                            ready_to_create = True
+                        else:
+                            print("Can't find dependence variable in object %s: %s" % (dep_obj_name, dep_var_name))
+                            ready_to_create = False
+                            break
                     else:
-                        print("Can't find dependence variable in object %s: %s" % (dep_obj_name, dep_var_name))
+                        print("Can't find dependence: %s" % dep_obj_name)
                         ready_to_create = False
                         break
-                else:
-                    print("Can't find dependence: %s" % dep_obj_name)
-                    ready_to_create = False
-                    break
         if ready_to_create:
             print("Crate object :%s" % item)
-            new_obj = known_classes[item_name][ModelInfo.INSTANCE](item_name)
+            new_obj = get_model_instance(item["class"], item["version"], item_name)
             #TODO: Correct creation code
             # for param in item["params"]:
-
             new_obj.init()
             created_models[item_name] = {}
+            json_items.remove(item_name)
+
         i = i + 1 if i < len(json_items) else 0
 
     for key, value in known_classes.items():

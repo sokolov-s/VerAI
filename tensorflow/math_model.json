@@ -1,7 +1,7 @@
 {
   "DataSetInput" : {
     "class" : "DataSet",
-    "version" : "1.0",
+    "version" : "3118af41e200a30e6b7546aaee416bfa60b70cd5",
     "params" : [
       {
         "name": "db_type",
@@ -34,7 +34,7 @@
   },
   "Reader" : {
     "class" : "Reader",
-    "version" : "1.0",
+    "version" : "9a2c690163fa92fd263a0f514b9d1f724e7390d2",
     "input" : [
       {
         "name": "dataset",
@@ -73,7 +73,7 @@
   },
   "A" : {
     "class" : "Variable",
-    "version" : "5f92ff71b6328fc6991df92c9ba32257dd3ea7d8",
+    "version" : "0cccf257f1daca4f2916ea43639ba78d27f87814",
     "input" : null,
     "params" : [
       {
@@ -136,7 +136,7 @@
   },
   "B" : {
     "class" : "Variable",
-    "version" : "5f92ff71b6328fc6991df92c9ba32257dd3ea7d8",
+    "version" : "0cccf257f1daca4f2916ea43639ba78d27f87814",
     "params" : [
       {
         "name": "initial_value",
@@ -199,7 +199,7 @@
   },
   "MulA" : {
     "class" : "Multiply",
-    "version" : "7d80fe244b42bc31f2abfd7aba8f5bffe5d5d5e1",
+    "version" : "7e1d6a98bfaf55ec554b4f47e5a8c1dae640c172",
     "input" : [
       {
         "name": "x",
@@ -228,7 +228,7 @@
   },
   "MulB" : {
     "class" : "Multiply",
-    "version" : "7d80fe244b42bc31f2abfd7aba8f5bffe5d5d5e1",
+    "version" : "7e1d6a98bfaf55ec554b4f47e5a8c1dae640c172",
     "input" : [
       {
         "name": "x",
@@ -256,7 +256,7 @@
   },
   "MulAB" : {
     "class" : "Multiply",
-    "version" : "7d80fe244b42bc31f2abfd7aba8f5bffe5d5d5e1",
+    "version" : "7e1d6a98bfaf55ec554b4f47e5a8c1dae640c172",
     "input" : [
       {
         "name": "x",
@@ -284,7 +284,7 @@
   },
   "Delta" : {
     "class" : "Subtract",
-    "version" : "b9e79283f66c490540f50470deb380ef2f42153e",
+    "version" : "d4caed896971170ec4f64f3ad08e2ea532851ce5",
     "input" : [
       {
         "name": "x",
@@ -312,7 +312,7 @@
   },
   "SquareDelta" : {
     "class" : "Square",
-    "version" : "c3b5af8855945bb3007e39ea9ee1cd4ad1c1114e",
+    "version" : "be25b849c3953654d27f8c1e9560233079a50c85",
     "input" : [
       {
         "name": "x",
@@ -335,7 +335,7 @@
   },
   "Loss" : {
     "class" : "ReduceSum",
-    "version" : "5f92ff71b6328fc6991df92c9ba32257dd3ea7d8",
+    "version" : "ed6d7cc658b52f6a6b77f00fc67b11234ea98a32",
     "input" : [
       {
         "name": "x",
@@ -373,7 +373,7 @@
   },
   "TrainModel" : {
     "class" : "AdamOptimizer",
-    "version" : "244362a6b7c606290d84fef7da9f034b4e7f8ab3",
+    "version" : "4e49143157312d6eacf003073e004a0f44bced45",
     "input" : [
       {
         "name": "loss",
