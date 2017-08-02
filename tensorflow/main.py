@@ -94,6 +94,28 @@ def get_model_instance(class_name: str, version: str, name: str):
             return obj_value[ModelInfo.INSTANCE](name)
     return None
 
+
+def set_inputs(module_instance, json_item):
+    if "input" in json_item and json_item["input"]:
+        for dependence in json_item["input"]:
+            dep_obj_name, dep_var_name = str(dependence["value"]).split('.')
+            if dep_obj_name in created_models.keys():
+                if dep_var_name in created_models[dep_obj_name].keys():
+                    module_instance.set_input(dependence["name"], created_models[dep_obj_name][dep_var_name])
+                else:
+                    raise ValueError("Ca't find dependence value")
+                    break
+
+
+def set_params(module_instance, json_item):
+    if "params" in json_item and json_item["params"]:
+        for param in json_item["params"]:
+            try:
+                module_instance.set_param(param["name"], param["value"])
+            except Exception as ex:
+                print("\033[91m%s\033[0m" % ex)
+
+
 with open(json_file) as fp:
     try:
         js_data = json.load(fp,  object_pairs_hook=OrderedDict)
@@ -118,18 +140,19 @@ with open(json_file) as fp:
         dep_var_name = ""
         if "input" in item and item["input"]:
             for dependence in item["input"]:
-                if dependence["important"]:
+                if "important" not in dependence.keys() or dependence["important"]:
                     dep_obj_name, dep_var_name = str(dependence["value"]).split('.')
                     print("Find dependence: object = %s, variable = %s" % (dep_obj_name, dep_var_name))
                     if dep_obj_name in created_models.keys():
                         if dep_var_name in created_models[dep_obj_name].keys():
                             ready_to_create = True
                         else:
-                            print("Can't find dependence variable in object %s: %s" % (dep_obj_name, dep_var_name))
+                            print("\033[91mCan't find dependence variable in object %s: %s\033[0m" % (dep_obj_name, dep_var_name))
+                            print("created models = %s" % created_models)
                             ready_to_create = False
                             break
                     else:
-                        print("Can't find dependence: %s" % dep_obj_name)
+                        print("\033[91mCan't find dependence: %s\033[0m" % dep_obj_name)
                         ready_to_create = False
                         break
         if ready_to_create:
@@ -137,11 +160,13 @@ with open(json_file) as fp:
             new_obj = get_model_instance(item["class"], item["version"], item_name)
             #TODO: Correct creation code
             # for param in item["params"]:
-            new_obj.init()
-            created_models[item_name] = {}
+            set_inputs(new_obj, item)
+            set_params(new_obj, item)
+            results = new_obj.init()
+            created_models[item_name] = results
             json_items.remove(item_name)
 
-        i = i + 1 if i < len(json_items) else 0
+        i = i + 1 if i < len(json_items) - 1 else 0
 
     for key, value in known_classes.items():
         print("Init %s" % key)

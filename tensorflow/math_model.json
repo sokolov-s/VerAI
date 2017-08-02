@@ -62,12 +62,10 @@
     ],
     "output" : [
       {
-        "name" : "x_input",
-        "type" : "float32"
+        "name" : "x_input"
       },
       {
-        "name" : "x_result",
-        "type" : "float32"
+        "name" : "x_result"
       }
     ]
   },
@@ -129,7 +127,7 @@
     ],
     "output" : [
       {
-        "name": "a",
+        "name": "result",
         "type" : "float32"
       }
     ]
@@ -191,8 +189,7 @@
     ],
     "output" : [
       {
-        "name": "name",
-        "value": "b",
+        "name": "result",
         "type" : "float32"
       }
     ]
@@ -203,7 +200,7 @@
     "input" : [
       {
         "name": "x",
-        "value": "A.a",
+        "value": "A.result",
         "important": true
 
       },
@@ -232,7 +229,7 @@
     "input" : [
       {
         "name": "x",
-        "value" : "B.b",
+        "value" : "B.result",
         "important": true
       },
       {
@@ -260,12 +257,12 @@
     "input" : [
       {
         "name": "x",
-        "value" : "MulA.mul_a",
+        "value" : "MulA.result",
         "important": true
       },
       {
         "name": "y",
-        "value": "MulB.mul_b",
+        "value": "MulB.result",
         "important": true
       }
     ],
@@ -288,7 +285,7 @@
     "input" : [
       {
         "name": "x",
-        "value" : "MulAB.mul_ab",
+        "value" : "MulAB.result",
         "important": true
       },
       {
@@ -316,14 +313,14 @@
     "input" : [
       {
         "name": "x",
-        "value" : "Delta.result_delta",
+        "value" : "Delta.result",
         "important": true
       }
     ],
     "params" : [
       {
         "name": "name",
-        "value": "result_delta",
+        "value": "square",
         "important": false
       }
     ],
@@ -339,7 +336,7 @@
     "input" : [
       {
         "name": "x",
-        "value" : "SquareDelta.squared_delta",
+        "value" : "SquareDelta.result",
         "important": true
       }
     ],
@@ -377,7 +374,7 @@
     "input" : [
       {
         "name": "loss",
-        "value": "Loss.output.loss",
+        "value": "Loss.result",
         "important": true
       },
       {
@@ -465,7 +462,7 @@
     },
     "output" : [
       {
-        "name": "train"
+        "name": "result"
       }
     ]
   }

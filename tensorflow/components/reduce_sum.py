@@ -2,7 +2,6 @@
 
 import base
 import tensorflow as tf
-from enum import Enum
 
 
 class ReduceSum(base.Base):
@@ -10,13 +9,13 @@ class ReduceSum(base.Base):
     Some text about class
     """
 
-    class Input(Enum):
+    class Input:
         X = "x"
 
-    class Output(Enum):
+    class Output:
         RESULT = "result"
 
-    class Params(Enum):
+    class Params:
         NAME = "name"
         AXIS = "axis"
         KEEP_DIMS = "keep_dims"

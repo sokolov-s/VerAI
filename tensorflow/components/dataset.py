@@ -1,7 +1,6 @@
 #!/usr/bin/env python3.5
 
 import base
-from enum import Enum
 
 
 class DataSet(base.Base):
@@ -9,12 +8,12 @@ class DataSet(base.Base):
     Some text about class
     """
 
-    class Params(Enum):
+    class Params:
         DB_TYPE = "db_type"
-        FOLDER = "folders"
+        FOLDER = "folder"
         FILES = "files"
 
-    class Output(Enum):
+    class Output:
         INSTANCE = "instance"
 
     def __init__(self, name):

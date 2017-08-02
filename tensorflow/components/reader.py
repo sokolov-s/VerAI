@@ -1,7 +1,6 @@
 #!/usr/bin/env python3.5
 
 import base
-from enum import Enum
 import dataset
 
 
@@ -10,16 +9,17 @@ class Reader(base.Base):
     Some text about class
     """
 
-    class Input(Enum):
+    class Input:
         DATASET = "dataset"
 
-    class Params(Enum):
+    class Params:
         MODULE = "module"
         QUEUE_CAPACITY = "queue_capacity"
         NAME = "name"
 
-    # class Output(Enum):
-    #     INSTANCE = "instance"
+    class Output:
+        DATA = "x_input"
+        RESULT = "x_result"
 
     def __init__(self, name):
         base.Base.__init__(self, name=name)
