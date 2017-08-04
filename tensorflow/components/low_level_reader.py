@@ -4,7 +4,7 @@ import base
 import dataset
 
 
-class Reader(base.Base):
+class LowLevelReader(base.Base):
     """
     Some text about class
     """

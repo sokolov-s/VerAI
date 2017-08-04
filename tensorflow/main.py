@@ -6,12 +6,11 @@ import os.path
 import json
 from collections import OrderedDict
 
-from os.path import dirname, basename, isfile
+from os.path import basename, isfile
 import glob
 from ast import ClassDef, parse
 import importlib
 import inspect
-from enum import Enum
 import subprocess
 
 json_file = None
@@ -141,25 +140,38 @@ with open(json_file) as fp:
         if "input" in item and item["input"]:
             for dependence in item["input"]:
                 if "important" not in dependence.keys() or dependence["important"]:
-                    dep_obj_name, dep_var_name = str(dependence["value"]).split('.')
-                    print("Find dependence: object = %s, variable = %s" % (dep_obj_name, dep_var_name))
-                    if dep_obj_name in created_models.keys():
-                        if dep_var_name in created_models[dep_obj_name].keys():
-                            ready_to_create = True
+                    dep_list = []
+                    if isinstance(dependence["value"], dict) or isinstance(dependence["value"], list):
+                        for obj in dependence["value"]:
+                            dep_obj_name, dep_var_name = obj.split('.')
+                            dep_list.append([dep_obj_name, dep_var_name])
+                    else:
+                        dep_obj_name, dep_var_name = str(dependence["value"]).split('.')
+                        dep_list.append([dep_obj_name, dep_var_name])
+                    for dep in dep_list:
+                        dep_obj_name, dep_var_name = dep
+                        print("Find dependence: object = %s, variable = %s" % (dep_obj_name, dep_var_name))
+                        if dep_obj_name in created_models.keys():
+                            if dep_var_name in created_models[dep_obj_name].keys():
+                                ready_to_create = True
+                            else:
+                                print("\033[91mCan't find dependence variable in object %s: %s\033[0m" %
+                                      (dep_obj_name, dep_var_name))
+                                ready_to_create = False
+                                raise Exception("\033[93mCan't find dependence variable in object %s: %s\033[0m" %
+                                            (dep_obj_name, dep_var_name))
+                                break
                         else:
-                            print("\033[91mCan't find dependence variable in object %s: %s\033[0m" % (dep_obj_name, dep_var_name))
-                            print("created models = %s" % created_models)
+                            print("\033[93mCan't find dependence: %s\033[0m. %s Object creation has postponed " %
+                                  (dep_obj_name, item_name))
                             ready_to_create = False
                             break
-                    else:
-                        print("\033[91mCan't find dependence: %s\033[0m" % dep_obj_name)
-                        ready_to_create = False
-                        break
         if ready_to_create:
             print("Crate object :%s" % item)
             new_obj = get_model_instance(item["class"], item["version"], item_name)
-            #TODO: Correct creation code
-            # for param in item["params"]:
+            if not new_obj:
+                raise ValueError("Can't find module instance: class_name = %s, version = %s" %
+                                 (item["class"], item["version"]))
             set_inputs(new_obj, item)
             set_params(new_obj, item)
             results = new_obj.init()

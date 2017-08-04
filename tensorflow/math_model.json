@@ -1,7 +1,7 @@
 {
   "DataSetInput" : {
     "class" : "DataSet",
-    "version" : "3118af41e200a30e6b7546aaee416bfa60b70cd5",
+    "version" : "53c00e3ace6ab0a210c551841dbf812d4589abc5",
     "params" : [
       {
         "name": "db_type",
@@ -32,21 +32,21 @@
       }
     ]
   },
-  "Reader" : {
-    "class" : "Reader",
-    "version" : "9a2c690163fa92fd263a0f514b9d1f724e7390d2",
+  "LReader" : {
+    "class" : "LowLevelReader",
+    "version" : "89b297b7547f7131d53a66637680732a6695a945",
     "input" : [
       {
         "name": "dataset",
-        "value" : [
-          "DataSetInput.out"
-          ]
+        "value" : "DataSetInput.instance"
       }
     ],
     "params" : [
       {
         "name": "module",
         "value": "reader_file",
+        "class": "ReaderFile",
+        "version": "89b297b7547f7131d53a66637680732a6695a945",
         "important": true
       },
       {
@@ -71,7 +71,7 @@
   },
   "A" : {
     "class" : "Variable",
-    "version" : "0cccf257f1daca4f2916ea43639ba78d27f87814",
+    "version" : "4b035aa826a475e04fb191b1c188e2858bacbae5",
     "input" : null,
     "params" : [
       {
@@ -127,14 +127,13 @@
     ],
     "output" : [
       {
-        "name": "result",
-        "type" : "float32"
+        "name": "result"
       }
     ]
   },
   "B" : {
     "class" : "Variable",
-    "version" : "0cccf257f1daca4f2916ea43639ba78d27f87814",
+    "version" : "4b035aa826a475e04fb191b1c188e2858bacbae5",
     "params" : [
       {
         "name": "initial_value",
@@ -196,7 +195,7 @@
   },
   "MulA" : {
     "class" : "Multiply",
-    "version" : "7e1d6a98bfaf55ec554b4f47e5a8c1dae640c172",
+    "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
     "input" : [
       {
         "name": "x",
@@ -225,7 +224,7 @@
   },
   "MulB" : {
     "class" : "Multiply",
-    "version" : "7e1d6a98bfaf55ec554b4f47e5a8c1dae640c172",
+    "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
     "input" : [
       {
         "name": "x",
@@ -253,7 +252,7 @@
   },
   "MulAB" : {
     "class" : "Multiply",
-    "version" : "7e1d6a98bfaf55ec554b4f47e5a8c1dae640c172",
+    "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
     "input" : [
       {
         "name": "x",
@@ -281,7 +280,7 @@
   },
   "Delta" : {
     "class" : "Subtract",
-    "version" : "d4caed896971170ec4f64f3ad08e2ea532851ce5",
+    "version" : "68b0f0b3698a85df7e8dae777ac3c69b21e3c751",
     "input" : [
       {
         "name": "x",
@@ -309,7 +308,7 @@
   },
   "SquareDelta" : {
     "class" : "Square",
-    "version" : "be25b849c3953654d27f8c1e9560233079a50c85",
+    "version" : "92046892d83b5b8ac35977d41557db021df4b1b1",
     "input" : [
       {
         "name": "x",
@@ -332,7 +331,7 @@
   },
   "Loss" : {
     "class" : "ReduceSum",
-    "version" : "ed6d7cc658b52f6a6b77f00fc67b11234ea98a32",
+    "version" : "f3d6adb0d8d3642d32ef9c0f81c5027c08f2bb96",
     "input" : [
       {
         "name": "x",
