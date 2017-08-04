@@ -26,7 +26,7 @@
         "important": false
       }
     ],
-    "output" : [
+    "outputs" : [
       {
         "name" : "instance"
       }
@@ -34,8 +34,8 @@
   },
   "LReader" : {
     "class" : "LowLevelReader",
-    "version" : "89b297b7547f7131d53a66637680732a6695a945",
-    "input" : [
+    "version" : "8de82acff60cbddf96f6ad5b64cf9cd0290e632a",
+    "inputs" : [
       {
         "name": "dataset",
         "value" : "DataSetInput.instance"
@@ -60,7 +60,7 @@
         "important": false
       }
     ],
-    "output" : [
+    "outputs" : [
       {
         "name" : "x_input"
       },
@@ -72,7 +72,7 @@
   "A" : {
     "class" : "Variable",
     "version" : "4b035aa826a475e04fb191b1c188e2858bacbae5",
-    "input" : null,
+    "inputs" : null,
     "params" : [
       {
         "name": "initial_value",
@@ -125,7 +125,7 @@
         "important": false
       }
     ],
-    "output" : [
+    "outputs" : [
       {
         "name": "result"
       }
@@ -186,7 +186,7 @@
         "important": false
       }
     ],
-    "output" : [
+    "outputs" : [
       {
         "name": "result",
         "type" : "float32"
@@ -196,7 +196,7 @@
   "MulA" : {
     "class" : "Multiply",
     "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
-    "input" : [
+    "inputs" : [
       {
         "name": "x",
         "value": "A.result",
@@ -216,7 +216,7 @@
         "important": false
       }
     ],
-    "output" : [
+    "outputs" : [
       {
         "name": "result"
       }
@@ -225,7 +225,7 @@
   "MulB" : {
     "class" : "Multiply",
     "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
-    "input" : [
+    "inputs" : [
       {
         "name": "x",
         "value" : "B.result",
@@ -244,7 +244,7 @@
         "important": false
       }
     ],
-    "output" : [
+    "outputs" : [
       {
         "name": "result"
       }
@@ -253,7 +253,7 @@
   "MulAB" : {
     "class" : "Multiply",
     "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
-    "input" : [
+    "inputs" : [
       {
         "name": "x",
         "value" : "MulA.result",
@@ -272,7 +272,7 @@
         "important": false
       }
     ],
-    "output" : [
+    "outputs" : [
       {
         "name": "result"
       }
@@ -281,7 +281,7 @@
   "Delta" : {
     "class" : "Subtract",
     "version" : "68b0f0b3698a85df7e8dae777ac3c69b21e3c751",
-    "input" : [
+    "inputs" : [
       {
         "name": "x",
         "value" : "MulAB.result",
@@ -300,7 +300,7 @@
         "important": false
       }
     ],
-    "output" : [
+    "outputs" : [
       {
         "name": "result"
       }
@@ -309,7 +309,7 @@
   "SquareDelta" : {
     "class" : "Square",
     "version" : "92046892d83b5b8ac35977d41557db021df4b1b1",
-    "input" : [
+    "inputs" : [
       {
         "name": "x",
         "value" : "Delta.result",
@@ -323,7 +323,7 @@
         "important": false
       }
     ],
-    "output" : [
+    "outputs" : [
       {
         "name": "result"
       }
@@ -332,7 +332,7 @@
   "Loss" : {
     "class" : "ReduceSum",
     "version" : "f3d6adb0d8d3642d32ef9c0f81c5027c08f2bb96",
-    "input" : [
+    "inputs" : [
       {
         "name": "x",
         "value" : "SquareDelta.result",
@@ -361,7 +361,7 @@
         "important": false
       }
     ],
-    "output" : [
+    "outputs" : [
       {
         "name": "result"
       }
@@ -370,7 +370,7 @@
   "TrainModel" : {
     "class" : "AdamOptimizer",
     "version" : "4e49143157312d6eacf003073e004a0f44bced45",
-    "input" : [
+    "inputs" : [
       {
         "name": "loss",
         "value": "Loss.result",
@@ -459,7 +459,7 @@
         }
       ]
     },
-    "output" : [
+    "outputs" : [
       {
         "name": "result"
       }

@@ -2,7 +2,7 @@
 
 import base
 import dataset
-
+from module_loader import ModuleLoader
 
 class LowLevelReader(base.Base):
     """
@@ -37,7 +37,7 @@ class LowLevelReader(base.Base):
         # dataset = self.get_input(self.Input.DATASET)
         # if dataset.get_param(dataset.DataSet.Params.DB_TYPE) == "file":
         #
-        #     self.reader =
+        self.reader = ModuleLoader.get_model_instance(self.get_param(self.Params.MODULE))
         pass
 
     def run(self):
