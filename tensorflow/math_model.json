@@ -45,8 +45,16 @@
       {
         "name": "module",
         "value": "reader_file",
-        "class": "ReaderFile",
-        "version": "89b297b7547f7131d53a66637680732a6695a945",
+        "important": true
+      },
+      {
+        "name": "class",
+        "value": "ReaderFile",
+        "important": true
+      },
+      {
+        "name": "version",
+        "value": "89b297b7547f7131d53a66637680732a6695a945",
         "important": true
       },
       {
