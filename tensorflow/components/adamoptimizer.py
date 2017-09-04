@@ -9,8 +9,8 @@ class AdamOptimizer(base.Base):
     Some text about class
     """
 
-    def __init__(self, name):
-        base.Base.__init__(self, name=name)
+    def __init__(self, tf_session, name):
+        base.Base.__init__(self, tf_session=tf_session, name=name)
         self.add_input("input_tensor", desc="A tensor to optimize", important=True)
         self.add_input("iteration_count", value=0, important=False)
 

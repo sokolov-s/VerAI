@@ -21,8 +21,8 @@ class ReduceSum(base.Base):
         KEEP_DIMS = "keep_dims"
         REDUCE_INDICES = "reduction_indices"
 
-    def __init__(self, name):
-        base.Base.__init__(self, name=name)
+    def __init__(self, tf_session, name):
+        base.Base.__init__(self, tf_session=tf_session, name=name)
 
         self.add_input(self.Input.X, desc="The tensor to reduce. Should have numeric type", important=True)
 

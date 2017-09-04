@@ -17,8 +17,8 @@ class Square(base.Base):
     class Params:
         NAME = "name"
 
-    def __init__(self, name):
-        base.Base.__init__(self, name=name)
+    def __init__(self, tf_session, name):
+        base.Base.__init__(self, tf_session=tf_session, name=name)
         desc = "A Tensor or SparseTensor. Must be one of the following types: half, float32, float64, int32, int64, " \
                "complex64, complex128"
         self.add_input(self.Input.X, desc=desc, important=True)

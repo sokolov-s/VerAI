@@ -6,6 +6,7 @@ import os.path
 import json
 from collections import OrderedDict
 from module_loader import ModuleLoader
+import tensorflow as tf
 
 json_file = None
 
@@ -65,6 +66,7 @@ def set_params(module_instance, json_item):
             except Exception as ex:
                 print("\033[91m%s\033[0m" % ex)
 
+sess = tf.Session()
 
 with open(json_file) as fp:
     try:
@@ -120,7 +122,8 @@ with open(json_file) as fp:
                             break
         if ready_to_create:
             print("Crate object :%s" % item)
-            new_obj = modules.get_model_instance(item["class"], item["version"], item_name)
+            new_obj = modules.get_model_instance(class_name=item["class"], version=item["version"], name=item_name,
+                                                 tf_session=sess)
             if not new_obj:
                 raise ValueError("Can't find module instance: class_name = %s, version = %s" %
                                  (item["class"], item["version"]))

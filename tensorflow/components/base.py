@@ -1,9 +1,6 @@
 #!/usr/bin/env python3.5
 
 from abc import ABCMeta, abstractmethod
-from typing import Any, Dict
-from enum import Enum
-import inspect
 
 
 class Base(metaclass=ABCMeta):
@@ -11,24 +8,20 @@ class Base(metaclass=ABCMeta):
     Some text about class
     """
 
-    class ParamType(Enum):
+    class ParamType:
         VALUE = "value"
         DESC = "description"
         IMPORTANT = "important"
 
-    def __init__(self, name):
+    def __init__(self, tf_session, name):
         self.name = name
         self.inputs = dict()
         self.outputs = dict()
         self.params = dict()
+        self.sess = tf_session
 
     def get_name(self):
         return self.name
-
-    @staticmethod
-    def __retrieve_name(var):
-        callers_local_vars = inspect.currentframe().f_back.f_locals.items()
-        return [var_name for var_name, var_val in callers_local_vars if var_val is var]
 
     @staticmethod
     def _add_param_to_obj(obj: dict, name: str, value=None, desc="", important=True):
@@ -37,16 +30,18 @@ class Base(metaclass=ABCMeta):
     @staticmethod
     def _check_param_name_in_obj(obj: dict, name: str):
         if name not in obj.keys():
-            raise ValueError("\"%s\" did not match as key in %s" % (name, Base.__retrieve_name(obj)))
+            raise ValueError("\"%s\" did not match as key in dictionary (%s)" % (name, obj.keys()))
 
-    @staticmethod
-    def _set_param_value_in_obj(obj: dict, name: str, value):
-        Base._check_param_name_in_obj(obj=obj, name=name)
+    def _set_param_value_in_obj(self, obj: dict, name: str, value):
+        self._check_param_name_in_obj(obj=obj, name=name)
         obj[name][Base.ParamType.VALUE] = value
 
-    @staticmethod
-    def _get_param_value_from_obj(obj: dict, name: str):
-        Base._check_param_name_in_obj(obj=obj, name=name)
+    def _set_params_value_in_obj(self, obj: dict, params: dict):
+        for key, value in params.items():
+            self._set_param_value_in_obj(obj, key, value)
+
+    def _get_param_value_from_obj(self, obj: dict, name: str):
+        self._check_param_name_in_obj(obj=obj, name=name)
         return obj[name][Base.ParamType.VALUE]
 
     def add_input(self, name: str, value=None, desc="", important=True):
@@ -54,6 +49,9 @@ class Base(metaclass=ABCMeta):
 
     def set_input(self, name, value):
         self._set_param_value_in_obj(obj=self.inputs, name=name, value=value)
+
+    def set_inputs(self, inputs: dict):
+        self._set_params_value_in_obj(obj=self.inputs, params=inputs)
 
     def get_input(self, name):
         return self._get_param_value_from_obj(self.inputs, name)
@@ -64,6 +62,9 @@ class Base(metaclass=ABCMeta):
     def set_output(self, name, value):
         self._set_param_value_in_obj(obj=self.outputs, name=name, value=value)
 
+    def set_outputs(self, outputs: dict):
+        self._set_params_value_in_obj(obj=self.outputs, params=outputs)
+
     def get_output(self, name):
         return self._get_param_value_from_obj(self.outputs, name)
 
@@ -73,8 +74,14 @@ class Base(metaclass=ABCMeta):
     def set_param(self, name, value):
         self._set_param_value_in_obj(obj=self.params, name=name, value=value)
 
+    def set_params(self, params: dict):
+        self._set_params_value_in_obj(obj=self.params, params=params)
+
     def get_param(self, name):
         return self._get_param_value_from_obj(self.params, name)
+
+    def get_session(self):
+        return self.sess
 
     @abstractmethod
     def init(self):

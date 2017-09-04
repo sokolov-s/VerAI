@@ -2,23 +2,31 @@
   "DataSetInput" : {
     "class" : "DataSet",
     "version" : "53c00e3ace6ab0a210c551841dbf812d4589abc5",
+    "component_type": "dataset", 
     "params" : [
       {
-        "name": "db_type",
-        "value": "file",
+        "name" : "file_type",
+        "value" : "text",
         "important": true
       },
       {
         "name": "folder",
-        "value": "/home/serhii/Projects/VerAI/python",
+        "value": "/home/serhii/Projects/VerAI/tensorflow",
         "important": true
       },
       {
-        "name": "files",
+        "name": "train_input",
         "value": [
-          "input.data"
+          "train_input.txt"
         ],
-        "important": true
+        "important": false
+      },
+      {
+        "name": "train_target",
+        "value": [
+          "train_target.txt"
+        ],
+        "important": false
       },
       {
         "name": "name",
@@ -28,52 +36,22 @@
     ],
     "outputs" : [
       {
-        "name" : "instance"
-      }
-    ]
-  },
-  "LReader" : {
-    "class" : "LowLevelReader",
-    "version" : "8de82acff60cbddf96f6ad5b64cf9cd0290e632a",
-    "inputs" : [
-      {
-        "name": "dataset",
-        "value" : "DataSetInput.instance"
-      }
-    ],
-    "params" : [
-      {
-        "name": "module",
-        "value": "reader_file",
-        "important": true
+        "name" : "train_input"
       },
       {
-        "name": "class",
-        "value": "ReaderFile",
-        "important": true
+        "name" : "train_target"
       },
       {
-        "name": "version",
-        "value": "89b297b7547f7131d53a66637680732a6695a945",
-        "important": true
+        "name" : "test_input"
       },
       {
-        "name": "queue_capacity",
-        "value": 10,
-        "important": false
+        "name" : "test_target"
       },
       {
-        "name": "name",
-        "value": "text_reader",
-        "important": false
-      }
-    ],
-    "outputs" : [
-      {
-        "name" : "x_input"
+        "name" : "validate_input"
       },
       {
-        "name" : "x_result"
+        "name" : "validate_target"
       }
     ]
   },
@@ -81,6 +59,7 @@
     "class" : "Variable",
     "version" : "4b035aa826a475e04fb191b1c188e2858bacbae5",
     "inputs" : null,
+    "component_type" : "model",
     "params" : [
       {
         "name": "initial_value",
@@ -196,8 +175,7 @@
     ],
     "outputs" : [
       {
-        "name": "result",
-        "type" : "float32"
+        "name": "result"
       }
     ]
   },
@@ -213,7 +191,7 @@
       },
       {
         "name": "y",
-        "value": "Reader.x_input",
+        "value": "DataSetInput.train_input",
         "important": true
       }
     ],
@@ -241,7 +219,7 @@
       },
       {
         "name": "y",
-        "value": "Reader.x_input",
+        "value": "DataSetInput.train_input",
         "important": true
       }
     ],
@@ -297,7 +275,7 @@
       },
       {
         "name": "y",
-        "value": "Reader.x_result",
+        "value": "DataSetInput.train_target",
         "important": true
       }
     ],

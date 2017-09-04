@@ -53,9 +53,9 @@ class ModuleLoader(metaclass=Singleton):
                                                     modules[module_name][ModuleLoader.ModuleInfo.VERSION]))
         self.modules.update(modules)
 
-    def get_model_instance(self, class_name: str, version: str, name: str):
+    def get_model_instance(self, class_name: str, version: str, name: str, tf_session):
         for obj_name, obj_value in self.modules.items():
             if obj_value[ModuleLoader.ModuleInfo.CLASS_NAME] == class_name and \
                             obj_value[ModuleLoader.ModuleInfo.VERSION] == version:
-                return obj_value[ModuleLoader.ModuleInfo.INSTANCE](name)
+                return obj_value[ModuleLoader.ModuleInfo.INSTANCE](tf_session=tf_session, name=name)
         return None

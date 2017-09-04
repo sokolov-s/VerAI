@@ -1,0 +1,14 @@
+{
+  "DataSet" : {
+    "class" : "DataSet",
+    "version" : "53c00e3ace6ab0a210c551841dbf812d4589abc5",
+    "component_type": "dataset",
+    "params" : [
+    ],
+    "outputs" : [
+      {
+        "name" : "instance"
+      }
+    ]
+  }
+}

@@ -26,8 +26,8 @@ class Variable(base.Base):
         EXPECTED_SHAPE = "expected_shape"
         IMPORT_SCOPE = "import_scope"
 
-    def __init__(self, name):
-        base.Base.__init__(self, name=name)
+    def __init__(self, tf_session, name):
+        base.Base.__init__(self, tf_session=tf_session, name=name)
 
         self.add_input(self.Input.X, desc="A Tensor", important=False)
 
