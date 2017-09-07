@@ -5,30 +5,6 @@
     "component_type": "dataset", 
     "params" : [
       {
-        "name" : "file_type",
-        "value" : "text",
-        "important": true
-      },
-      {
-        "name": "folder",
-        "value": "/home/serhii/Projects/VerAI/tensorflow",
-        "important": true
-      },
-      {
-        "name": "train_input",
-        "value": [
-          "train_input.txt"
-        ],
-        "important": false
-      },
-      {
-        "name": "train_target",
-        "value": [
-          "train_target.txt"
-        ],
-        "important": false
-      },
-      {
         "name": "name",
         "value": "dataset1",
         "important": false
@@ -36,22 +12,10 @@
     ],
     "outputs" : [
       {
-        "name" : "train_input"
+        "name" : "raw_data"
       },
       {
-        "name" : "train_target"
-      },
-      {
-        "name" : "test_input"
-      },
-      {
-        "name" : "test_target"
-      },
-      {
-        "name" : "validate_input"
-      },
-      {
-        "name" : "validate_target"
+        "name" : "target_data"
       }
     ]
   },

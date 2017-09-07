@@ -5,7 +5,7 @@ import getopt
 import os.path
 import json
 from collections import OrderedDict
-from module_loader import ModuleLoader
+from component_loader import ComponentLoader
 import tensorflow as tf
 
 json_file = None
@@ -76,7 +76,7 @@ with open(json_file) as fp:
         print("Bad json format in file %s" % json_file)
         sys.exit(2)
 
-    modules = ModuleLoader()
+    modules = ComponentLoader()
 
     json_items = []
     created_models = {}
@@ -122,7 +122,7 @@ with open(json_file) as fp:
                             break
         if ready_to_create:
             print("Crate object :%s" % item)
-            new_obj = modules.get_model_instance(class_name=item["class"], version=item["version"], name=item_name,
+            new_obj = modules.get_component_instance(class_name=item["class"], version=item["version"], name=item_name,
                                                  tf_session=sess)
             if not new_obj:
                 raise ValueError("Can't find module instance: class_name = %s, version = %s" %

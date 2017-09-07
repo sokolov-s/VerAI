@@ -9,9 +9,10 @@ class DataSet(DataSetBase):
         DataSetBase.__init__(self)
 
     def switch_iteration(self, value: DataSetBase.Iterations):
-        self.iteration = value
+        self._set_iteration(value)
 
     def get_next(self):
         result = None
+
         return result
 

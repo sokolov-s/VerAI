@@ -32,13 +32,13 @@ class AdamOptimizer(base.Base):
                             }
         self.minimize_params = dict()
 
-        self.add_optimize_param(fn_name="minimize", param_name="global_step", important=False)
-        self.add_optimize_param(fn_name="minimize", param_name="var_list", important=False)
-        self.add_optimize_param(fn_name="minimize", param_name="gate_gradients", value="GATE_OP", important=False)
-        self.add_optimize_param(fn_name="minimize", param_name="aggregation_method", important=False)
-        self.add_optimize_param(fn_name="minimize", param_name="colocate_gradients_with_ops", value=False, important=False)
-        self.add_optimize_param(fn_name="minimize", param_name="name", important=False)
-        self.add_optimize_param(fn_name="minimize", param_name="grad_loss", important=False)
+        self._add_optimize_param(fn_name="minimize", param_name="global_step", important=False)
+        self._add_optimize_param(fn_name="minimize", param_name="var_list", important=False)
+        self._add_optimize_param(fn_name="minimize", param_name="gate_gradients", value="GATE_OP", important=False)
+        self._add_optimize_param(fn_name="minimize", param_name="aggregation_method", important=False)
+        self._add_optimize_param(fn_name="minimize", param_name="colocate_gradients_with_ops", value=False, important=False)
+        self._add_optimize_param(fn_name="minimize", param_name="name", important=False)
+        self._add_optimize_param(fn_name="minimize", param_name="grad_loss", important=False)
 
     def __get_optimize_param_obj(self, fn_name=None):
         name = fn_name if fn_name else self.optimize_function

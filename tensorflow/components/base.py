@@ -23,6 +23,9 @@ class Base(metaclass=ABCMeta):
     def get_name(self):
         return self.name
 
+    def get_class_name(self):
+        return self.__class__.__name__
+
     @staticmethod
     def _add_param_to_obj(obj: dict, name: str, value=None, desc="", important=True):
         obj[name] = {Base.ParamType.DESC: desc, Base.ParamType.VALUE: value, Base.ParamType.IMPORTANT: important}
@@ -56,6 +59,9 @@ class Base(metaclass=ABCMeta):
     def get_input(self, name):
         return self._get_param_value_from_obj(self.inputs, name)
 
+    def get_inputs(self):
+        return self.inputs
+
     def add_output(self, name: str, value=None, desc=""):
         self._add_param_to_obj(obj=self.outputs, name=name, value=value, desc=desc)
 
@@ -68,6 +74,9 @@ class Base(metaclass=ABCMeta):
     def get_output(self, name):
         return self._get_param_value_from_obj(self.outputs, name)
 
+    def get_outputs(self):
+        return self.outputs
+
     def add_param(self, name: str, value=None, desc="", important=True):
         self._add_param_to_obj(obj=self.params, name=name, value=value, desc=desc, important=important)
 
@@ -79,6 +88,9 @@ class Base(metaclass=ABCMeta):
 
     def get_param(self, name):
         return self._get_param_value_from_obj(self.params, name)
+
+    def get_params(self):
+        return self.params
 
     def get_session(self):
         return self.sess

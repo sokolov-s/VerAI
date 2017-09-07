@@ -24,23 +24,6 @@ enqueue_op_input = queue_input.enqueue([future_input, future_result])
 x, y = queue_input.dequeue()
 # x = tf.Print(x, [x], "x = ")
 # y = tf.Print(y, [y], "y = ")
-
-filenames_input = ["/home/serhii/Projects/VerAI/tensorflow/train_input.txt"]
-filenames_target = ["/home/serhii/Projects/VerAI/tensorflow/train_target.txt"]
-dataset_input = tf.contrib.data.TextLineDataset(filenames_input).repeat()
-dataset_target = tf.contrib.data.TextLineDataset(filenames_target).repeat()
-iterator_input = dataset_input.make_one_shot_iterator()
-iterator_target = dataset_target.make_one_shot_iterator()
-
-tx = iterator_input.get_next()
-# tx = tf.Print(tx, [tx], "TX : ")
-ty = iterator_target.get_next()
-# ty = tf.Print(ty, [ty], "TY : ")
-
-x = tf.Variable(0.0)
-y = tf.Variable(0.0)
-# x, y = next_el[0], next_el[1]
-
 # create model and learning model
 a1 = tf.multiply(a, x)
 a2 = tf.multiply(b, x)
@@ -67,54 +50,44 @@ sess = tf.Session()
 # with tf.Session() as sess:
 sess.run(init)
 
-# def read_db():
-    # reader = freader.ReaderFile("./input.data", ["int32", "int32"])
-    # while not coord.should_stop():
-    #     input_values, result_values = reader.readline()
-    #     if not input_values:
-    #         reader.set_position(0)
-    #         continue
-    #     sess.run(enqueue_op_input,
-    #              feed_dict={future_input: input_values, future_result: result_values})
-    # return
+
+def read_db():
+    reader = freader.ReaderFile("./input.csv", ["int32", "int32"])
+    while not coord.should_stop():
+        input_values, result_values = reader.readline()
+        if not input_values:
+            reader.set_position(0)
+            continue
+        sess.run(enqueue_op_input,
+                 feed_dict={future_input: input_values, future_result: result_values})
+    return
 
     # run threads
 # thread = Thread(target=read_db)
 # threads = [thread]
 # thread.start()
-# threads = [Thread(target=read_db)]
-# for thr in threads: thr.start()
+threads = [Thread(target=read_db)]
+for thr in threads: thr.start()
 # check the accuracy before training
-
-# sess.run(linear_model)
+sess.run(linear_model)
 
 # training loop
-for i in range(1000):
-    px = tf.string_to_number(tx)
-    py = tf.string_to_number(ty)
-    copy_px = x.assign(px)
-    copy_py = y.assign(py)
-    # x = copy_px
-    # y = copy_py
-    sess.run(copy_px)
-    sess.run(copy_py)
-    # print("i = %d" % i)
+for i in range(10000):
     sess.run(train)
+
     # stop data queue
-# coord.request_stop()
-# coord.join(threads)
+coord.request_stop()
+coord.join(threads)
 
 
-# def clear():
-#     size = sess.run(queue_input.size())
-#     for i in range(size):
-#         sess.run(queue_input.dequeue())
+def clear():
+    size = sess.run(queue_input.size())
+    for i in range(size):
+        sess.run(queue_input.dequeue())
 
-# clear()
+clear()
 print("a=%f , b=%f " % (sess.run(a), sess.run(b)))
-sess.run(x.assign(1.2))
-print(sess.run(linear_model))
-# print(sess.run([enqueue_op_input, linear_model], feed_dict={future_input: [2.0], future_result: [0.0]}))
-# print(sess.run([enqueue_op_input, linear_model], feed_dict={future_input: [3.12], future_result: [0.0]}))
-# print(sess.run([enqueue_op_input, linear_model], feed_dict={future_input: [1.0], future_result: [0.0]}))
+print(sess.run([enqueue_op_input, linear_model], feed_dict={future_input: [2.0], future_result: [0.0]}))
+print(sess.run([enqueue_op_input, linear_model], feed_dict={future_input: [3.12], future_result: [0.0]}))
+print(sess.run([enqueue_op_input, linear_model], feed_dict={future_input: [1.0], future_result: [0.0]}))
 #     # summary_writer = tf.summary.FileWriter('./', sess.graph)
