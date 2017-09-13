@@ -42,8 +42,6 @@ class ComponentLoader(metaclass=Singleton):
             instance = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(instance)
 
-            # mod = importlib.import_module(component_name)
-            # print("Test1. mod = %s" % str(mod))
             p = parse(inspect.getsource(instance))
             classes_in_module = [cls.name for cls in p.body if isinstance(cls, ClassDef)]
             for class_name in classes_in_module:

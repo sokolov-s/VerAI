@@ -79,7 +79,10 @@ class DataSetBase(object, metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
-    def get_next(self):
+    def fill_next_feed_dict(self, batch_size):
         pass
 
+    @abstractclassmethod
+    def output_placeholders(self):
+        pass
 

@@ -8,14 +8,34 @@
         "name": "name",
         "value": "dataset1",
         "important": false
+      },
+      {
+        "name": "git_link",
+        "value": "link",
+        "important": true
+      },
+      {
+        "name": "folder",
+        "value": "dataset",
+        "important": true
+      },
+      {
+        "name": "outputs_description",
+        "value": "outputs.json",
+        "important": true
+      },
+      {
+        "name": "handler",
+        "value": "dataset_handler.py",
+        "important": true
       }
     ],
     "outputs" : [
       {
-        "name" : "raw_data"
+        "name" : "image"
       },
       {
-        "name" : "target_data"
+        "name" : "label"
       }
     ]
   },

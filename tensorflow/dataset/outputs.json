@@ -1,0 +1,1 @@
+{"outputs": [{"dtype": "float32", "shape": "(1, 784)", "name": "image"}, {"dtype": "float64", "shape": "(1, 10)", "name": "label"}]}
