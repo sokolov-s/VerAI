@@ -81,10 +81,10 @@ def main():
 
 handler = DataSetHandler()
 feed_dict_result = handler.fill_next_feed_dict(1)
-outputs = handler.output_placeholders()
+outputs = handler.get_output_placeholders()
 
 x = tf.Variable(2.0, dtype=outputs["labels"].dtype)
-y = tf.multiply(x, outputs["labels"])  
+y = tf.multiply(x, outputs["labels"])
 
 init = tf.global_variables_initializer()
 sess = tf.Session()

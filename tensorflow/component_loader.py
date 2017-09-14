@@ -44,6 +44,7 @@ class ComponentLoader(metaclass=Singleton):
 
             p = parse(inspect.getsource(instance))
             classes_in_module = [cls.name for cls in p.body if isinstance(cls, ClassDef)]
+            #TODO: Do not search in cicle 
             for class_name in classes_in_module:
                 if class_name == "Base":
                     continue

@@ -1,7 +1,7 @@
 {
   "DataSetInput" : {
     "class" : "DataSet",
-    "version" : "53c00e3ace6ab0a210c551841dbf812d4589abc5",
+    "version" : "f4bc0e298b7ceb3a319ee300f4a85f9d2a5465ff",
     "component_type": "dataset", 
     "params" : [
       {
@@ -35,20 +35,54 @@
         "name" : "image"
       },
       {
-        "name" : "label"
+        "name" : "labels"
       }
     ]
   },
-  "A" : {
-    "class" : "Variable",
-    "version" : "4b035aa826a475e04fb191b1c188e2858bacbae5",
+  "ZerosW" : {
+    "class" : "Zeros",
+    "version" : "aa94522ac4e798794fd2e105c41444570e55df57",
     "inputs" : null,
     "component_type" : "model",
     "params" : [
       {
-        "name": "initial_value",
-        "value": 0.7,
+        "name": "shape",
+        "value": "[784, 10]",
         "important": true
+      },
+      {
+        "name": "dtype",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "W" : {
+    "class" : "Variable",
+    "version" : "aa94522ac4e798794fd2e105c41444570e55df57",
+    "inputs" : [
+      {
+        "name": "x",
+        "value": "ZerosW.result",
+        "important": false
+      }
+    ],
+    "component_type" : "model",
+    "params" : [
+      {
+        "name": "initial_value",
+        "value": 0,
+        "important": false
       },
       {
         "name": "trainable",
@@ -92,6 +126,34 @@
       },
       {
         "name": "import_scope",
+        "value": null,
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "ZerosB" : {
+    "class" : "Zeros",
+    "version" : "aa94522ac4e798794fd2e105c41444570e55df57",
+    "inputs" : null,
+    "component_type" : "model",
+    "params" : [
+      {
+        "name": "shape",
+        "value": "[10]",
+        "important": true
+      },
+      {
+        "name": "dtype",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "name",
         "value": null,
         "important": false
       }
@@ -104,12 +166,20 @@
   },
   "B" : {
     "class" : "Variable",
-    "version" : "4b035aa826a475e04fb191b1c188e2858bacbae5",
+    "version" : "aa94522ac4e798794fd2e105c41444570e55df57",
+    "component_type" : "model",
+    "inputs" : [
+      {
+        "name": "x",
+        "value": "ZerosB.result",
+        "important": false
+      }
+    ],
     "params" : [
       {
         "name": "initial_value",
-        "value": 0.1,
-        "important": true
+        "value": 0,
+        "important": false
       },
       {
         "name": "trainable",
@@ -163,26 +233,56 @@
       }
     ]
   },
-  "MulA" : {
-    "class" : "Multiply",
+  "MatmulXW" : {
+    "class" : "Matmul",
     "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
+    "component_type" : "model",
     "inputs" : [
       {
-        "name": "x",
-        "value": "A.result",
+        "name": "a",
+        "value": "DataSetInput.image",
         "important": true
-
       },
       {
-        "name": "y",
-        "value": "DataSetInput.train_input",
+        "name": "b",
+        "value": "W.result",
         "important": true
       }
     ],
     "params" : [
       {
+        "name": "transpose_a",
+        "value": false,
+        "important": false
+      },
+      {
+        "name": "transpose_b",
+        "value": false,
+        "important": false
+      },
+      {
+        "name": "adjoint_a",
+        "value": false,
+        "important": false
+      },
+      {
+        "name": "adjoint_b",
+        "value": false,
+        "important": false
+      },
+      {
+        "name": "a_is_sparse",
+        "value": false,
+        "important": false
+      },
+      {
+        "name": "b_is_sparse",
+        "value": false,
+        "important": false
+      },
+      {
         "name": "name",
-        "value": "mul_a",
+        "value": null,
         "important": false
       }
     ],
@@ -192,25 +292,26 @@
       }
     ]
   },
-  "MulB" : {
-    "class" : "Multiply",
+  "Y" : {
+    "class" : "Add",
     "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
+    "component_type" : "model",
     "inputs" : [
       {
         "name": "x",
-        "value" : "B.result",
+        "value" : "MatmulXW.result",
         "important": true
       },
       {
         "name": "y",
-        "value": "DataSetInput.train_input",
+        "value": "B.result",
         "important": true
       }
     ],
     "params" : [
       {
         "name": "name",
-        "value": "mul_b",
+        "value": "add",
         "important": false
       }
     ],
@@ -220,76 +321,46 @@
       }
     ]
   },
-  "MulAB" : {
-    "class" : "Multiply",
-    "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
-    "inputs" : [
-      {
-        "name": "x",
-        "value" : "MulA.result",
-        "important": true
-      },
-      {
-        "name": "y",
-        "value": "MulB.result",
-        "important": true
-      }
-    ],
-    "params" : [
-      {
-        "name": "name",
-        "value": "mul_ab",
-        "important": false
-      }
-    ],
-    "outputs" : [
-      {
-        "name": "result"
-      }
-    ]
-  },
-  "Delta" : {
-    "class" : "Subtract",
+  "Entropy" : {
+    "class" : "SoftmaxCrossEntropyWithLogits",
     "version" : "68b0f0b3698a85df7e8dae777ac3c69b21e3c751",
+    "component_type" : "train",
     "inputs" : [
       {
-        "name": "x",
-        "value" : "MulAB.result",
-        "important": true
+        "name": "labels",
+        "value" : "DataSetInput.labels",
+        "important": false
       },
       {
-        "name": "y",
-        "value": "DataSetInput.train_target",
-        "important": true
-      }
-    ],
-    "params" : [
-      {
-        "name": "name",
-        "value": "result",
+        "name": "logist",
+        "value": "Y.result",
         "important": false
       }
     ],
-    "outputs" : [
-      {
-        "name": "result"
-      }
-    ]
-  },
-  "SquareDelta" : {
-    "class" : "Square",
-    "version" : "92046892d83b5b8ac35977d41557db021df4b1b1",
-    "inputs" : [
-      {
-        "name": "x",
-        "value" : "Delta.result",
-        "important": true
-      }
-    ],
     "params" : [
       {
+        "name": "_sentinel",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "labels",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "logits",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "dim",
+        "value": -1,
+        "important": false
+      },
+      {
         "name": "name",
-        "value": "square",
+        "value": null,
         "important": false
       }
     ],
@@ -300,12 +371,13 @@
     ]
   },
   "Loss" : {
-    "class" : "ReduceSum",
+    "class" : "ReduceMean",
     "version" : "f3d6adb0d8d3642d32ef9c0f81c5027c08f2bb96",
+    "component_type" : "train",
     "inputs" : [
       {
-        "name": "x",
-        "value" : "SquareDelta.result",
+        "name": "input_tensor",
+        "value" : "Entropy.result",
         "important": true
       }
     ],
@@ -322,7 +394,7 @@
       },
       {
         "name": "name",
-        "value": "loss",
+        "value": null,
         "important": false
       },
       {
@@ -338,44 +410,13 @@
     ]
   },
   "TrainModel" : {
-    "class" : "AdamOptimizer",
+    "class" : "GradientDescentOptimizer",
     "version" : "4e49143157312d6eacf003073e004a0f44bced45",
-    "inputs" : [
-      {
-        "name": "loss",
-        "value": "Loss.result",
-        "important": true
-      },
-      {
-        "name": "iteration_count",
-        "value": 10000,
-        "important": false
-      }
-    ],
+    "component_type" : "train",
     "params" : [
       {
-        "name": "iteration_count",
-        "value": null,
-        "important": true
-      },
-      {
         "name": "learning_rate",
-        "value": 0.001,
-        "important": false
-      },
-      {
-        "name": "beta1",
-        "value": 0.9,
-        "important": false
-      },
-      {
-        "name": "beta2",
-        "value": 0.999,
-        "important": false
-      },
-      {
-        "name": "epsilon",
-        "value": 1e-08,
+        "value": 0.01,
         "important": false
       },
       {
@@ -385,12 +426,19 @@
       },
       {
         "name": "name",
-        "value": "train_model",
+        "value": "GradientDescent",
         "important": false
       }
     ],
     "optimize_function" : {
       "name" : "minimize",
+      "inputs" : [
+        {
+            "name": "learning_rate",
+            "value": "Loss.result",
+            "important": false
+        }
+      ],
       "params" : [
         {
           "name": "global_step",
@@ -429,6 +477,181 @@
         }
       ]
     },
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "ArgmaxY" : {
+    "class" : "Argmax",
+    "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
+    "component_type" : "train",
+    "inputs" : [
+      {
+        "name": "input",
+        "value" : "Y.result",
+        "important": true
+      }
+    ],
+    "params" : [
+      {
+        "name": "axis",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "dimension",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "output_type",
+        "value": "tf.int64",
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "ArgmaxLabel" : {
+    "class" : "Argmax",
+    "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
+    "component_type" : "train",
+    "inputs" : [
+      {
+        "name": "input",
+        "value" : "DataSetInput.labels",
+        "important": true
+      }
+    ],
+    "params" : [
+      {
+        "name": "axis",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "dimension",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "output_type",
+        "value": "tf.int64",
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "CorrectPrediction" : {
+    "class" : "Equal",
+    "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
+    "component_type" : "train",
+    "inputs" : [
+      {
+        "name": "x",
+        "value" : "ArgmaxY.result",
+        "important": true
+      },
+      {
+        "name": "y",
+        "value" : "ArgmaxLabel.result",
+        "important": true
+      }
+    ],
+    "params" : [
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "Cast" : {
+    "class" : "Cast",
+    "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
+    "component_type" : "train",
+    "inputs" : [
+      {
+        "name": "x",
+        "value" : "CorrectPrediction.result",
+        "important": true
+      },
+      {
+        "name": "dtype",
+        "value" : "tf.float32",
+        "important": true
+      }
+    ],
+    "params" : [
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "Accuracy" : {
+    "class" : "ReduceMean",
+    "version" : "f3d6adb0d8d3642d32ef9c0f81c5027c08f2bb96",
+    "component_type" : "train",
+    "inputs" : [
+      {
+        "name": "input_tensor",
+        "value" : "Cast.result",
+        "important": true
+      }
+    ],
+    "params" : [
+      {
+        "name": "axis",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "keep_dims",
+        "value": false,
+        "important": false
+      },
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "reduction_indices",
+        "value": null,
+        "important": false
+      }
+    ],
     "outputs" : [
       {
         "name": "result"

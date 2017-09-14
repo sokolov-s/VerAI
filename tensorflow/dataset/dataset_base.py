@@ -5,8 +5,6 @@ from abc import ABCMeta, abstractclassmethod
 import logging
 
 
-
-
 class DataSetBase(object, metaclass=ABCMeta):
     """
     Some text about class
@@ -83,6 +81,6 @@ class DataSetBase(object, metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
-    def output_placeholders(self):
+    def get_output_placeholders(self):
         pass
 

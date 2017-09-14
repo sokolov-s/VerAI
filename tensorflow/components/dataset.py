@@ -2,9 +2,9 @@
 
 import base
 import tensorflow as tf
-import sys.modules
 import importlib
-
+import sys
+import importlib.util
 
 class DataSet(base.Base):
     """
@@ -28,6 +28,8 @@ class DataSet(base.Base):
         self.add_param(self.Params.GIT_LINK, important=True)
         self.add_param(self.Params.FOLDER, important=True)
         self.add_param(self.Params.NAME, important=False)
+        self.add_param(self.Params.DESCRIPTION, important=True)
+        self.add_param(self.Params.HANDLER, important=False)
         self.handler = None
     
     def get_handler(self):
@@ -35,11 +37,20 @@ class DataSet(base.Base):
     
     # Base class interface implementation
     def init(self):
-        module = importlib.import_module(self.get_param(self.Params.FOLDER) + "." + self.get_param(self.Params.HANDLER).split(".")[0])
+        folder = self.get_param(self.Params.FOLDER)
+        handler_script_name = self.get_param(self.Params.HANDLER) 
+        component_name = handler_script_name.split(".")[0]
+        
+        sys.path.append(folder)
+        spec = importlib.util.spec_from_file_location(component_name, folder + "/" + handler_script_name)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
         instance = getattr(module, "DataSetHandler")
+        
         self.handler = instance()
-        outputs = {}
-        self.set_outputs(outputs)
+        outputs = self.handler.get_output_placeholders()
+        for key, value in outputs.items():
+            self.add_output(key, value=value)
         return outputs
 
     def run(self):

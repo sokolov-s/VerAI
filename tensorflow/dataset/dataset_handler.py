@@ -38,5 +38,5 @@ class DataSetHandler(DataSetBase):
             feed_dict[value] = outputs[key]
         return feed_dict
     
-    def output_placeholders(self):
+    def get_output_placeholders(self):
         return self.tf_outputs

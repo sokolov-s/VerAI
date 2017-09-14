@@ -17,6 +17,7 @@ def print_no_argument_and_exit():
     exit(2)
 
 def parse_argv():
+    global json_file
     try:
         if len(sys.argv) <= 1:
             print_no_argument_and_exit()
@@ -112,12 +113,14 @@ def check_dependences(json_item, created_components):
                         
 def main():
     parse_argv()
+    global json_file
+    print(json_file)
     if json_file is None or not os.path.isfile(json_file):
         print("Can't find json file")
         exit(2)
         
     js_data = load_json(json_file)
-    json_items = copy.copy(js_data.keys())
+    json_items = list(js_data.keys())
     
     modules = ComponentLoader()
     created_models = {}
