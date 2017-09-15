@@ -4,7 +4,7 @@ import base
 import tensorflow as tf
 
 
-class Square(base.Base):
+class Zeros(base.Base):
     """
     Creates a tensor with all elements set to zero.
     """
