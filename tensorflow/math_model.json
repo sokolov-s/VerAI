@@ -47,7 +47,7 @@
     "params" : [
       {
         "name": "shape",
-        "value": "[784, 10]",
+        "value": [784, 10],
         "important": true
       },
       {
@@ -144,12 +144,12 @@
     "params" : [
       {
         "name": "shape",
-        "value": "[10]",
+        "value": [10],
         "important": true
       },
       {
         "name": "dtype",
-        "value": null,
+        "value": "tf.float32",
         "important": false
       },
       {
@@ -235,7 +235,7 @@
   },
   "MatmulXW" : {
     "class" : "Matmul",
-    "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
+    "version" : "7fd05a4890fa888c498dba61da220cf045c235b6",
     "component_type" : "model",
     "inputs" : [
       {
@@ -294,7 +294,7 @@
   },
   "Y" : {
     "class" : "Add",
-    "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
+    "version" : "886525c335f905e23a67b7f63886332522e02a63",
     "component_type" : "model",
     "inputs" : [
       {
@@ -323,7 +323,7 @@
   },
   "Entropy" : {
     "class" : "SoftmaxCrossEntropyWithLogits",
-    "version" : "68b0f0b3698a85df7e8dae777ac3c69b21e3c751",
+    "version" : "eaf69a4c79c802d4ca8d23e78607cd1ba47ee983",
     "component_type" : "train",
     "inputs" : [
       {
@@ -372,7 +372,7 @@
   },
   "Loss" : {
     "class" : "ReduceMean",
-    "version" : "f3d6adb0d8d3642d32ef9c0f81c5027c08f2bb96",
+    "version" : "b67d8acd874ca3a361f46eae5da94a104323845f",
     "component_type" : "train",
     "inputs" : [
       {
@@ -411,7 +411,7 @@
   },
   "TrainModel" : {
     "class" : "GradientDescentOptimizer",
-    "version" : "4e49143157312d6eacf003073e004a0f44bced45",
+    "version" : "c776748c66dbd460ea309ba95ae749bf81b338c3",
     "component_type" : "train",
     "params" : [
       {
@@ -485,7 +485,7 @@
   },
   "ArgmaxY" : {
     "class" : "Argmax",
-    "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
+    "version" : "9eae97ef07d953218f62277b33cba8224e334f02",
     "component_type" : "train",
     "inputs" : [
       {
@@ -524,7 +524,7 @@
   },
   "ArgmaxLabel" : {
     "class" : "Argmax",
-    "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
+    "version" : "9eae97ef07d953218f62277b33cba8224e334f02",
     "component_type" : "train",
     "inputs" : [
       {
@@ -563,7 +563,7 @@
   },
   "CorrectPrediction" : {
     "class" : "Equal",
-    "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
+    "version" : "01caf7fb41e1cf8e15ddd7e7c1b8ef7771e44de8",
     "component_type" : "train",
     "inputs" : [
       {
@@ -592,7 +592,7 @@
   },
   "Cast" : {
     "class" : "Cast",
-    "version" : "1d71d4822ac7bae7b7ba75f50e7276587cc5cb9d",
+    "version" : "875a2764da00c49bcf07ab486047d3324bd43218",
     "component_type" : "train",
     "inputs" : [
       {
@@ -621,7 +621,7 @@
   },
   "Accuracy" : {
     "class" : "ReduceMean",
-    "version" : "f3d6adb0d8d3642d32ef9c0f81c5027c08f2bb96",
+    "version" : "b67d8acd874ca3a361f46eae5da94a104323845f",
     "component_type" : "train",
     "inputs" : [
       {

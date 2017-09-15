@@ -31,7 +31,10 @@ class Multiply(base.Base):
         self.add_param(self.Params.NAME, desc="A name for the operation (optional)", value=name, important=False)
 
     def init(self):
-        res = tf.multiply(self.get_input(self.Input.X), self.get_input(self.Input.Y), self.get_param(self.Params.NAME))
+        res = tf.multiply(x=self.get_input(self.Input.X), 
+                          y=self.get_input(self.Input.Y), 
+                          name=self.get_param(self.Params.NAME)
+                          )
         self.set_output(self.Output.RESULT, res)
         return {self.Output.RESULT: res}
 
