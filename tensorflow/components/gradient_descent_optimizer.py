@@ -83,8 +83,8 @@ class GradientDescentOptimizer(base.Base):
                                      grad_loss=self.get_optimize_param("grad_loss")
                                      )
 
-        self.set_output("out", res)
-        return {"out": res}
+        self.set_output(self.Output.RESULT, res)
+        return {self.Output.RESULT: res}
 
     def run(self):
         pass

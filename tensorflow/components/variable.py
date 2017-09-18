@@ -45,7 +45,7 @@ class Variable(base.Base):
         self.add_param(self.Params.NAME, desc="A name for the operation (optional)", value=name, important=False)
 
     def init(self):
-        value = self.get_input(self.Input.X) if self.get_input(self.Input.X) else self.get_param(self.Params.INIT_VALUE)
+        value = self.get_input(self.Input.X) if self.get_input(self.Input.X) is not None else self.get_param(self.Params.INIT_VALUE)
         res = tf.Variable(initial_value=value,
                           trainable=self.get_param(self.Params.TRAINABLE),
                           collections=self.get_param(self.Params.COLLECTIONS),

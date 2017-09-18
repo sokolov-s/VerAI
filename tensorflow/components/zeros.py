@@ -24,12 +24,12 @@ class Zeros(base.Base):
 
         self.add_param(self.Params.SHAPE, desc="A list of integers, a tuple of integers, or a 1-D Tensor of type int32", 
                        important=True)
-        self.add_param(self.Params.DTYPE, desc="The type of an element in the resulting Tensor", important=False)
+        self.add_param(self.Params.DTYPE, desc="The type of an element in the resulting Tensor", important=False, value="float32")
         self.add_param(self.Params.NAME, desc="A name for the operation (optional).", value=name, important=False)
 
     def init(self):
         res = tf.zeros(shape=self.get_param(self.Params.SHAPE),
-                       dtype=tf.to_dtype(self.get_param(self.Params.DTYPE)), 
+                       dtype=tf.as_dtype(self.get_param(self.Params.DTYPE)), 
                        name=self.get_param(self.Params.NAME)
                        )
         self.set_output(self.Output.RESULT, res)

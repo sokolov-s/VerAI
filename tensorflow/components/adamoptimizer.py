@@ -14,7 +14,7 @@ class AdamOptimizer(base.Base):
         self.add_input("input_tensor", desc="A tensor to optimize", important=True)
         self.add_input("iteration_count", value=0, important=False)
 
-        self.add_output("out", desc="A Tensor")
+        self.add_output("result", desc="A Tensor")
 
         self.add_param("iteration_count", value=0, important=False)
         self.add_param("learning_rate", value=0.001, important=True)
@@ -84,8 +84,8 @@ class AdamOptimizer(base.Base):
                                      grad_loss=self.get_optimize_param("grad_loss")
                                      )
 
-        self.set_output("out", res)
-        return {"out": res}
+        self.set_output("result", res)
+        return {"result": res}
 
     def run(self):
         pass

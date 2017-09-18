@@ -8,6 +8,7 @@ import copy
 from collections import OrderedDict
 from component_loader import ComponentLoader
 import tensorflow as tf
+from asyncore import read
 
 json_file = None
 
@@ -74,7 +75,6 @@ def load_json(file):
     return data
 
 def check_dependences(json_item, created_components):
-    print("Parse object %s" % json_item)
     ready_to_create = True
     dep_obj_name = ""
     dep_var_name = ""
@@ -93,23 +93,19 @@ def check_dependences(json_item, created_components):
                 for dep in dep_list:
                     obj_name = dep["obj_name"] 
                     var_name = dep["var_name"]
-                    print("Find dependence: object = %s, variable = %s" % (obj_name, var_name))
+                    print("Find for dependence: object = %s, variable = %s" % (obj_name, var_name))
                     if obj_name in created_components.keys():
-                        if var_name in created_components[obj_name].keys():
-                            ready_to_create = True
-                        else:
+                        if var_name not in created_components[obj_name].keys():
                             print("\033[91mCan't find dependence variable in object %s: %s\033[0m" %
                                   (obj_name, var_name))
-                            ready_to_create = False
                             raise Exception("\033[93mCan't find dependence variable in object %s: %s\033[0m" %
                                         (obj_name, var_name))
-                            break
+                            return False
                     else:
-                        print("\033[93mCan't find dependence: %s. %s Object creation has been postponed\033[0m" %
-                              (obj_name, item_name))
-                        ready_to_create = False
-                        break
-    return ready_to_create
+                        print("\033[93mCan't find dependence: %s.%s. Object creation has been postponed\033[0m" %
+                              (obj_name, var_name))
+                        return False
+    return True
                         
 def main():
     parse_argv()
@@ -130,10 +126,10 @@ def main():
         item_name = json_items[i]
         item = js_data[item_name]
         
+        print("Parse object %s :%s" % (item_name, item))
         ready_to_create = check_dependences(item, created_models)
-        
         if ready_to_create:
-            print("Crate object :%s" % item)
+            print("Create object %s :%s" % (item_name, item))
             new_obj = modules.get_component_instance(class_name=item["class"], version=item["version"], name=item_name,
                                                  tf_session=sess)
             if not new_obj:
@@ -148,3 +144,4 @@ def main():
         i = i + 1 if i < len(json_items) - 1 else 0
 
 main()
+print("Model has been built")

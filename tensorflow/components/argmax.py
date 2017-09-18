@@ -17,7 +17,6 @@ class Argmax(base.Base):
     class Params:
         AXIS = "axis"
         NAME = "name"
-        DIMENSION = "dimension"
         OUTPUT_TYPE = "output_type"
 
     def __init__(self, tf_session, name):
@@ -32,17 +31,15 @@ class Argmax(base.Base):
             Describes which axis of the input Tensor to reduce across. For vectors, use axis = 0"
         self.add_param(self.Params.AXIS, desc=desc, important=False)
         self.add_param(self.Params.NAME, desc="Operation argmax", value=name, important=False)
-        self.add_param(self.Params.DIMENSION, important=False)
         self.add_param(self.Params.OUTPUT_TYPE, desc="An optional tf.DType from: tf.int32, tf.int64. Defaults to tf.int64", 
                        important=False)
 
     def init(self):
-        output_type = tf.to_dtype(self.get_param(self.Params.OUTPUT_TYPE)) if self.get_param(self.Params.OUTPUT_TYPE) else tf.int64
+        output_type = tf.as_dtype(self.get_param(self.Params.OUTPUT_TYPE)) if self.get_param(self.Params.OUTPUT_TYPE) else tf.int64
         
         res = tf.argmax(input=self.get_input(self.Input.X), 
                         axis=self.get_param(self.Params.AXIS),
                         name=self.get_param(self.Params.NAME),
-                        dimension=self.get_param(self.Params.DIMENSION),
                         output_type=output_type
                         )
         self.set_output(self.Output.RESULT, res)

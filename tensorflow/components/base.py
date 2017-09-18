@@ -1,6 +1,8 @@
 #!/usr/bin/env python3.5
 
 from abc import ABCMeta, abstractmethod
+import tensorflow as tf
+from email.policy import default
 
 
 class Base(metaclass=ABCMeta):
@@ -94,7 +96,12 @@ class Base(metaclass=ABCMeta):
 
     def get_session(self):
         return self.sess
-
+    
+    @staticmethod
+    def to_tf_dtype(dtype: str, default=None):
+        res = tf.as_dtype(dtype) if dtype else default
+        return res 
+        
     @abstractmethod
     def init(self):
         pass

@@ -42,8 +42,8 @@ class Matmul(base.Base):
         self.add_param(self.Params.NAME, desc="A name for the operation (optional)", value=name, important=False)
 
     def init(self):
-        res = tf.matmul(x=self.get_input(self.Input.X),
-                        y=self.get_input(self.Input.Y),
+        res = tf.matmul(a=self.get_input(self.Input.X),
+                        b=self.get_input(self.Input.Y),
                         transpose_a=self.get_param(self.Params.TRANSPOSE_A),
                         transpose_b=self.get_param(self.Params.TRANSPOSE_B),
                         adjoint_a=self.get_param(self.Params.ADJOINT_A),
