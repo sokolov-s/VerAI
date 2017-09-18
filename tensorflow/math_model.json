@@ -41,7 +41,7 @@
   },
   "ZerosW" : {
     "class" : "Zeros",
-    "version" : "574fc9fa37ae1703c0a3b6ac49c60e1faae22ecf",
+    "version" : "25e818a90e1054cabca174b3d06db8f3496db86a",
     "inputs" : null,
     "component_type" : "model",
     "params" : [
@@ -69,7 +69,7 @@
   },
   "W" : {
     "class" : "Variable",
-    "version" : "aa94522ac4e798794fd2e105c41444570e55df57",
+    "version" : "58347d53140fccd81f8f41819fec6f1c85a851f9",
     "inputs" : [
       {
         "name": "x",
@@ -138,7 +138,7 @@
   },
   "ZerosB" : {
     "class" : "Zeros",
-    "version" : "574fc9fa37ae1703c0a3b6ac49c60e1faae22ecf",
+    "version" : "25e818a90e1054cabca174b3d06db8f3496db86a",
     "inputs" : null,
     "component_type" : "model",
     "params" : [
@@ -166,7 +166,7 @@
   },
   "B" : {
     "class" : "Variable",
-    "version" : "aa94522ac4e798794fd2e105c41444570e55df57",
+    "version" : "58347d53140fccd81f8f41819fec6f1c85a851f9",
     "component_type" : "model",
     "inputs" : [
       {
@@ -235,7 +235,7 @@
   },
   "MatmulXW" : {
     "class" : "Matmul",
-    "version" : "7fd05a4890fa888c498dba61da220cf045c235b6",
+    "version" : "df82ffe08cfd36a7bbd7c0d0cfede70de4bbc860",
     "component_type" : "model",
     "inputs" : [
       {
@@ -323,7 +323,7 @@
   },
   "Entropy" : {
     "class" : "SoftmaxCrossEntropyWithLogits",
-    "version" : "eaf69a4c79c802d4ca8d23e78607cd1ba47ee983",
+    "version" : "0948670973339564569f1f712e631501e596adcb",
     "component_type" : "train",
     "inputs" : [
       {
@@ -401,7 +401,7 @@
   },
   "TrainModel" : {
     "class" : "GradientDescentOptimizer",
-    "version" : "c776748c66dbd460ea309ba95ae749bf81b338c3",
+    "version" : "984f2f1fffdbbb2076a3f1700ed5840df953aca5",
     "component_type" : "train",
     "inputs" : [
         {
@@ -475,7 +475,7 @@
   },
   "ArgmaxY" : {
     "class" : "Argmax",
-    "version" : "9eae97ef07d953218f62277b33cba8224e334f02",
+    "version" : "d8f0f987114ee5497c5dcdb77d5202d26f4a2d2e",
     "component_type" : "train",
     "inputs" : [
       {
@@ -509,7 +509,7 @@
   },
   "ArgmaxLabel" : {
     "class" : "Argmax",
-    "version" : "9eae97ef07d953218f62277b33cba8224e334f02",
+    "version" : "d8f0f987114ee5497c5dcdb77d5202d26f4a2d2e",
     "component_type" : "train",
     "inputs" : [
       {
