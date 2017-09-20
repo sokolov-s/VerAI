@@ -1,0 +1,641 @@
+{
+  "DataSetInput" : {
+    "class" : "DataSet",
+    "version" : "0998d0a8cf67ad3804346571946e5ee295ba3a22",
+    "component_type": "dataset", 
+    "params" : [
+      {
+        "name": "name",
+        "value": "dataset1",
+        "important": false
+      },
+      {
+        "name": "git_link",
+        "value": "link",
+        "important": true
+      },
+      {
+        "name": "folder",
+        "value": "dataset",
+        "important": true
+      },
+      {
+        "name": "outputs_description",
+        "value": "outputs.json",
+        "important": true
+      },
+      {
+        "name": "handler",
+        "value": "dataset_handler.py",
+        "important": true
+      }
+    ],
+    "outputs" : [
+      {
+        "name" : "image"
+      },
+      {
+        "name" : "labels"
+      }
+    ]
+  },
+  "ZerosW" : {
+    "class" : "Zeros",
+    "version" : "25e818a90e1054cabca174b3d06db8f3496db86a",
+    "inputs" : null,
+    "component_type" : "model",
+    "params" : [
+      {
+        "name": "shape",
+        "value": [784, 10],
+        "important": true
+      },
+      {
+        "name": "dtype",
+        "value": "float32",
+        "important": false
+      },
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "W" : {
+    "class" : "Variable",
+    "version" : "58347d53140fccd81f8f41819fec6f1c85a851f9",
+    "inputs" : [
+      {
+        "name": "x",
+        "value": "ZerosW.result",
+        "important": true
+      }
+    ],
+    "component_type" : "model",
+    "params" : [
+      {
+        "name": "initial_value",
+        "value": 0,
+        "important": false
+      },
+      {
+        "name": "trainable",
+        "value": true,
+        "important": true
+      },
+      {
+        "name": "collections",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "validate_shape",
+        "value": true,
+        "important": false
+      },
+      {
+        "name": "caching_device",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "name",
+        "value": "Weight_a",
+        "important": false
+      },
+      {
+        "name": "variable_def",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "dtype",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "expected_shape",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "import_scope",
+        "value": null,
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "ZerosB" : {
+    "class" : "Zeros",
+    "version" : "25e818a90e1054cabca174b3d06db8f3496db86a",
+    "inputs" : null,
+    "component_type" : "model",
+    "params" : [
+      {
+        "name": "shape",
+        "value": [10],
+        "important": true
+      },
+      {
+        "name": "dtype",
+        "value": "float32",
+        "important": false
+      },
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "B" : {
+    "class" : "Variable",
+    "version" : "58347d53140fccd81f8f41819fec6f1c85a851f9",
+    "component_type" : "model",
+    "inputs" : [
+      {
+        "name": "x",
+        "value": "ZerosB.result",
+        "important": false
+      }
+    ],
+    "params" : [
+      {
+        "name": "initial_value",
+        "value": 0,
+        "important": false
+      },
+      {
+        "name": "trainable",
+        "value": true,
+        "important": true
+      },
+      {
+        "name": "collections",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "validate_shape",
+        "value": true,
+        "important": false
+      },
+      {
+        "name": "caching_device",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "name",
+        "value": "Weight_a",
+        "important": false
+      },
+      {
+        "name": "variable_def",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "dtype",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "expected_shape",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "import_scope",
+        "value": null,
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "MatmulXW" : {
+    "class" : "Matmul",
+    "version" : "df82ffe08cfd36a7bbd7c0d0cfede70de4bbc860",
+    "component_type" : "model",
+    "inputs" : [
+      {
+        "name": "a",
+        "value": "DataSetInput.image",
+        "important": true
+      },
+      {
+        "name": "b",
+        "value": "W.result",
+        "important": true
+      }
+    ],
+    "params" : [
+      {
+        "name": "transpose_a",
+        "value": false,
+        "important": false
+      },
+      {
+        "name": "transpose_b",
+        "value": false,
+        "important": false
+      },
+      {
+        "name": "adjoint_a",
+        "value": false,
+        "important": false
+      },
+      {
+        "name": "adjoint_b",
+        "value": false,
+        "important": false
+      },
+      {
+        "name": "a_is_sparse",
+        "value": false,
+        "important": false
+      },
+      {
+        "name": "b_is_sparse",
+        "value": false,
+        "important": false
+      },
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "Y" : {
+    "class" : "Add",
+    "version" : "886525c335f905e23a67b7f63886332522e02a63",
+    "component_type" : "model",
+    "inputs" : [
+      {
+        "name": "x",
+        "value" : "MatmulXW.result",
+        "important": true
+      },
+      {
+        "name": "y",
+        "value": "B.result",
+        "important": true
+      }
+    ],
+    "params" : [
+      {
+        "name": "name",
+        "value": "add",
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "Entropy" : {
+    "class" : "SoftmaxCrossEntropyWithLogits",
+    "version" : "0948670973339564569f1f712e631501e596adcb",
+    "component_type" : "train",
+    "inputs" : [
+      {
+        "name": "labels",
+        "value" : "DataSetInput.labels",
+        "important": true
+      },
+      {
+        "name": "logits",
+        "value": "Y.result",
+        "important": true
+      }
+    ],
+    "params" : [
+      {
+        "name": "_sentinel",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "dim",
+        "value": -1,
+        "important": false
+      },
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "Loss" : {
+    "class" : "ReduceMean",
+    "version" : "b67d8acd874ca3a361f46eae5da94a104323845f",
+    "component_type" : "train",
+    "inputs" : [
+      {
+        "name": "input_tensor",
+        "value" : "Entropy.result",
+        "important": true
+      }
+    ],
+    "params" : [
+      {
+        "name": "axis",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "keep_dims",
+        "value": false,
+        "important": false
+      },
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "reduction_indices",
+        "value": null,
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "TrainModel" : {
+    "class" : "GradientDescentOptimizer",
+    "version" : "984f2f1fffdbbb2076a3f1700ed5840df953aca5",
+    "component_type" : "train",
+    "inputs" : [
+        {
+            "name": "x",
+            "value": "Loss.result",
+            "important": true
+        }
+    ],
+    "params" : [
+      {
+        "name": "learning_rate",
+        "value": 0.5,
+        "important": false
+      },
+      {
+        "name": "use_locking",
+        "value": false,
+        "important": false
+      },
+      {
+        "name": "name",
+        "value": "GradientDescent",
+        "important": false
+      }
+    ],
+    "optimize_function" : {
+      "name" : "minimize",
+      "params" : [
+        {
+          "name": "global_step",
+          "value": null,
+          "important": false
+        },
+        {
+          "name": "var_list",
+          "value": null,
+          "important": false
+        },
+        {
+          "name": "gate_gradients",
+          "value": "GATE_OP",
+          "important": false
+        },
+        {
+          "name": "aggregation_method",
+          "value": null,
+          "important": false
+        },
+        {
+          "name": "colocate_gradients_with_ops",
+          "value": false,
+          "important": false
+        },
+        {
+          "name": "name",
+          "value": null,
+          "important": false
+        },
+        {
+          "name": "grad_loss",
+          "value": null,
+          "important": false
+        }
+      ]
+    },
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "ArgmaxY" : {
+    "class" : "Argmax",
+    "version" : "d8f0f987114ee5497c5dcdb77d5202d26f4a2d2e",
+    "component_type" : "test",
+    "inputs" : [
+      {
+        "name": "input",
+        "value" : "Y.result",
+        "important": true
+      }
+    ],
+    "params" : [
+      {
+        "name": "axis",
+        "value": 1,
+        "important": false
+      },
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "output_type",
+        "value": "int64",
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "ArgmaxLabel" : {
+    "class" : "Argmax",
+    "version" : "d8f0f987114ee5497c5dcdb77d5202d26f4a2d2e",
+    "component_type" : "test",
+    "inputs" : [
+      {
+        "name": "input",
+        "value" : "DataSetInput.labels",
+        "important": true
+      }
+    ],
+    "params" : [
+      {
+        "name": "axis",
+        "value": 1,
+        "important": false
+      },
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "output_type",
+        "value": "int64",
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "CorrectPrediction" : {
+    "class" : "Equal",
+    "version" : "01caf7fb41e1cf8e15ddd7e7c1b8ef7771e44de8",
+    "component_type" : "test",
+    "inputs" : [
+      {
+        "name": "x",
+        "value" : "ArgmaxY.result",
+        "important": true
+      },
+      {
+        "name": "y",
+        "value" : "ArgmaxLabel.result",
+        "important": true
+      }
+    ],
+    "params" : [
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "Cast" : {
+    "class" : "Cast",
+    "version" : "875a2764da00c49bcf07ab486047d3324bd43218",
+    "component_type" : "test",
+    "inputs" : [
+      {
+        "name": "x",
+        "value" : "CorrectPrediction.result",
+        "important": true
+      }
+    ],
+    "params" : [
+      {
+        "name": "dtype",
+        "value" : "float32",
+        "important": true
+      },
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  },
+  "Accuracy" : {
+    "class" : "ReduceMean",
+    "version" : "b67d8acd874ca3a361f46eae5da94a104323845f",
+    "component_type" : "test",
+    "inputs" : [
+      {
+        "name": "input_tensor",
+        "value" : "Cast.result",
+        "important": true
+      }
+    ],
+    "params" : [
+      {
+        "name": "axis",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "keep_dims",
+        "value": false,
+        "important": false
+      },
+      {
+        "name": "name",
+        "value": null,
+        "important": false
+      },
+      {
+        "name": "reduction_indices",
+        "value": null,
+        "important": false
+      }
+    ],
+    "outputs" : [
+      {
+        "name": "result"
+      }
+    ]
+  }
+}
