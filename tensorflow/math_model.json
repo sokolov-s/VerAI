@@ -413,7 +413,7 @@
     "params" : [
       {
         "name": "learning_rate",
-        "value": 0.01,
+        "value": 0.5,
         "important": false
       },
       {
@@ -476,7 +476,7 @@
   "ArgmaxY" : {
     "class" : "Argmax",
     "version" : "d8f0f987114ee5497c5dcdb77d5202d26f4a2d2e",
-    "component_type" : "train",
+    "component_type" : "test",
     "inputs" : [
       {
         "name": "input",
@@ -487,7 +487,7 @@
     "params" : [
       {
         "name": "axis",
-        "value": null,
+        "value": 1,
         "important": false
       },
       {
@@ -510,7 +510,7 @@
   "ArgmaxLabel" : {
     "class" : "Argmax",
     "version" : "d8f0f987114ee5497c5dcdb77d5202d26f4a2d2e",
-    "component_type" : "train",
+    "component_type" : "test",
     "inputs" : [
       {
         "name": "input",
@@ -521,7 +521,7 @@
     "params" : [
       {
         "name": "axis",
-        "value": null,
+        "value": 1,
         "important": false
       },
       {
@@ -544,7 +544,7 @@
   "CorrectPrediction" : {
     "class" : "Equal",
     "version" : "01caf7fb41e1cf8e15ddd7e7c1b8ef7771e44de8",
-    "component_type" : "train",
+    "component_type" : "test",
     "inputs" : [
       {
         "name": "x",
@@ -573,7 +573,7 @@
   "Cast" : {
     "class" : "Cast",
     "version" : "875a2764da00c49bcf07ab486047d3324bd43218",
-    "component_type" : "train",
+    "component_type" : "test",
     "inputs" : [
       {
         "name": "x",
@@ -602,7 +602,7 @@
   "Accuracy" : {
     "class" : "ReduceMean",
     "version" : "b67d8acd874ca3a361f46eae5da94a104323845f",
-    "component_type" : "train",
+    "component_type" : "test",
     "inputs" : [
       {
         "name": "input_tensor",
